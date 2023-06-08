@@ -50,6 +50,17 @@ class Gnome_Database:
                         '''
                          , (username, password))
         self.connect.commit()
+    
+    def delete_user(self, username):
+        self.cursor.execute("DELETE FROM user WHERE username = ?", (username,))
+        row_count = self.cursor.rowcount
+
+        if row_count > 0:
+            print("Delete successful. Rows affected:", row_count)
+        else:
+            print("No rows deleted. The username may not exist or match any records.")
+
+        self.connect.commit()
 
 
 jatek = Gnome_Database()
