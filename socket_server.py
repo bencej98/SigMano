@@ -13,30 +13,30 @@ class Message:
 
 
 class Connection:
-    def __init__(self, socket: socket.socket) -> None:
+    def __init__(self, sock: socket.socket) -> None:
         self.incoming_queue = queue.Queue()
-        self.socket = socket
+        self.sock = sock
         self.name = None
         self.thread = threading.Thread(target=self.incoming_traffic_manager, daemon=True)
         self.thread.start()
 
     def is_alive(self):
-        return self.socket is not None
+        return self.sock is not None
     
     def close(self):
         if self.is_alive():
             try:
-                self.socket.getpeername()
+                self.sock.getpeername()
                 print(f"Closing connection from {self.name}")
             except OSError:
                 print(f"Closed connection by {self.name}.")
-            self.socket.close()
-            self.socket = None
+            self.sock.close()
+            self.sock = None
     
     def incoming_traffic_manager(self):
         while self.is_alive():
             try:
-                data = self.socket.recv(1024)
+                data = self.sock.recv(1024)
             except ConnectionResetError:
                 break
             if not data:
@@ -46,7 +46,7 @@ class Connection:
                     incoming_data = json.loads(data.decode("utf-8"))
                     print(incoming_data)
                 except json.decoder.JSONDecodeError:
-                    remote = self.socket.getpeername()
+                    remote = self.sock.getpeername()
                     print(f"Invalid payload from {remote[0]}:{remote[1]}")
                 else:
                     self.incoming_queue.put(incoming_data)
@@ -56,7 +56,7 @@ class Connection:
     def outgoing_traffic_manager(self, data):  
         if self.is_alive():
             try:
-                self.socket.send(json.dumps(data).encode("utf-8"))
+                self.sock.send(json.dumps(data).encode("utf-8"))
             except ConnectionResetError:
                 self.close()
 
