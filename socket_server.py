@@ -3,7 +3,6 @@ import json
 import time
 import socket
 import threading
-# import subprocess
 
 
 class Message:
@@ -94,50 +93,47 @@ class Gameserver:
         return new_messages
     
     def process_data(self):
-
         new_messages = self.check_incoming_messages()
         self.check_connections_liveness()
         for connection_id in new_messages:
             curr_msg = new_messages[connection_id]
-            # print(curr_msg.msg)
-            # curr_connection = self.connections[connection_id]
-
             if curr_msg.type:
-
                 if curr_msg.type == "Action":
-
-                    self.broadcast_message(100)  # Send code 100 for Action type
-
+                    self.broadcast_message(
+                        {'Type': 'Action', 'Payload': {'1': 'hit', '2': 'defend'}})
                 elif curr_msg.type == "Registration":
-
-                    self.broadcast_message(200)  # Send code 200 for Registration type
-
+                    self.broadcast_message({
+                        "Type": "Registration",
+                        "Payload": {
+                            "username": "xy",
+                            "password": "xy"
+                        }
+                    })  
                 elif curr_msg.type == "Closed":
                     self.connections[connection_id].close()
-                    # self.broadcast_message(300)  # Send code 300 for Closed type
-
                 elif curr_msg.type == "Position":
-
-                    self.broadcast_message(400)  # Send code 400 for Position type
-
+                    self.broadcast_message({
+                        "Type": "Position",
+                        "Payload": {
+                            "User": ['x', 'y']
+                        }
+                    })
                 elif curr_msg.type == "Event":
-
-                    self.broadcast_message(500)  # Send code 500 for Event type
-
+                    self.broadcast_message({
+                        "Type": "Event",
+                        "Payload": {
+                            "happening": "msg",
+                            "outcome": "msg"
+                        }
+                    }) 
                 else:
-
                     self.broadcast_message(800)  # Send code 999 for unknown type
-
             else:
-
                 self.broadcast_message(999)  # Send code 999 for missing type
 
-
     def broadcast_message(self, data):
-
         for connection_id in self.connections:
             self.connections[connection_id].outgoing_traffic_manager(data)
-
 
     def check_connections_liveness(self):
         conns_to_del = []
