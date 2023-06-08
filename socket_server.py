@@ -1,0 +1,157 @@
+import queue
+import json
+import time
+import socket
+import threading
+# import subprocess
+
+
+class Message:
+    def __init__(self, type, payload) -> None:
+        self.type = type
+        self.payload = payload
+
+
+class Connection:
+    def __init__(self, socket: socket.socket) -> None:
+        self.incoming_queue = queue.Queue()
+        self.socket = socket
+        self.name = None
+        self.thread = threading.Thread(target=self.incoming_traffic_manager, daemon=True)
+        self.thread.start()
+
+    def is_alive(self):
+        return self.socket is not None
+    
+    def close(self):
+        if self.is_alive():
+            try:
+                self.socket.getpeername()
+                print(f"Closing connection from {self.name}")
+            except OSError:
+                print(f"Closed connection by {self.name}.")
+            self.socket.close()
+            self.socket = None
+    
+    def incoming_traffic_manager(self):
+        while self.is_alive():
+            try:
+                data = self.socket.recv(1024)
+            except ConnectionResetError:
+                break
+            if not data:
+                break
+            else:
+                try:
+                    incoming_data = json.loads(data.decode("utf-8"))
+                    print(incoming_data)
+                except json.decoder.JSONDecodeError:
+                    remote = self.socket.getpeername()
+                    print(f"Invalid payload from {remote[0]}:{remote[1]}")
+                else:
+                    self.incoming_queue.put(incoming_data)
+            time.sleep(0.001)
+        self.close()
+
+    def outgoing_traffic_manager(self, data):  
+        if self.is_alive():
+            try:
+                self.socket.send(json.dumps(data).encode("utf-8"))
+            except ConnectionResetError:
+                self.close()
+
+class Gameserver:
+    def __init__(self, ip="0.0.0.0", port=10000) -> None:
+        self.messages = []
+        self.server_socket = socket.socket(
+            socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.bind((ip, port))
+        self.server_socket.listen()
+        self.connections = {}
+        self.connections_lock = threading.Lock()
+        self.incoming_connections_thread = threading.Thread(
+            target=self.new_connection, daemon=True)
+        self.incoming_connections_thread.start()
+    
+    def new_connection(self):
+        while True:
+            sock, addr = self.server_socket.accept()
+            print(f"Connected by {addr}")
+            connection_id = f"{addr[0]}:{addr[1]}"
+            connection = Connection(sock)
+            with self.connections_lock:
+                self.connections[connection_id] = connection
+            time.sleep(0.001)
+
+    def check_incoming_messages(self):
+        new_messages = {}
+        for connection_id in self.connections:
+            conn_queue = self.connections[connection_id].incoming_queue
+            if not conn_queue.empty():
+                msg = conn_queue.get()
+                msg_obj = Message(msg["Type"], msg["Payload"])
+                new_messages[connection_id] = msg_obj
+        return new_messages
+    
+    def process_data(self):
+
+        new_messages = self.check_incoming_messages()
+        self.check_connections_liveness()
+        for connection_id in new_messages:
+            curr_msg = new_messages[connection_id]
+            # print(curr_msg.msg)
+            # curr_connection = self.connections[connection_id]
+
+            if curr_msg.type:
+
+                if curr_msg.type == "Action":
+
+                    self.broadcast_message(100)  # Send code 100 for Action type
+
+                elif curr_msg.type == "Registration":
+
+                    self.broadcast_message(200)  # Send code 200 for Registration type
+
+                elif curr_msg.type == "Closed":
+                    self.connections[connection_id].close()
+                    # self.broadcast_message(300)  # Send code 300 for Closed type
+
+                elif curr_msg.type == "Position":
+
+                    self.broadcast_message(400)  # Send code 400 for Position type
+
+                elif curr_msg.type == "Event":
+
+                    self.broadcast_message(500)  # Send code 500 for Event type
+
+                else:
+
+                    self.broadcast_message(800)  # Send code 999 for unknown type
+
+            else:
+
+                self.broadcast_message(999)  # Send code 999 for missing type
+
+
+    def broadcast_message(self, data):
+
+        for connection_id in self.connections:
+            self.connections[connection_id].outgoing_traffic_manager(data)
+
+
+    def check_connections_liveness(self):
+        conns_to_del = []
+        for connection_id in self.connections:
+            if not self.connections[connection_id].is_alive():
+                conns_to_del.append(connection_id)
+        for id in conns_to_del:
+            self.connections.pop(id)
+
+def main():
+        server = Gameserver()
+        while True:
+            server.process_data()
+            time.sleep(0.001)
+
+if __name__ == "__main__":
+    main()
