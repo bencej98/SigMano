@@ -21,6 +21,7 @@ class ClientConnection:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
                 client_socket.connect((HOST, PORT))
 
+                #TODO:switch on authentication
                 # self.send_message(client_socket, self.init_message)
                 # is_authenticated = False
                 # while not is_authenticated:
