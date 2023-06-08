@@ -42,6 +42,12 @@
 	"Payload": {}
 }
 ```
+```json
+{
+	"Type": "Auth","Payload": {"username": "xy","password": "xy"}
+}
+```
+
 
 ### Server-Client communicaton
 - The JSON convention should be as follows during client-server communication:
@@ -60,5 +66,11 @@
 		"happening": "msg",
 		"outcome": "msg"
 	}
+}
+```
+
+```json
+{
+	"Type": "Auth","Payload": true // false
 }
 ```
