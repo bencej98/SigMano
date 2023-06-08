@@ -1,10 +1,10 @@
 # SigMano Requirements
 
-## Server requiremenets
+## Server Requirements
 
-## Client requiremenets
+## Client Requirements
 
-## Database requirements
+## Database Requirements
 
 - If there is no database behind the server, the server should create one upon the first launch.
 - Players should be authenticated using the database.
