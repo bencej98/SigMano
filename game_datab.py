@@ -14,18 +14,19 @@ class Gnome_Database:
     def create_table(self):
         '''Creates the database'''
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS "user" (
-                "ID" INTEGER NOT NULL,
+                "id" INTEGER NOT NULL,
                 "username" TEXT UNIQUE,
                 "password" TEXT,
                 "gnome" TEXT UNIQUE,
                 "sumscore" INTEGER,
-                PRIMARY KEY("ID" AUTOINCREMENT)
+                PRIMARY KEY("id" AUTOINCREMENT)
             )''')
         
         self.cursor.execute(
             '''
             CREATE TABLE IF NOT EXISTS "match" (
-            "id"	INTEGER NOT NULL,
+            "match_id"	INTEGER NOT NULL,
+            "user_id"	INTEGER NOT NULL,
             "kill_count"	INTEGER,
             "score"	INTEGER,
             "date" DATETIME DEFAULT CURRENT_TIMESTAMP,
