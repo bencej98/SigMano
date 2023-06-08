@@ -21,6 +21,17 @@ class Gnome_Database:
                 "sumscore" INTEGER,
                 PRIMARY KEY("ID" AUTOINCREMENT)
             )''')
+        
+        self.cursor.execute(
+            '''
+            CREATE TABLE IF NOT EXISTS "match" (
+            "id"	INTEGER NOT NULL,
+            "kill_count"	INTEGER,
+            "score"	INTEGER,
+            "date" DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY("id" AUTOINCREMENT)
+            )'''
+        )
         self.connect.commit()
         # self.connect.close()
         print("")
