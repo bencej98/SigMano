@@ -3,10 +3,13 @@ import os.path
 from datetime import datetime
 
 class Gnome_Database:
-    path = f"game_database_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.db"
+    # path = f"game_database_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.db"
+    path = f"game_database.db"
 
     def __init__(self) -> None:
-        pass
+        self.connect = sqlite3.connect(self.path)
+        self.cursor = self.connect.cursor()
+        self.create_table()
 
     def create_table(self):
         '''Creates the database'''
@@ -18,12 +21,15 @@ class Gnome_Database:
                 "sumscore" INTEGER,
                 PRIMARY KEY("ID" AUTOINCREMENT)
             )''')
-        self.conn.commit()
+        self.connect.commit()
+        # self.connect.close()
         print("")
-
-    def create_time_stamp(self):
-        current_time = datetime.now().strftime("%Y-%m-%d-%H-%M")
-        return current_time
         
+    def close_connection(self):
+        '''Closes the database connection'''
+        self.cursor.close()
+        self.connect.close()
 
-
+jatek = Gnome_Database()
+jatek.create_table()
+jatek.close_connection()
