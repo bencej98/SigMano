@@ -147,7 +147,8 @@ class Incomming:
                 print(f"FROM SERVER: {new_message.__dict__}")
 
         except Exception as e:
-            print("EXCEPTION", e)
+            #print("EXCEPTION", e)
+            pass
 
     def parse_incoming(self, data):
         return json.loads(data.decode("utf-8"))
