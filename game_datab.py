@@ -25,7 +25,7 @@ class Gnome_Database:
             '''
             CREATE TABLE IF NOT EXISTS "match" (
             "match_id"	INTEGER NOT NULL,
-            "user_id"	INTEGER NOT NULL,
+            "username"	TEXT,
             "kill_count"	INTEGER,
             "score"	INTEGER,
             "date" DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -43,9 +43,9 @@ class Gnome_Database:
         '''Inserts user into database'''
         self.cursor.execute('''
                         INSERT INTO user
-                        VALUES(?, ?)
+                        VALUES(?, ?, ?, ?, ?)
                         '''
-                         , (username, password))
+                         , (None, username, password, None, None))
         self.connect.commit()
     
     def delete_user(self, username):
@@ -67,16 +67,18 @@ class Gnome_Database:
                          , (username,))
         print(f"TEST user's score: {self.cursor.fetchone()[0]}")
 
-    
+    def add_results_upon_death(self, username, kill_count, score):
+        self.cursor.execute('''
+                            INSERT INTO match
+                            VALUES (?, ?, ?, ?, ?)
+        '''
+        , (None, username, kill_count, score, None))
+        self.connect.commit()
+
+
 
 jatek = Gnome_Database()
 jatek.create_table()
 jatek.close_connection()
 
 
-# '''
-# SELECT score
-# FROM match
-# INNER JOIN user
-# ON user.id = match.user_id
-# '''
