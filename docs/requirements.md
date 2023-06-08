@@ -42,6 +42,7 @@
 	"Payload": {}
 }
 ```
+
 ```json
 {
 	"Type": "Auth","Payload": {"username": "xy","password": "xy"}
