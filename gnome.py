@@ -6,6 +6,7 @@ class Gnome:
         self.user = user
         self.location = {}
         self.strategy = []
+        self.event_counter = 0
         self.actual_points = 0
         self.kill_count = 0
 
@@ -72,11 +73,13 @@ gnome2 = Gnome("lol2", "loluser2")
 
 map = Map(20, 20)
 map.add_gnome_to_active_gnomes(gnome1, gnome2)
-for gnome_name, gnome in map.active_gnomes.items():
-    print(gnome_name, gnome.location["x"], gnome.location["y"])
-    for valami in range(20):
-        gnome.random_move(map)
+
+if __name__ == "__main__":
+    for gnome_name, gnome in map.active_gnomes.items():
         print(gnome_name, gnome.location["x"], gnome.location["y"])
+        for valami in range(20):
+            gnome.random_move(map)
+            print(gnome_name, gnome.location["x"], gnome.location["y"])
 
 
 
