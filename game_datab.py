@@ -62,6 +62,13 @@ class Gnome_Database:
 
         self.connect.commit()
 
+    def print_sum_point(self, username):
+        self.cursor.execute('''
+                        SELECT sumscore FROM user
+                        WHERE username = ?
+                        '''
+                         , (username,))
+        print(f"TEST user's score: {self.cursor.fetchone()[0]}")
 
 jatek = Gnome_Database()
 jatek.create_table()
