@@ -15,44 +15,49 @@ class ClientConnection:
         self.connect_to_server(host, port)
 
     def connect_to_server(self, HOST, PORT):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-            client_socket.connect((HOST, PORT))
 
-            #self.send_message(client_socket, self.init_message)
+        try: 
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+                client_socket.connect((HOST, PORT))
 
-            incomming_messages=threading.Thread(target=self.incomming.accept_incoming, args=(client_socket,))
-            incomming_messages.start()
+                #self.send_message(client_socket, self.init_message)
 
-            while True:
-                print("ACTIONS:")
-                for index, actions_text in enumerate(self.action_types):
-                    print(f"{index}:{actions_text}")
+                incomming_messages=threading.Thread(target=self.incomming.accept_incoming, args=(client_socket,))
+                incomming_messages.start()
 
-                choosen = input("\nKüldöm üzenet:")
-                try: 
-                    selected_number = int(choosen)
+                while True:
+                    print("ACTIONS:")
+                    for index, actions_text in enumerate(self.action_types):
+                        print(f"{index}:{actions_text}")
 
-                except ValueError:
-                    print("Számot kérek!")
-                    continue       
+                    choosen = input("\nKüldöm üzenet:")
+                    try: 
+                        selected_number = int(choosen)
 
-                if selected_number <0 or selected_number >= len(self.action_types):
-                    print("A listából válassz!")
-                    continue
+                    except ValueError:
+                        print("Számot kérek!")
+                        continue       
 
-                action = self.action_types[selected_number]
+                    if selected_number <0 or selected_number >= len(self.action_types):
+                        print("A listából válassz!")
+                        continue
 
-                match action:
-                    case "Action":
-                        test_action = {"1": "hit","2": "defend"}
-                        self.send_message(client_socket, self.outgoing.action_message(test_action))
-                        
-                    case "Registration":
-                        test_user_name =  {"username": "xy","password": "xy"}
-                        self.send_message(client_socket, self.outgoing.registration_message(test_user_name))
-                        
-                    case "Closed":
-                        self.send_message(client_socket,self.outgoing.close_message())
+                    action = self.action_types[selected_number]
+
+                    match action:
+                        case "Action":
+                            test_action = {"1": "hit","2": "defend"}
+                            self.send_message(client_socket, self.outgoing.action_message(test_action))
+                            
+                        case "Registration":
+                            test_user_name =  {"username": "xy","password": "xy"}
+                            self.send_message(client_socket, self.outgoing.registration_message(test_user_name))
+                            
+                        case "Closed":
+                            self.send_message(client_socket,self.outgoing.close_message())
+                            
+        except Exception as e:
+            print("[Something went wrong]")
 
     def send_message(self,client_socket, message):
         client_socket.sendall(json.dumps(message).encode("utf-8"))
