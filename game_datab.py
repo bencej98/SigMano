@@ -3,7 +3,6 @@ import os.path
 from datetime import datetime
 
 class Gnome_Database:
-    # path = f"game_database_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.db"
     path = "game_database.db"
 
     def __init__(self) -> None:
@@ -34,8 +33,6 @@ class Gnome_Database:
             )'''
         )
         self.connect.commit()
-        # self.connect.close()
-        print("")
         
     def close_connection(self):
         '''Closes the database connection'''
@@ -70,9 +67,12 @@ class Gnome_Database:
                          , (username,))
         print(f"TEST user's score: {self.cursor.fetchone()[0]}")
 
+    
+
 jatek = Gnome_Database()
 jatek.create_table()
 jatek.close_connection()
+
 
 # '''
 # SELECT score
