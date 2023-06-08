@@ -6,9 +6,7 @@ class Gnome:
         self.user = user
         self.location = {}
         self.strategy = []
-        self.health = 10
-        self.attack = 3
-        self.defense = 2
+        self.actual_points = 0
 
     def spawn_gnome(self, map):
         self.location["x"] = random.randint(0, map.x_coordinate)
