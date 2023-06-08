@@ -4,7 +4,7 @@ from datetime import datetime
 
 class Gnome_Database:
     # path = f"game_database_{datetime.now().strftime('%Y-%m-%d-%H-%M')}.db"
-    path = f"game_database.db"
+    path = "game_database.db"
 
     def __init__(self) -> None:
         self.connect = sqlite3.connect(self.path)
@@ -30,7 +30,7 @@ class Gnome_Database:
             "kill_count"	INTEGER,
             "score"	INTEGER,
             "date" DATETIME DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY("id" AUTOINCREMENT)
+            PRIMARY KEY("match_id" AUTOINCREMENT)
             )'''
         )
         self.connect.commit()
@@ -42,6 +42,23 @@ class Gnome_Database:
         self.cursor.close()
         self.connect.close()
 
+    def create_user(self, username, password):
+        '''Inserts user into database'''
+        self.cursor.execute('''
+                        INSERT INTO user
+                        VALUES(?, ?)
+                        '''
+                         , (username, password))
+        self.connect.commit()
+
+
 jatek = Gnome_Database()
 jatek.create_table()
 jatek.close_connection()
+
+# '''
+# SELECT score
+# FROM match
+# INNER JOIN user
+# ON user.id = match.user_id
+# '''
