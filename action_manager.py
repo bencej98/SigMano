@@ -20,17 +20,20 @@ class ActionManager:
                 self.gnome_first.kill_count += 1
                 self.gnome_second.actual_points -= 1
             case _:
-                print("tie")
-        self.gnome_first.event_counter += 1
-        self.gnome_second.event_counter += 1
+                print("tie") 
+        self.gnome_first.increase_event_counter()
+        self.gnome_second.increase_event_counter()
 
-gnome1 = Gnome("a", "a")
-gnome2 = Gnome("b", "b")
-list1 = ["stone", "stone", "stone", "stone", "scissor", "paper","paper", "paper","scissor","paper"]
-list2 = ["paper","scissor", "stone","scissor","paper","stone", "stone", "stone", "stone", "stone"]
-gnome1.strategy = list1
-gnome2.strategy = list2
-manager=ActionManager(gnome1, gnome2)
-for i in range(10):
-    manager.fight()
+
+if __name__ == "__main__":
+
+    gnome1 = Gnome("a", "a")
+    gnome2 = Gnome("b", "b")
+    list1 = ["stone", "stone", "stone", "stone", "scissor", "paper","paper", "paper","scissor","paper"]
+    list2 = ["paper","scissor", "stone","scissor","paper","stone", "stone", "stone", "stone", "stone"]
+    gnome1.strategy = list1
+    gnome2.strategy = list2
+    manager=ActionManager(gnome1, gnome2)
+    for i in range(15):
+        manager.fight()
 

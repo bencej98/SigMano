@@ -55,6 +55,12 @@ class Gnome:
         if map.x_coordinate >= coord["x"] >= 0 and map.y_coordinate >= coord["y"] >= 0:
             return True
         return False
+    
+    def increase_event_counter(self):
+        if self.event_counter < 9:
+            self.event_counter += 1
+        else:
+            self.event_counter = 0
 
 
 class Map:
