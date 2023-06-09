@@ -35,13 +35,6 @@ tile_number = 20
 def x_y_for_screen(coordinate:int):
    return tile_size*(coordinate-9.5)
 
-# TODO: Flexible window later
-
-turtle.setup(tile_size*tile_number, tile_size*tile_number, None, None)
-window = turtle.Screen()
-window.title("Arena")
-window.bgcolor("lightgreen")
-
 def create_object(object_name:str, coordinates:list):
    x = x_y_for_screen(coordinates[0])
    y = x_y_for_screen(coordinates[1])
@@ -100,4 +93,13 @@ def temp_valami():
 
 
 def start_loop():
+   # TODO: Flexible window later
+   turtle.setup(tile_size*tile_number, tile_size*tile_number, None, None)
+   window = turtle.Screen()
+   window.title("Arena")
+   window.bgcolor("lightgreen")
+   temp_valami()
    window.mainloop()
+
+if __name__ == "__main__":
+   start_loop()
