@@ -1,5 +1,6 @@
 import random
 
+
 class Gnome:
     def __init__(self, name, user) -> None:
         self.name = name
@@ -102,7 +103,14 @@ class Map:
                 collided_gnomes.append(gnomes)
         return collided_gnomes
 
-
+    def move_all_gnomes(self):
+        position_update_dict = {}
+        for gnome_name, gnome in self.active_gnomes.items():
+            gnome.random_move(self)
+            position = (gnome.location["x"], gnome.location["y"])
+            position_update_dict[gnome.user] = position
+        position_update_for_client = {"type": "position", "payload": position_update_dict}
+        return position_update_for_client
 #function check
 if __name__ == "__main__":
     gnome1 = Gnome("lol", "loluser")
@@ -117,6 +125,6 @@ if __name__ == "__main__":
         for valami in range(20):
             gnome.random_move(map)
             print(gnome_name, gnome.location["x"], gnome.location["y"])
-
-
+    position_dict = map.move_all_gnomes()
+    print(position_dict)
 
