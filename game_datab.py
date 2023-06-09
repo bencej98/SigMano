@@ -136,7 +136,7 @@ class Gnome_Database:
             )
 
             self.connect.commit()
-            logging.info("Sum score updated for user: %s. New sum score: %s", username, score)
+            logging.info("Sum score updated for user: %s", username)
         except sqlite3.Error as e:
             error_msg = "Error updating sum score: %s" % str(e)
             logging.error(error_msg)
