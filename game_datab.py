@@ -28,7 +28,7 @@ class Gnome_Database:
             "username"	TEXT,
             "kill_count"	INTEGER,
             "score"	INTEGER,
-            "date" DATETIME DEFAULT CURRENT_TIMESTAMP,
+            "date" TEXT NOT NULL,
             PRIMARY KEY("match_id" AUTOINCREMENT)
             )'''
         )
@@ -68,11 +68,12 @@ class Gnome_Database:
         print(f"TEST user's score: {self.cursor.fetchone()[0]}")
 
     def add_results_upon_death(self, username, kill_count, score):
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.cursor.execute('''
                             INSERT INTO match
                             VALUES (?, ?, ?, ?, ?)
         '''
-        , (None, username, kill_count, score, None))
+        , (None, username, kill_count, score, current_time))
         self.connect.commit()
 
 
@@ -80,5 +81,3 @@ class Gnome_Database:
 jatek = Gnome_Database()
 jatek.create_table()
 jatek.close_connection()
-
-
