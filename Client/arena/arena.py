@@ -3,10 +3,11 @@ import time
 import random
 
 class Player(turtle.Turtle):
-   def __init__(self, name:str, x:int, y:int, color:str, size:float):
+   def __init__(self, name:str, x:int, y:int, color:str, size:float, speed:int):
       super().__init__()
       self.penup()
       self.name = name
+      self.speed(speed)
       self.goto(x, y)
       self.color(color)
       self.size = size
@@ -16,6 +17,7 @@ class Player(turtle.Turtle):
       self.name1.color(color)
       self.name1.hideturtle()
       self.name1.penup()
+      self.name1.speed(speed)
       self.name1.goto(x, y+10*size)
       self.name1.write(name, False, "center")
 
@@ -43,7 +45,7 @@ window.bgcolor("lightgreen")
 def create_object(object_name:str, coordinates:list):
    x = x_y_for_screen(coordinates[0])
    y = x_y_for_screen(coordinates[1])
-   obj = Player(object_name, x, y, "black", tile_size/60)
+   obj = Player(object_name, x, y, "black", tile_size/60, 2)
    return obj
 
 def get_obj_from_list(name:str,object_list:list):
@@ -51,11 +53,30 @@ def get_obj_from_list(name:str,object_list:list):
       if i.name == name:
          return i
 
-def dict_data_for_screen(jason_dict:dict, object_list:list):
+def obj_names_from_list(obj_list:list) -> list:
    obj_names = []
-   for i in object_list:
+   for i in obj_list:
       obj_names.append(i.name)
-   for name, coordinates in jason_dict.items():
+   return obj_names
+
+def remove_obj_from_list(obj_list:list, json_dict:dict):
+   names_from_json = []
+   removable_objects = []
+   for name in json_dict.keys():
+      names_from_json.append(name)
+   for obj in obj_list:
+      if obj.name not in names_from_json:
+         removable_objects.append(obj)
+   for obj in removable_objects:
+      obj_list.remove(obj)
+      obj.color("lightgreen")
+      obj.name1.clear()
+      del obj
+
+def dict_data_for_screen(json_dict:dict, object_list:list):
+   obj_names = obj_names_from_list(object_list)
+   remove_obj_from_list(object_list,json_dict)
+   for name, coordinates in json_dict.items():
       if name in obj_names:
          obj = get_obj_from_list(name, object_list)
          obj.move(coordinates[0], coordinates[1])
@@ -68,11 +89,12 @@ object_list = []
 for i in range(10):
    x = random.randint(0,19)
    y = random.randint(0,19)
-   name = random.randint(1,3)
+   name = random.randint(1,2)
    x2 = random.randint(0,19)
    y2 = random.randint(0,19)
-   name2 = random.randint(1,3)
-   jason = {name:[x,y], name2:[x2,y2]}
-   dict_data_for_screen(jason, object_list)
+   name2 = random.randint(3,4)
+   json = {name:[x,y], name2:[x2,y2]}
+   dict_data_for_screen(json, object_list)
+   time.sleep(1)
 
 window.mainloop()
