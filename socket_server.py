@@ -4,6 +4,8 @@ import time
 import socket
 import threading
 from game_datab import *
+from gnome import *
+
 
 class Message:
     def __init__(self, type, payload) -> None:
@@ -68,6 +70,7 @@ class Gameserver:
         self.server_socket.listen()
         self.connections = {}
         self.db = Gnome_Database()
+        self.travel = Map(19, 19)
         self.connections_lock = threading.Lock()
         self.incoming_connections_thread = threading.Thread(
             target=self.new_connection, daemon=True)
@@ -125,6 +128,19 @@ class Gameserver:
                     self.broadcast_message(800)  # Send code 999 for unknown type
             else:
                 self.broadcast_message(999)  # Send code 999 for missing type
+    def tik_data(self):
+        while True:
+            gnome1 = Gnome("lol", "loluser")
+            gnome2 = Gnome("lol2", "loluser2")
+            self.travel.add_gnome_to_active_gnomes(gnome1, gnome2)
+            travel = self.travel.move_all_gnomes()
+            # self.broadcast_message(travel)
+            print(travel)
+            time.sleep(1)
+
+    def run_tik_data_thread(self):
+        tik_thread = threading.Thread(target=self.tik_data)
+        tik_thread.start()
 
     def broadcast_message(self, data):
         for connection_id in self.connections:
@@ -145,7 +161,8 @@ class Gameserver:
 def main():
         server = Gameserver()
         server.db.create_table()
-        while True:
+        server.run_tik_data_thread()
+        while True:            
             server.process_data()
             time.sleep(0.001)
 
