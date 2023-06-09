@@ -1,6 +1,8 @@
 import socket
 import json
 import threading
+import time
+from tkinter import messagebox
 from arena.auth_screen import MainApp
 
 
@@ -12,19 +14,35 @@ class ClientConnection:
         self.user_name = None
         self.user_password = None
 
+        self.socket_client = None
+
+        self.frame_destroy = None
+
         self.incomming = Incomming()
         self.outgoing = Outgoing()
 
         self.connect_to_server(host, port)
+
+    def init_socket(self, socket):
+         self.socket_client = socket
 
     def connect_to_server(self, HOST, PORT):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
                 client_socket.connect((HOST, PORT))
 
+                incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(client_socket,self.init_socket,  self.destroy_frames))
+                incomming_messages.start()
+                
+
+                while not self.socket_client:
+                    print("wait for init socket", self.socket_client)
+                    time.sleep(1)
+
                 auth_screen_app = MainApp(self.get_user_name_password_from_form)
                 auth_screen_app.mainloop()
             
+                
 
                 #TODO:switch on authentication
                 # self.send_message(client_socket, self.init_message)
@@ -39,8 +57,6 @@ class ClientConnection:
                 #     else:
                 #         break
 
-                incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(client_socket,))
-                incomming_messages.start()
 
                 while True:
                     print("ACTIONS:")
@@ -81,27 +97,38 @@ class ClientConnection:
         except ConnectionError as e:
             print("[Something went wrong]: ConnectionError", e)
 
-    def get_user_name_password_from_form(self, log_type, name, password):
-        print(log_type, name, password)
+    def destroy_frames(self):
+        self.frame_destroy()
+
+    def get_user_name_password_from_form(self, log_type, name, password, frame_destroy):
+        print("frame dest:",frame_destroy)
+        self.frame_destroy = frame_destroy
+
         if log_type == "Auth":
-            self.auth_client(name,password)
+            self.auth_client(self.outgoing.authentication_message, name,password)
 
-        # if log_type == "Registration":
-        #     value = self.registration_message({"username": name,"password": password})
+        if log_type == "Registration":
+            self.auth_client(self.outgoing.registration_message, name,password)
 
-
-    def auth_client(self, client_socket, name, password) -> bool:
+    def auth_client(self, auth_or_register, name, password) -> bool:
         user_data={"username": name,"password": password}
-        self.send_message(client_socket,self.outgoing.authentication_message(user_data))
+        self.send_message(self.socket_client, auth_or_register(user_data))
 
+        # message = self.process_incomming_register_login(self.socket_client)
+        # print("auth_client", message)
+
+    def process_incomming_register_login(self, client_socket):
         data = client_socket.recv(2048)
         incoming = self.incomming.parse_incoming(data)
         print("AUTH", incoming)
+
+        self.frame_destroy()
 
         if incoming["Type"] == "Auth" and incoming["Payload"]:
             return True
 
         return False
+
 
     def send_message(self, client_socket, message):
         client_socket.sendall(json.dumps(message).encode("utf-8"))
@@ -148,7 +175,11 @@ class Incomming:
         self.event = None
         pass
 
-    def accept_incoming(self, client_socket):
+    def accept_incoming(self, client_socket, set_socket_cb, frame_destroy):
+        set_socket_cb(client_socket)
+
+
+
         try:
             while True:
                 data = client_socket.recv(2048)
@@ -160,6 +191,11 @@ class Incomming:
                 new_message = Message(incoming["Type"], incoming["Payload"])
 
                 print(f"FROM SERVER: {new_message.__dict__}")
+                #TODO: leválasztani a visszajövő érték szerint, hogy regisztráljon vagy nyissa meg az arénát.
+                
+                print(frame_destroy)
+                messagebox.showinfo("User registered", "Registration success!")
+                frame_destroy()
 
         except Exception as e:
             #print("EXCEPTION", e)

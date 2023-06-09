@@ -29,6 +29,8 @@ class MainApp(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
+        
+
         # create a frame dict. and put each page into it
         self.frames = {}
         for curr_page in (LoginPage, RegisterPage):
@@ -51,6 +53,7 @@ class LoginPage(tk.Frame):
 
     def __init__(self, parent, controller, add_user_to_login):
         self.add_user_to_login = add_user_to_login
+        self.frame_parent = controller
 
         tk.Frame.__init__(self, parent)
         self.controller = controller
@@ -81,7 +84,11 @@ class LoginPage(tk.Frame):
     def logging_in(self, username: tk.StringVar, password: tk.StringVar)-> dict | None:
         if self._control_input(username, password):
             print("logging in...")
-            self.add_user_to_login("Auth", username.get(), password.get())
+            self.add_user_to_login("Auth", username.get(), password.get(), self._destroy)
+
+    def _destroy(self):
+        self.frame_parent.destroy()
+
 
     def _control_input(self, username: tk.StringVar, password: tk.StringVar):
         """ Controls the input from the user """
@@ -98,6 +105,8 @@ class RegisterPage(tk.Frame):
 
     def __init__(self, parent, controller, add_user_to_login):
         self.add_user_to_login = add_user_to_login 
+        self.frame_parent = controller
+        
 
         tk.Frame.__init__(self, parent)
         self.controller = controller
@@ -137,11 +146,16 @@ class RegisterPage(tk.Frame):
             
             print("username: ", username.get())
             print("password: ", hashed_pw)
-            self.add_user_to_login("Registration", username.get(), hashed_pw)
+            self.add_user_to_login("Registration", username.get(), hashed_pw, self._destroy)
+
+            
 
             self._empty_entry_fields()
             messagebox.showinfo("Success", "Successfuly registered!")
             self.controller.show_frame("LoginPage")
+    
+    def _destroy(self):
+        self.frame_parent.destroy()
 
     def _control_user_credentials(self, username: tk.StringVar, password_1: tk.StringVar, password_2: tk.StringVar):
         """Controls if user gave correct credentials

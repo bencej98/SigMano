@@ -8,7 +8,7 @@ class App():
     def __init__(self, HOST="localhost", PORT=10000) -> None:
         print("START GAME")
         #register_page = auth_screen.MainApp()
-        clienet_socket = client_socket.ClientConnection(HOST, PORT)
+        client_socket.ClientConnection(HOST, PORT)
 
 if __name__ == "__main__":
     App()
