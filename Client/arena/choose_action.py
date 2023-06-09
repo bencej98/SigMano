@@ -49,6 +49,7 @@ class ChooseAction(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        self.config(background="skyblue")
         self.controller = controller
         title_label = tk.Label(self, text="Choose action", font=self.controller.title_font)
         title_label.pack(side="top", fill="x", pady=10)
