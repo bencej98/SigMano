@@ -110,6 +110,7 @@ class RegisterPage(tk.Frame):
         self.controller = controller
         title_label = tk.Label(self, text="Register Page", font=controller.title_font)
         title_label.pack(side="top", fill="x", pady=10)
+
         # # username
         username_label = tk.Label(self, text="User name: ", font=controller.label_font)
         username = tk.StringVar()
@@ -146,12 +147,10 @@ class RegisterPage(tk.Frame):
             print("password: ", password_1.get())
             self.add_user_to_login("Registration", username.get(), password_1.get(), self._destroy)
 
-            
-
             self._empty_entry_fields()
             messagebox.showinfo("Success", "Successfuly registered!")
             self.controller.show_frame("LoginPage")
-    
+
     def _destroy(self):
         self.frame_parent.destroy()
 
@@ -163,13 +162,26 @@ class RegisterPage(tk.Frame):
             messagebox.showinfo("Empty field", "User name field can't be empty!")
         elif password_1.get().strip() == "" or password_2.get().strip() == "":
             messagebox.showinfo("Empty field", "Password field can't be empty!")
-
-        else:
+        elif len(username.get()) > 10:
+            messagebox.showinfo("Username too long", "Username shall contain a maximum of 10 characters!")
+        elif self._check_special_characters(username.get()):
             # check password match
             if password_1.get() != password_2.get():
                 messagebox.showinfo("Passwords do not match", "Passwords must match!")
             else:
                 return True
+    def _check_special_characters(self, username: str):
+        allowed_chars = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+        special_characters = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*',
+                              '+', ',', '-', '.', '/', ':', ';', '<', '=', '>',
+                              '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|',
+                              '}', '~', 'ö', 'ä', 'ü', 'ß']
+        for letter in username:
+            if letter.upper() not in allowed_chars:
+                messagebox.showinfo("Forbidden", "Only englsih alphabet characters are allowed!")
+                return False
+        return True
+
 
     def _hash_user_password(self, password: tk.StringVar) -> str:
         """Hashes the passwrod of the user"""
