@@ -4,6 +4,7 @@ import threading
 import time
 from tkinter import messagebox
 from arena.auth_screen import MainApp
+from arena.arena import start_loop, temp_valami
 
 
 class ClientConnection:
@@ -197,6 +198,8 @@ class Incomming:
                 #TODO: nyissa meg az arénát.
                     messagebox.showinfo("User registered", "Registration success!")
                     frame_destroy()
+                    # start_loop()
+                    # temp_valami()
 
         except Exception as e:
             #print("EXCEPTION", e)

@@ -86,15 +86,18 @@ def dict_data_for_screen(json_dict:dict, object_list:list):
 
 object_list = []
 
-for i in range(10):
-   x = random.randint(0,19)
-   y = random.randint(0,19)
-   name = random.randint(1,2)
-   x2 = random.randint(0,19)
-   y2 = random.randint(0,19)
-   name2 = random.randint(3,4)
-   json = {name:[x,y], name2:[x2,y2]}
-   dict_data_for_screen(json, object_list)
-   time.sleep(1)
+def temp_valami():
+   for i in range(10):
+      x = random.randint(0,19)
+      y = random.randint(0,19)
+      name = random.randint(1,2)
+      x2 = random.randint(0,19)
+      y2 = random.randint(0,19)
+      name2 = random.randint(3,4)
+      json = {name:[x,y], name2:[x2,y2]}
+      dict_data_for_screen(json, object_list)
+      time.sleep(1)
 
-window.mainloop()
+
+def start_loop():
+   window.mainloop()
