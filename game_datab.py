@@ -39,13 +39,13 @@ class Gnome_Database:
         self.cursor.close()
         self.connect.close()
 
-    def create_user(self, username, password):
+    def create_user(self, username, password, gnome_name):
         '''Inserts user into database'''
         self.cursor.execute('''
                         INSERT INTO user
                         VALUES(?, ?, ?, ?, ?)
                         '''
-                         , (None, username, password, None, None))
+                         , (None, username, password, gnome_name, None))
         self.connect.commit()
     
     def delete_user(self, username):
