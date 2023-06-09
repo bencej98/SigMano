@@ -43,8 +43,8 @@ class TestActionManager(unittest.TestCase):
  
 
         # Then, we call the fight method
-        self.action_manager.fight(self.map)
-
+        test_dict = self.action_manager.fight(self.map)
+        print(test_dict)
         # Now we can assert the conditions we expect after the fight
         # For example, we might expect that at least one gnome has won a fight and got a point
         self.assertTrue(any(gnome.actual_points > 0 for gnome in [self.gnome1, self.gnome2, self.gnome3]))
@@ -57,3 +57,4 @@ class TestActionManager(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+    
