@@ -79,15 +79,21 @@ class Gnome:
 
 
 class Map:
-    def __init__(self, max_x, max_y) -> None:
+    def __init__(self, max_x, max_y, maximum_gnomes) -> None:
         self.x_coordinate = max_x
         self.y_coordinate = max_y
+        self.maximum_gnomes = maximum_gnomes
         self.active_gnomes = {}
+        self.gnome_queue = []
 
-    def add_gnome_to_active_gnomes(self, *gnomes: Gnome) -> None:
-        for gnome in gnomes:
+    def add_gnome_to_gnome_queue(self, gnome: Gnome) -> None:
+        self.gnome_queue.append(gnome)
+
+    def transfer_gnomes_to_active_gnomes(self) -> None:
+        while len(self.active_gnomes) < self.maximum_gnomes:
+            gnome = self.gnome_queue.pop(0)
             gnome.spawn_gnome(self)
-            self.active_gnomes[gnome.name] = gnome
+            self.active_gnomes[gnome.user] = gnome
 
     def check_collisions(self):
         collided_gnomes = []
@@ -113,13 +119,16 @@ class Map:
         return position_update_for_client
 #function check
 if __name__ == "__main__":
-    gnome1 = Gnome("lol", "loluser")
-    gnome2 = Gnome("lol2", "loluser2")
+    gnomes_list = []
+    for n in range (10):
+        gnome = Gnome(f"lol{n}", f"loluser{n}")
+        gnomes_list.append(gnome)
 
+    map = Map(19, 19, 5)
+    for gnome in gnomes_list:
+        map.add_gnome_to_gnome_queue(gnome)
+    map.transfer_gnomes_to_active_gnomes()
 
-    map = Map(19, 19)
-    map.add_gnome_to_active_gnomes(gnome1, gnome2)
-    gnome1.location = {"x": 0, "y": 5}
     for gnome_name, gnome in map.active_gnomes.items():
         print(gnome_name, gnome.location["x"], gnome.location["y"])
         for valami in range(20):
@@ -127,4 +136,5 @@ if __name__ == "__main__":
             print(gnome_name, gnome.location["x"], gnome.location["y"])
     position_dict = map.move_all_gnomes()
     print(position_dict)
-
+    print(map.active_gnomes)
+    print(map.gnome_queue)
