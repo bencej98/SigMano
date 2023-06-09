@@ -33,26 +33,26 @@ class ActionManager:
     def check_fight_option(self, gnome_first, gnome_second):
         gnome_first_action = gnome_first.strategy[gnome_first.event_counter]
         gnome_second_action = gnome_second.strategy[gnome_second.event_counter]
-        encounter = f"{gnome_first.name} used {gnome_first_action} and {gnome_second.name} used {gnome_second_action}"
+        encounter = f"{gnome_first.user} used {gnome_first_action} and {gnome_second.user} used {gnome_second_action}"
         fight_message_dict = {
                     "encounter": encounter,
                     "outcome": ""
                 }
         match (gnome_first_action, gnome_second_action):
             case ("rock", "paper") | ("paper", "scissor") | ("scissor", "rock"):
-                print(f"{gnome_second.name} won")
+                print(f"{gnome_second.user} won")
                 gnome_second.actual_points += 1
                 gnome_second.kill_count += 1
                 gnome_first.actual_points -= 1
-                outcome = f"{gnome_second.name} won"
+                outcome = f"{gnome_second.user} won"
                 fight_message_dict["outcome"] = outcome
                 return fight_message_dict
             case ("rock", "scissor") | ("paper", "rock") | ("scissor", "paper"):
-                print(f"{gnome_first.name} won")
+                print(f"{gnome_first.user} won")
                 gnome_first.actual_points += 1
                 gnome_first.kill_count += 1
                 gnome_second.actual_points -= 1
-                outcome = f"{gnome_first.name} won"
+                outcome = f"{gnome_first.user} won"
                 fight_message_dict["outcome"] = outcome
                 return fight_message_dict
             case _:

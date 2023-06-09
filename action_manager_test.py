@@ -12,9 +12,9 @@ class TestActionManager(unittest.TestCase):
  
 
         # creating 3 gnomes
-        self.gnome1 = Gnome("gnome1", "user1")
-        self.gnome2 = Gnome("gnome2", "user2")
-        self.gnome3 = Gnome("gnome3", "user3")
+        self.gnome1 = Gnome("user1")
+        self.gnome2 = Gnome("user2")
+        self.gnome3 = Gnome("user3")
 
  
 

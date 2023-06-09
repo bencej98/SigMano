@@ -2,8 +2,7 @@ import random
 
 
 class Gnome:
-    def __init__(self, name, user) -> None:
-        self.name = name
+    def __init__(self, user) -> None:
         self.user = user
         self.location = {}
         self.strategy = []
@@ -121,7 +120,7 @@ class Map:
 if __name__ == "__main__":
     gnomes_list = []
     for n in range (10):
-        gnome = Gnome(f"lol{n}", f"loluser{n}")
+        gnome = Gnome(f"loluser{n}")
         gnomes_list.append(gnome)
 
     map = Map(19, 19, 5)
