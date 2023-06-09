@@ -21,13 +21,13 @@ class TestActionManager(unittest.TestCase):
         # adding the gnomes to the map
         self.map.add_gnome_to_active_gnomes(self.gnome1, self.gnome2, self.gnome3)
 
-        self.list1 = ["stone", "stone", "stone", "stone", "scissor", "paper","paper", "paper","scissor","paper"]
-        self.list2 = ["paper","scissor", "stone","scissor","paper","stone", "stone", "stone", "stone", "stone"]
-        self.list3 = ["scissor","paper", "paper","scissor","stone","paper", "stone", "scissor", "stone", "scissor"]
+        self.list1 = ["rock", "rock", "rock", "rock", "scissor", "paper","paper", "paper","scissor","paper"]
+        self.list2 = ["paper","scissor", "rock","scissor","paper","rock", "rock", "rock", "rock", "rock"]
+        self.list3 = ["scissor","paper", "paper","scissor","rock","paper", "rock", "scissor", "rock", "scissor"]
         self.gnome1.strategy = self.list1
         self.gnome2.strategy = self.list2
         self.gnome3.strategy = self.list3
-        self.gnome2.event_counter=1
+        self.gnome2.event_counter = 1
 
 
  
