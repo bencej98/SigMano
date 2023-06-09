@@ -6,7 +6,7 @@ from action_manager import ActionManager
 class TestActionManager(unittest.TestCase):
     
     def setUp(self):
-        self.map = Map(10, 10)  # creating an instance of the Map with dimensions 10x10
+        self.map = Map(10, 10, 5)  # creating an instance of the Map with dimensions 10x10
         self.action_manager = ActionManager()  # creating an instance of the ActionManager
 
  
@@ -19,7 +19,9 @@ class TestActionManager(unittest.TestCase):
  
 
         # adding the gnomes to the map
-        self.map.add_gnome_to_active_gnomes(self.gnome1, self.gnome2, self.gnome3)
+        for gnome in [self.gnome1, self.gnome2, self.gnome3]:
+            self.map.add_gnome_to_gnome_queue(gnome)
+        self.map.transfer_gnomes_to_active_gnomes()
 
         self.list1 = ["rock", "rock", "rock", "rock", "scissor", "paper","paper", "paper","scissor","paper"]
         self.list2 = ["paper","scissor", "rock","scissor","paper","rock", "rock", "rock", "rock", "rock"]
