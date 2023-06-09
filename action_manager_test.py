@@ -6,7 +6,7 @@ from action_manager import ActionManager
 class TestActionManager(unittest.TestCase):
     
     def setUp(self):
-        self.map = Map(10, 10)  # creating an instance of the Map with dimensions 10x10
+        self.map = Map(10, 10, 5)  # creating an instance of the Map with dimensions 10x10
         self.action_manager = ActionManager()  # creating an instance of the ActionManager
 
  
