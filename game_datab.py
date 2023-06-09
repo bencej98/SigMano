@@ -2,6 +2,7 @@ import sqlite3
 import os.path
 import logging
 from datetime import datetime
+from werkzeug.security import check_password_hash, generate_password_hash
 
 
 class Gnome_Database:
@@ -158,6 +159,33 @@ class Gnome_Database:
                 return True
             else:
                 return False
+            
+    def dict_factory(cursor, row):
+        fields = [column[0] for column in cursor.description]
+        return {key: value for key, value in zip(fields, row)}
+
+    def authenticate_user(self, username, password):
+        self.connect.row_factory = self.dict_factory
+        user_lower = username.lower()
+        user_data = self.cursor.execute("""
+                                        SELECT *
+                                        FROM user
+                                        WHERE username = ?
+                                        """
+                                        , (user_lower,))
+        user = user_data.fetchall()
+
+        if not any(user):
+            logging.info("User doesn't exist: %s", user_lower)
+            return False
+        elif user[0][2] == password:
+            logging.info("User succesfully logged in: %s", user_lower)
+            return True
+        else:
+            logging.info("Couldn't log user in: %s", user_lower)
+            return False
+
+
 
 # Set up logging configuration
 logging.basicConfig(
@@ -175,4 +203,3 @@ except sqlite3.Error as e:
 
 
 jatek = Gnome_Database()
-jatek.check_user_upon_registration("gÁbOR", "Teszt")
