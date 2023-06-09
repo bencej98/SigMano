@@ -14,51 +14,61 @@ class Gnome:
         self.location["x"] = random.randint(0, map.x_coordinate)
         self.location["y"] = random.randint(0, map.y_coordinate)
 
-    def check_random_direction(self):
-        random_num = random.randint()
-        if self.location["x"] == 0 and self.location["y"]:
-            pass
+    def check_random_direction(self, map):
+        x = self.location["x"]
+        y = self.location["y"]
+        map_x = map.x_coordinate
+        map_y = map.y_coordinate
+        direction_list = [0, 1, 2, 3, 4, 5, 6, 7]
+        while True:
+            rand = random.randint(0, len(direction_list) - 1)
+            direction = direction_list.pop(rand)
+            if x == 0 or y == 0 or x == map_x or y == map_y:
+                if (x == 0 and y == 0) and (0 <= direction <= 2):
+                    break
+                elif (x == map_x and y == map_y) and (4 <= direction <= 6):
+                    break
+                elif (x == 0 and y == map_y) and (2 <= direction <= 4):
+                    break
+                elif (x == map_x and y == 0) and (direction in (0, 6, 7)):
+                    break
+                elif x == 0 and (0 <= direction <= 4):
+                    break
+                elif y == 0 and (0 <= direction <= 2 or direction in (6, 7)):
+                    break
+                elif x == map_x and (direction == 0 or 4 <= direction <= 7):
+                    break
+                elif y == map_y and (2 <= direction <= 6):
+                    break
+            else:
+                break
+
+        return direction
 
     def random_move(self, map):
-        direction=random.randint(0,7)
-        coordinate_is_valid = False
-        random_counter = 0
-        while coordinate_is_valid == False and random_counter < 20:
-            temp_coord=self.location.copy()
-            match direction:
-                # 0 is up then clockwise
-                case 0: 
-                    temp_coord["y"] += 1 
-                case 1: 
-                    temp_coord["x"] += 1
-                    temp_coord["y"] += 1
-                case 2: 
-                    temp_coord["x"] +=1 
-                case 3: 
-                    temp_coord["x"] += 1
-                    temp_coord["y"] -= 1
-                case 4: 
-                    temp_coord["y"] -= 1 
-                case 5: 
-                    temp_coord["x"] -= 1
-                    temp_coord["y"] -= 1 
-                case 6: 
-                    temp_coord["x"] -= 1 
-                case 7: 
-                    temp_coord["x"] -= 1
-                    temp_coord["y"] += 1         
-            coordinate_is_valid = self.check_if_location_is_valid(temp_coord, map)
-            random_counter += 1
-
-        if random_counter < 20:
-            self.location = temp_coord
-        random_counter = 0
-
-            
-    def check_if_location_is_valid(self, coord, map):
-        if map.x_coordinate >= coord["x"] >= 0 and map.y_coordinate >= coord["y"] >= 0:
-            return True
-        return False
+        direction=self.check_random_direction(map)
+        match direction:
+            # 0 is up then clockwise
+            case 0: 
+                self.location["y"] += 1 
+            case 1: 
+                self.location["x"] += 1
+                self.location["y"] += 1
+            case 2: 
+                self.location["x"] += 1 
+            case 3: 
+                self.location["x"] += 1
+                self.location["y"] -= 1
+            case 4: 
+                self.location["y"] -= 1 
+            case 5: 
+                self.location["x"] -= 1
+                self.location["y"] -= 1 
+            case 6: 
+                self.location["x"] -= 1 
+            case 7: 
+                self.location["x"] -= 1
+                self.location["y"] += 1         
     
     def increase_event_counter(self):
         if self.event_counter < 9:
@@ -98,8 +108,10 @@ if __name__ == "__main__":
     gnome1 = Gnome("lol", "loluser")
     gnome2 = Gnome("lol2", "loluser2")
 
+
     map = Map(19, 19)
     map.add_gnome_to_active_gnomes(gnome1, gnome2)
+    gnome1.location = {"x": 0, "y": 5}
     for gnome_name, gnome in map.active_gnomes.items():
         print(gnome_name, gnome.location["x"], gnome.location["y"])
         for valami in range(20):
