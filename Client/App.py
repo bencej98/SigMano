@@ -1,6 +1,7 @@
 from client_socket import client_socket
 
 
+
 class App():
 
     def __init__(self, HOST="localhost", PORT=10000) -> None:
