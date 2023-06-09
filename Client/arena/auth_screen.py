@@ -4,7 +4,7 @@ from tkinter import messagebox
 
 class MainApp(tk.Tk):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, add_user_name_password  ,*args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.frame_width = 400
         self.frame_height = 400
@@ -33,7 +33,7 @@ class MainApp(tk.Tk):
         self.frames = {}
         for curr_page in (LoginPage, RegisterPage):
             page_name = curr_page.__name__
-            frame = curr_page(parent=container, controller=self)
+            frame = curr_page(parent=container, controller=self, add_user_to_login=add_user_name_password)
             self.frames[page_name] = frame
 
             # set all frame to the same grid location
@@ -49,7 +49,9 @@ class MainApp(tk.Tk):
 
 class LoginPage(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, add_user_to_login):
+        self.add_user_to_login = add_user_to_login
+
         tk.Frame.__init__(self, parent)
         self.controller = controller
         title_label = tk.Label(self, text="Login Page", font=self.controller.title_font)
@@ -76,21 +78,27 @@ class LoginPage(tk.Frame):
         login_button.pack(ipady=10, ipadx=10, pady=10)
         register_button.pack(ipady=10, ipadx=10)
 
-    def logging_in(self, username: tk.StringVar, password: tk.StringVar):
-        self._control_input(username, password)
-        print("logging in...")
+    def logging_in(self, username: tk.StringVar, password: tk.StringVar)-> dict | None:
+        if self._control_input(username, password):
+            print("logging in...")
+            self.add_user_to_login("Auth", username.get(), password.get())
 
     def _control_input(self, username: tk.StringVar, password: tk.StringVar):
         """ Controls the input from the user """
         if str(username.get()).strip() == "":
             messagebox.showinfo("Empty input", "User name field can't be empty!")
+            return False
+
         elif str(password.get()).strip() == "":
             messagebox.showinfo("Empty input", "Password field can't be empty!")
-
+            return False
+        return True
 
 class RegisterPage(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, add_user_to_login):
+        self.add_user_to_login = add_user_to_login 
+
         tk.Frame.__init__(self, parent)
         self.controller = controller
         title_label = tk.Label(self, text="Register Page", font=controller.title_font)
@@ -126,8 +134,11 @@ class RegisterPage(tk.Frame):
         if self._control_user_credentials(username, password_1, password_2):
             hashed_pw = self._hash_user_password(password_1)
             print("Sending user credentials...")
+            
             print("username: ", username.get())
             print("password: ", hashed_pw)
+            self.add_user_to_login("Registration", username.get(), hashed_pw)
+
             self._empty_entry_fields()
             messagebox.showinfo("Success", "Successfuly registered!")
             self.controller.show_frame("LoginPage")

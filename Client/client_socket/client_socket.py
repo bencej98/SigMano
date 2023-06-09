@@ -1,6 +1,7 @@
 import socket
 import json
 import threading
+from arena.auth_screen import MainApp
 
 
 class ClientConnection:
@@ -20,6 +21,10 @@ class ClientConnection:
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
                 client_socket.connect((HOST, PORT))
+
+                auth_screen_app = MainApp(self.get_user_name_password_from_form)
+                auth_screen_app.mainloop()
+            
 
                 #TODO:switch on authentication
                 # self.send_message(client_socket, self.init_message)
@@ -75,6 +80,15 @@ class ClientConnection:
 
         except ConnectionError as e:
             print("[Something went wrong]: ConnectionError", e)
+
+    def get_user_name_password_from_form(self, log_type, name, password):
+        print(log_type, name, password)
+        if log_type == "Auth":
+            self.auth_client(name,password)
+
+        # if log_type == "Registration":
+        #     value = self.registration_message({"username": name,"password": password})
+
 
     def auth_client(self, client_socket, name, password) -> bool:
         user_data={"username": name,"password": password}
