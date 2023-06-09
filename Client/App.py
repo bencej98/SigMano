@@ -11,7 +11,7 @@ class App():
         client_socket.ClientConnection(HOST, PORT)
 
 if __name__ == "__main__":
-    App()
+    #App()
 
-    #App("172.4.181.76", 8000)
-    #App("172.4.181.221", 10000)
+    App("172.4.181.190", 10000)
+    #App("172.4.181.232", 10000)

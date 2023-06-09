@@ -2,9 +2,10 @@ import socket
 import json
 import threading
 import time
+import random
 from tkinter import messagebox
 from arena.auth_screen import MainApp
-from arena.arena import start_loop
+from arena.arena import start_loop, dict_data_for_screen, json_temp
 
 class ClientConnection:
     def __init__(self, host, port) -> None:
@@ -25,77 +26,75 @@ class ClientConnection:
 
     def init_socket(self, socket):
          self.socket_client = socket
+    
 
     def connect_to_server(self, HOST, PORT):
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-                client_socket.connect((HOST, PORT))
+        
+            self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket_client.connect((HOST, PORT))
 
-                incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(client_socket,self.init_socket,  self.destroy_frames))
-                incomming_messages.start()
-                
-
-                while not self.socket_client:
-                    print("Wait for init socket", self.socket_client)
-                    time.sleep(1)
-
-                auth_screen_app = MainApp(self.get_user_name_password_from_form)
-                auth_screen_app.mainloop()
+            incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(self.socket_client,self.init_socket, self.destroy_frames))
+            incomming_messages.start()
             
-                
 
-                #TODO:switch on authentication
-                # self.send_message(client_socket, self.init_message)
-                # is_authenticated = False
-                # while not is_authenticated:
-                #     self.user_name = input("Kérem a nevét:")
-                #     self.user_password = input("Kérem a jelszót:")
+            while not self.socket_client:
+                print("Wait for init socket", self.socket_client)
+                time.sleep(1)
 
-                #     is_authenticated = self.auth_client(client_socket,self.user_name, self.user_password)
-                #     if not is_authenticated:                        
-                #         print("Authentication failed!")
-                #     else:
-                #         break
+            auth_screen_app = MainApp(self.get_user_name_password_from_form)
+            auth_screen_app.mainloop()
+        
+            
+
+            #TODO:switch on authentication
+            # self.send_message(client_socket, self.init_message)
+            # is_authenticated = False
+            # while not is_authenticated:
+            #     self.user_name = input("Kérem a nevét:")
+            #     self.user_password = input("Kérem a jelszót:")
+
+            #     is_authenticated = self.auth_client(client_socket,self.user_name, self.user_password)
+            #     if not is_authenticated:                        
+            #         print("Authentication failed!")
+            #     else:
+            #         break
 
 
-                while True:
-                    print("ACTIONS:")
-                    for index, actions_text in enumerate(self.action_types):
-                        print(f"{index}:{actions_text}")
+            while False:
+                print("ACTIONS:")
+                for index, actions_text in enumerate(self.action_types):
+                    print(f"{index}:{actions_text}")
 
-                    choosen = input("\nAction >> ")
-                    if choosen == "q":
+                choosen = input("\nAction >> ")
+                if choosen == "q":
+                    break
+                try:
+                    selected_number = int(choosen)
+
+                except ValueError:
+                    print("Számot kérek!")
+                    continue
+
+                if selected_number < 0 or selected_number >= len(self.action_types):
+                    print("A listából válassz!")
+                    continue
+
+                action = self.action_types[selected_number]
+
+                match action:
+                    case "Action":
+                        test_action = {"1": "hit", "2": "defend"}
+                        self.send_message(client_socket, self.outgoing.action_message(test_action))
+
+                    case "Registration":
+                        test_user_name = {"username": "xy", "password": "xy"}
+                        self.send_message(client_socket, self.outgoing.registration_message(test_user_name))
+
+                    case "Closed":
+                        self.send_message(client_socket, self.outgoing.close_message())
                         break
-                    try:
-                        selected_number = int(choosen)
 
-                    except ValueError:
-                        print("Számot kérek!")
-                        continue
-
-                    if selected_number < 0 or selected_number >= len(self.action_types):
-                        print("A listából válassz!")
-                        continue
-
-                    action = self.action_types[selected_number]
-
-                    match action:
-                        case "Action":
-                            test_action = {"1": "hit", "2": "defend"}
-                            self.send_message(client_socket, self.outgoing.action_message(test_action))
-
-                        case "Registration":
-                            test_user_name = {"username": "xy", "password": "xy"}
-                            self.send_message(client_socket, self.outgoing.registration_message(test_user_name))
-
-                        case "Closed":
-                            self.send_message(client_socket, self.outgoing.close_message())
-                            break
-
-            client_socket.close()
-
-        except ConnectionError as e:
-            print("[Something went wrong]: ConnectionError", e)
+            #client_socket.close()
 
     def destroy_frames(self):
         self.frame_destroy()
@@ -178,33 +177,60 @@ class Incomming:
     def accept_incoming(self, client_socket, set_socket_cb, frame_destroy):
         set_socket_cb(client_socket)
 
-        try:
-            while True:
-                data = client_socket.recv(2048)
-                if not data:
-                    print("Server disconnected!")
-                    break
+        while True:
+                
+                try: 
+                    data = client_socket.recv(2048)
+                    if not data:
+                        print("Server disconnected!")
+                        break
+                except OSError as e:
+                    print(e)
+                else:
+                    incoming = self.parse_incoming(data)
 
-                incoming = self.parse_incoming(data)
+                    print(f"FROM SERVER: {incoming}")
 
-                print(f"FROM SERVER: {incoming}")
-
-                if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
-                    if not incoming["Payload"]:
-                        messagebox.showinfo("Message", f"{'Registration' if incoming['Type']=='Registration' else 'Authentication'} success!")
-                        return
+                # if incoming["type"] == "Registration" or incoming["type"] == "Auth":
+                #     if not incoming["Payload"]:
+                #         messagebox.showinfo("Message", f"{'Registration' if incoming['type']=='Registration' else 'Authentication'} success!")
+                #         return
                     
-                #TODO: nyissa meg az arénát.
-                    messagebox.showinfo("User registered", "Registration success!")
-                    frame_destroy()
-                    start_loop()
-                    # temp_valami()
+                # #TODO: nyissa meg az arénát.
+                #     messagebox.showinfo("User registered", "Registration success!")
+                #     frame_destroy()
 
-        except Exception as e:
-            #print("EXCEPTION", e)
-            pass
+                    #json_temp = {'Type': 'position', 'payload': {'loluser': [2, 3], 'loluser2': [18, 9]}}
+                
+                    if incoming["type"] == "position":
+                        positions = incoming['payload']
+
+                        change_json = threading.Thread(target=self.change_data, args=(positions, ))
+                        change_json.start()
+
+                        start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
+
+
+
+
+        # except Exception as e:
+        #     print("EXCEPTION", e)
+        #     pass
+
+    def change_data(self, positions):
+        print("TYPE and DATA", positions['loluser'], positions['loluser2'])        
+        global json_temp
+        json_temp = positions
+
+        # while True:
+        #     time.sleep(1)
+        #     json_temp['loluser'][0] = random.randint(0,19)
+        #     json_temp['loluser'][1] = random.randint(0,19)
+        #     json_temp['loluser2'][0] = random.randint(0,19)
+        #     json_temp['loluser2'][1] = random.randint(0,19)
 
     def parse_incoming(self, data):
+        print("DATA", data)
         return json.loads(data.decode("utf-8"))
 
 
