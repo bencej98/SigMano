@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import font as tkfont
 from tkinter import messagebox
+from tkinter import ttk
 
 class MainApp(tk.Tk):
 
@@ -28,8 +29,6 @@ class MainApp(tk.Tk):
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
-
-        
 
         # create a frame dict. and put each page into it
         self.frames = {}
@@ -106,7 +105,6 @@ class RegisterPage(tk.Frame):
     def __init__(self, parent, controller, add_user_to_login):
         self.add_user_to_login = add_user_to_login 
         self.frame_parent = controller
-        
 
         tk.Frame.__init__(self, parent)
         self.controller = controller
@@ -141,12 +139,12 @@ class RegisterPage(tk.Frame):
 
     def _register_user(self, username: tk.StringVar, password_1: tk.StringVar, password_2: tk.StringVar):
         if self._control_user_credentials(username, password_1, password_2):
-            hashed_pw = self._hash_user_password(password_1)
+            # hashed_pw = self._hash_user_password(password_1)
             print("Sending user credentials...")
             
             print("username: ", username.get())
-            print("password: ", hashed_pw)
-            self.add_user_to_login("Registration", username.get(), hashed_pw, self._destroy)
+            print("password: ", password_1.get())
+            self.add_user_to_login("Registration", username.get(), password_1.get(), self._destroy)
 
             
 
@@ -161,7 +159,6 @@ class RegisterPage(tk.Frame):
         """Controls if user gave correct credentials
         Checks if passwords match"""
 
-        # check empty fields
         if username.get().strip() == "":
             messagebox.showinfo("Empty field", "User name field can't be empty!")
         elif password_1.get().strip() == "" or password_2.get().strip() == "":
@@ -187,8 +184,10 @@ class RegisterPage(tk.Frame):
         self.password_entry_1.delete(0,tk.END)
         self.password_entry_2.delete(0,tk.END)
 
-
+def get_user_name_password_from_form():
+    print("TEST METHOD")
 
 if __name__ == "__main__":
-    app = MainApp()
+    
+    app = MainApp(get_user_name_password_from_form)
     app.mainloop()
