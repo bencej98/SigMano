@@ -91,7 +91,7 @@ class Map:
 
     def transfer_gnomes_to_active_gnomes(self) -> None:
         while len(self.active_gnomes) < self.maximum_gnomes:
-            gnome = self.gnome_queue.pop()
+            gnome = self.gnome_queue.pop(0)
             gnome.spawn_gnome(self)
             self.active_gnomes[gnome.user] = gnome
 
