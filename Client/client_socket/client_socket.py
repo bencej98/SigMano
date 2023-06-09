@@ -36,7 +36,7 @@ class ClientConnection:
                 
 
                 while not self.socket_client:
-                    print("wait for init socket", self.socket_client)
+                    print("Wait for init socket", self.socket_client)
                     time.sleep(1)
 
                 auth_screen_app = MainApp(self.get_user_name_password_from_form)
@@ -117,17 +117,17 @@ class ClientConnection:
         # message = self.process_incomming_register_login(self.socket_client)
         # print("auth_client", message)
 
-    def process_incomming_register_login(self, client_socket):
-        data = client_socket.recv(2048)
-        incoming = self.incomming.parse_incoming(data)
-        print("AUTH", incoming)
+    # def process_incomming_register_login(self, client_socket):
+    #     data = client_socket.recv(2048)
+    #     incoming = self.incomming.parse_incoming(data)
+    #     print("AUTH", incoming)
 
-        self.frame_destroy()
+    #     self.frame_destroy()
 
-        if incoming["Type"] == "Auth" and incoming["Payload"]:
-            return True
+    #     if incoming["Type"] == "Auth" and incoming["Payload"]:
+    #         return True
 
-        return False
+    #     return False
 
 
     def send_message(self, client_socket, message):
@@ -178,8 +178,6 @@ class Incomming:
     def accept_incoming(self, client_socket, set_socket_cb, frame_destroy):
         set_socket_cb(client_socket)
 
-
-
         try:
             while True:
                 data = client_socket.recv(2048)
@@ -188,14 +186,17 @@ class Incomming:
                     break
 
                 incoming = self.parse_incoming(data)
-                new_message = Message(incoming["Type"], incoming["Payload"])
 
-                print(f"FROM SERVER: {new_message.__dict__}")
-                #TODO: leválasztani a visszajövő érték szerint, hogy regisztráljon vagy nyissa meg az arénát.
-                
-                print(frame_destroy)
-                messagebox.showinfo("User registered", "Registration success!")
-                frame_destroy()
+                print(f"FROM SERVER: {incoming}")
+
+                if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
+                    if not incoming["Payload"]:
+                        messagebox.showinfo("Message", f"{'Registration' if incoming['Type']=='Registration' else 'Authentication'} success!")
+                        return
+                    
+                #TODO: nyissa meg az arénát.
+                    messagebox.showinfo("User registered", "Registration success!")
+                    frame_destroy()
 
         except Exception as e:
             #print("EXCEPTION", e)
