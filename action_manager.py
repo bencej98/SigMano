@@ -14,7 +14,7 @@ class ActionManager:
             for gnomes in self.collided_gnomes:
                 for i, gnome in enumerate(gnomes):
                     if i < len(gnomes) - 1:
-                        for j in range(i + 1, len(gnomes)):
+                        for j in range(i+1, len(gnomes)):
                             gnome_first = gnome
                             gnome_second = gnomes[j]
                             fight_message_dict = self.check_fight_option(gnome_first, gnome_second)
@@ -22,8 +22,13 @@ class ActionManager:
                                 self.event_dictionary[gnome_first.user].append(fight_message_dict)
                             else:
                                 self.event_dictionary[gnome_first.user] = [fight_message_dict]
+                            if gnome_second.user in self.event_dictionary:
+                                self.event_dictionary[gnome_second.user].append(fight_message_dict)
+                            else:
+                                self.event_dictionary[gnome_second.user] = [fight_message_dict]
                             gnome_first.increase_event_counter()
                             gnome_second.increase_event_counter()
+        return self.event_dictionary
 
     def check_fight_option(self, gnome_first, gnome_second):
         gnome_first_action = gnome_first.strategy[gnome_first.event_counter]
