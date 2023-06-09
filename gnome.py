@@ -1,5 +1,5 @@
 import random
-import json
+
 
 class Gnome:
     def __init__(self, name, user) -> None:
@@ -110,8 +110,7 @@ class Map:
             position = (gnome.location["x"], gnome.location["y"])
             position_update_dict[gnome.user] = position
         position_update_for_client = {"type": "position", "payload": position_update_dict}
-        position_update_for_client_json = json.dumps(position_update_for_client)
-        return position_update_for_client_json
+        return position_update_for_client
 #function check
 if __name__ == "__main__":
     gnome1 = Gnome("lol", "loluser")
@@ -126,6 +125,6 @@ if __name__ == "__main__":
         for valami in range(20):
             gnome.random_move(map)
             print(gnome_name, gnome.location["x"], gnome.location["y"])
-
-
+    position_dict = map.move_all_gnomes()
+    print(position_dict)
 
