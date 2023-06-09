@@ -102,7 +102,14 @@ class Map:
                 collided_gnomes.append(gnomes)
         return collided_gnomes
 
-
+    def move_all_gnomes(self):
+        position_update_dict = {}
+        for gnome_name, gnome in self.active_gnomes.items():
+            gnome.random_move(self)
+            position = (gnome.location["x"], gnome.location["y"])
+            position_update_dict[gnome.user] = position
+        return position_update_dict
+    
 #function check
 if __name__ == "__main__":
     gnome1 = Gnome("lol", "loluser")
