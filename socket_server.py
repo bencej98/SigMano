@@ -99,10 +99,10 @@ class Gameserver:
             curr_msg = new_messages[connection_id]
             if curr_msg.type:
                 if curr_msg.type == "Action":
-                    self.broadcast_message(
+                    self.send_response(connection_id,
                         {'Type': 'Action', 'Payload': {'1': 'hit', '2': 'defend'}})
                 elif curr_msg.type == "Registration":
-                    self.broadcast_message({
+                    self.send_response(connection_id, {
                         "Type": "Registration",
                         "Payload": {
                             "username": "xy",
@@ -119,7 +119,7 @@ class Gameserver:
                         }
                     })
                 elif curr_msg.type == "Event":
-                    self.broadcast_message({
+                    self.send_response( connection_id, {
                         "Type": "Event",
                         "Payload": {
                             "happening": "msg",
@@ -134,6 +134,10 @@ class Gameserver:
     def broadcast_message(self, data):
         for connection_id in self.connections:
             self.connections[connection_id].outgoing_traffic_manager(data)
+
+    def send_response(self, person_id, data):
+        if person_id in self.connections:
+            self.connections[person_id].outgoing_traffic_manager(data)
 
     def check_connections_liveness(self):
         conns_to_del = []
