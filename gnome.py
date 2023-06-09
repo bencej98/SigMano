@@ -14,6 +14,11 @@ class Gnome:
         self.location["x"] = random.randint(0, map.x_coordinate)
         self.location["y"] = random.randint(0, map.y_coordinate)
 
+    def check_random_direction(self):
+        random_num = random.randint()
+        if self.location["x"] == 0 and self.location["y"]:
+            pass
+
     def random_move(self, map):
         direction=random.randint(0,7)
         coordinate_is_valid = False
@@ -26,12 +31,12 @@ class Gnome:
                     temp_coord["y"] += 1 
                 case 1: 
                     temp_coord["x"] += 1
-                    temp_coord["y"] += 1 
+                    temp_coord["y"] += 1
                 case 2: 
                     temp_coord["x"] +=1 
                 case 3: 
                     temp_coord["x"] += 1
-                    temp_coord["y"] -= 1  
+                    temp_coord["y"] -= 1
                 case 4: 
                     temp_coord["y"] -= 1 
                 case 5: 
