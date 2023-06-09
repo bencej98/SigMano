@@ -19,7 +19,9 @@ class TestActionManager(unittest.TestCase):
  
 
         # adding the gnomes to the map
-        self.map.add_gnome_to_active_gnomes(self.gnome1, self.gnome2, self.gnome3)
+        for gnome in [self.gnome1, self.gnome2, self.gnome3]:
+            self.map.add_gnome_to_gnome_queue(gnome)
+        self.map.transfer_gnomes_to_active_gnomes()
 
         self.list1 = ["rock", "rock", "rock", "rock", "scissor", "paper","paper", "paper","scissor","paper"]
         self.list2 = ["paper","scissor", "rock","scissor","paper","rock", "rock", "rock", "rock", "rock"]
