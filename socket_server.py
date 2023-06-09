@@ -3,7 +3,7 @@ import json
 import time
 import socket
 import threading
-
+from game_datab import *
 
 class Message:
     def __init__(self, type, payload) -> None:
@@ -67,6 +67,7 @@ class Gameserver:
         self.server_socket.bind((ip, port))
         self.server_socket.listen()
         self.connections = {}
+        self.db = Gnome_Database()
         self.connections_lock = threading.Lock()
         self.incoming_connections_thread = threading.Thread(
             target=self.new_connection, daemon=True)
@@ -102,13 +103,7 @@ class Gameserver:
                     self.send_response(connection_id,
                         {'Type': 'Action', 'Payload': {'1': 'hit', '2': 'defend'}})
                 elif curr_msg.type == "Registration":
-                    self.send_response(connection_id, {
-                        "Type": "Registration",
-                        "Payload": {
-                            "username": "xy",
-                            "password": "xy"
-                        }
-                    })  
+                    self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
                 elif curr_msg.type == "Closed":
                     self.connections[connection_id].close()
                 elif curr_msg.type == "Position":
@@ -149,6 +144,7 @@ class Gameserver:
 
 def main():
         server = Gameserver()
+        server.db.create_table()
         while True:
             server.process_data()
             time.sleep(0.001)
