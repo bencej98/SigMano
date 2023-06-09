@@ -67,6 +67,7 @@ class Gnome_Database:
             )
             self.connect.commit()
             logging.info("New user created: %s", username)
+            return True
         except sqlite3.Error as e:
             error_msg = "Error creating user: %s" % str(e)
             logging.error(error_msg)
@@ -142,6 +143,21 @@ class Gnome_Database:
             logging.error(error_msg)
             print(error_msg)
 
+    def check_user_upon_registration(self, username, password):
+            user_lower = username.lower()
+            self.cursor.execute(   """
+                          SELECT *
+                          FROM user
+                          WHERE username = ?
+                          """
+                          , (user_lower,))
+            validator = self.cursor.fetchone()
+            if validator is None:
+                gnome_name = f"gnome_{user_lower}"
+                self.create_user(user_lower, password, gnome_name)
+                return True
+            else:
+                return False
 
 # Set up logging configuration
 logging.basicConfig(
@@ -156,3 +172,7 @@ except sqlite3.Error as e:
     error_msg = "Error initializing Gnome_Database: %s" % str(e)
     logging.error(error_msg)
     print(error_msg)
+
+
+jatek = Gnome_Database()
+jatek.check_user_upon_registration("gÁbOR", "Teszt")
