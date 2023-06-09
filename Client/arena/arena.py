@@ -5,6 +5,12 @@ import random
 class Player(turtle.Turtle):
    def __init__(self, name:str, x:int, y:int, color:str, size:float, speed:int):
       super().__init__()
+      self.name1 = turtle.Turtle()
+      self.name1.color(color)
+      self.name1.hideturtle()
+      self.name1.penup()
+      self.name1.speed(speed)
+      self.name1.goto(x, y+10*size)
       self.penup()
       self.name = name
       self.speed(speed)
@@ -13,12 +19,6 @@ class Player(turtle.Turtle):
       self.size = size
       self.shapesize(size)
       self.shape("circle")
-      self.name1 = turtle.Turtle()
-      self.name1.color(color)
-      self.name1.hideturtle()
-      self.name1.penup()
-      self.name1.speed(speed)
-      self.name1.goto(x, y+10*size)
       self.name1.write(name, False, "center")
 
    def move(self, x:int, y:int):
