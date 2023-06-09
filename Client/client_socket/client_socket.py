@@ -3,9 +3,11 @@ import json
 import threading
 import time
 import random
+import queue
+
 from tkinter import messagebox
 from arena.auth_screen import MainApp
-from arena.arena import start_loop, dict_data_for_screen, json_temp
+from arena.arena import start_loop, dict_data_for_screen, json_temp, set_temp_json
 
 class ClientConnection:
     def __init__(self, host, port) -> None:
@@ -16,7 +18,7 @@ class ClientConnection:
         self.user_password = None
 
         self.socket_client = None
-
+        
         self.frame_destroy = None
 
         self.incomming = Incomming()
@@ -42,9 +44,9 @@ class ClientConnection:
                 time.sleep(1)
 
             auth_screen_app = MainApp(self.get_user_name_password_from_form)
-            auth_screen_app.mainloop()
-        
+            auth_screen_app.mainloop()        
             
+            #region MANUAL LOOP 
 
             #TODO:switch on authentication
             # self.send_message(client_socket, self.init_message)
@@ -58,7 +60,6 @@ class ClientConnection:
             #         print("Authentication failed!")
             #     else:
             #         break
-
 
             while False:
                 print("ACTIONS:")
@@ -96,11 +97,13 @@ class ClientConnection:
 
             #client_socket.close()
 
+            #endregion
+
     def destroy_frames(self):
         self.frame_destroy()
+        
 
     def get_user_name_password_from_form(self, log_type, name, password, frame_destroy):
-        print("frame dest:",frame_destroy)
         self.frame_destroy = frame_destroy
 
         if log_type == "Auth":
@@ -113,29 +116,11 @@ class ClientConnection:
         user_data={"username": name,"password": password}
         self.send_message(self.socket_client, auth_or_register(user_data))
 
-        # message = self.process_incomming_register_login(self.socket_client)
-        # print("auth_client", message)
-
-    # def process_incomming_register_login(self, client_socket):
-    #     data = client_socket.recv(2048)
-    #     incoming = self.incomming.parse_incoming(data)
-    #     print("AUTH", incoming)
-
-    #     self.frame_destroy()
-
-    #     if incoming["Type"] == "Auth" and incoming["Payload"]:
-    #         return True
-
-    #     return False
-
-
     def send_message(self, client_socket, message):
         client_socket.sendall(json.dumps(message).encode("utf-8"))
 
 
 # region OUTGOING MESSAGES:
-
-
 class Outgoing:
     def __init__(self) -> None:
         pass
@@ -156,83 +141,80 @@ class Outgoing:
     def close_message(self) -> dict:
         # example: {"Type": "Registration","Payload": {"username": "xy","password": "xy"}}
         return {"Type": "Closed", "Payload": {}}
-
-
 # endregion
-
-
 # region INCOMING MESSAGES:
-class Message:
-    def __init__(self, incoming_type, payload) -> None:
-        self.Type = incoming_type
-        self.Payload = payload
-
-
 class Incomming:
     def __init__(self) -> None:
         self.positions = None
         self.event = None
-        pass
+
+        self.is_logged_in = False
+        self.is_started = False
+
+        self.incoming_queue = queue.Queue()        
 
     def accept_incoming(self, client_socket, set_socket_cb, frame_destroy):
         set_socket_cb(client_socket)
 
-        while True:
-                
-                try: 
-                    data = client_socket.recv(2048)
-                    if not data:
-                        print("Server disconnected!")
-                        break
-                except OSError as e:
-                    print(e)
-                else:
-                    incoming = self.parse_incoming(data)
+        while True:                
+            try: 
+                data = client_socket.recv(2048)
+                if not data:
+                    print("Server disconnected!")
+                    break
+            except OSError as e:
+                print(e)
+            else:
+                incoming = self.parse_incoming(data)
 
-                    print(f"FROM SERVER: {incoming}")
-
-                # if incoming["type"] == "Registration" or incoming["type"] == "Auth":
-                #     if not incoming["Payload"]:
-                #         messagebox.showinfo("Message", f"{'Registration' if incoming['type']=='Registration' else 'Authentication'} success!")
-                #         return
+                #sikeres regisztáció
+                if incoming["type"] == "Registration" or incoming["type"] == "Auth":
+                    self.failed_login(incoming)
+                    continue
                     
-                # #TODO: nyissa meg az arénát.
-                #     messagebox.showinfo("User registered", "Registration success!")
-                #     frame_destroy()
+                #zárja a login felületet
+                if not self.is_logged_in:
+                    destroy_frame_thread = threading.Thread(target=self.destroy_login_ui, args=(frame_destroy, ))
+                    destroy_frame_thread.start()
 
-                    #json_temp = {'Type': 'position', 'payload': {'loluser': [2, 3], 'loluser2': [18, 9]}}
-                
-                    if incoming["type"] == "position":
-                        positions = incoming['payload']
+                #módosítja a pozíciókat
+                change_json = threading.Thread(target=self.pop_queue)
+                change_json.start()
 
-                        change_json = threading.Thread(target=self.change_data, args=(positions, ))
-                        change_json.start()
+                #nyitja az arenát felületet
+                if not self.is_started:
+                    start_arena = threading.Thread(target=self.start_arena)
+                    start_arena.start()
+                    self.is_started = True
 
-                        start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
+    def failed_login(self, incoming):
+        if not incoming["payload"]:
+            messagebox.showinfo("Message", f"{'Registration' if incoming['type']=='Registration' else 'Authentication'} failed!")
+            return
+
+    def destroy_login_ui(self, frame_destroy):
+        self.is_logged_in = True
+        messagebox.showinfo("User registered", "Registration success!")
+        frame_destroy()
 
 
-
-
-        # except Exception as e:
-        #     print("EXCEPTION", e)
-        #     pass
+    def start_arena(self):
+        start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
 
     def change_data(self, positions):
-        print("TYPE and DATA", positions['loluser'], positions['loluser2'])        
-        global json_temp
-        json_temp = positions
+        set_temp_json(positions)
 
-        # while True:
-        #     time.sleep(1)
-        #     json_temp['loluser'][0] = random.randint(0,19)
-        #     json_temp['loluser'][1] = random.randint(0,19)
-        #     json_temp['loluser2'][0] = random.randint(0,19)
-        #     json_temp['loluser2'][1] = random.randint(0,19)
+    def pop_queue(self):
+        while True:
+            incoming = self.incoming_queue.get()
+            print("incoming queue:", incoming)
+            if incoming["type"] == "position":
+                self.change_data(incoming['payload'])
+            time.sleep(2)
 
     def parse_incoming(self, data):
-        print("DATA", data)
-        return json.loads(data.decode("utf-8"))
-
-
-
+        data = data.decode("utf-8")
+        parsed = json.loads(data)
+        self.incoming_queue.put(parsed)
+        return parsed
 # endregion

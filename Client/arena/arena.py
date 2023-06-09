@@ -80,6 +80,11 @@ def dict_data_for_screen(json_dict:dict, object_list:list=[]):
 object_list = []
 json_temp = {'loluser': [2, 3], 'loluser2': [18, 9]}
 
+def set_temp_json(dict_obj):
+   print("SET TEMP:", dict_obj)
+   global json_temp
+   json_temp = dict_obj
+
 # def temp_valami():
    # for i in range(10):
    #    x = random.randint(0,19)
