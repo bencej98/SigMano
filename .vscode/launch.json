@@ -29,10 +29,18 @@
             "justMyCode": true
         },
         {
-            "name": "choose action",
+            "name": "choose_action",
             "type": "python",
             "request": "launch",
             "program": "Client/arena/choose_action.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "auth_screen",
+            "type": "python",
+            "request": "launch",
+            "program": "Client/arena/auth_screen.py",
             "console": "integratedTerminal",
             "justMyCode": true
         }
