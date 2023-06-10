@@ -5,11 +5,11 @@ class ActionManager:
         self.collided_gnomes = []
         self.event_dictionary = {}
         
-    def get_collided_gnomes(self, map: Map):
+    def _get_collided_gnomes(self, map: Map):
         self.collided_gnomes = map.check_collisions()
 
     def fight(self, map):
-        self.get_collided_gnomes(map)
+        self._get_collided_gnomes(map)
         if len(self.collided_gnomes) > 0:
             for gnomes in self.collided_gnomes:
                 for i, gnome in enumerate(gnomes):
@@ -17,7 +17,7 @@ class ActionManager:
                         for j in range(i+1, len(gnomes)):
                             gnome_first = gnome
                             gnome_second = gnomes[j]
-                            fight_message_dict = self.check_fight_option(gnome_first, gnome_second)
+                            fight_message_dict = self._check_fight_option(gnome_first, gnome_second)
                             if gnome_first.user in self.event_dictionary:
                                 self.event_dictionary[gnome_first.user].append(fight_message_dict)
                             else:
@@ -29,8 +29,17 @@ class ActionManager:
                             gnome_first.increase_event_counter()
                             gnome_second.increase_event_counter()
         return self.event_dictionary
+    
+    def check_gnome_death(self, map: Map):
+        gnome_deathnote = []
+        for gnome_name, gnome in map.active_gnomes.items():
+            if gnome.lose_count >= 3:
+                gnome_deathnote.append(gnome_name)
+        
+        for gnome_name in gnome_deathnote:
+            del map.active_gnomes[gnome_name]
 
-    def check_fight_option(self, gnome_first, gnome_second):
+    def _check_fight_option(self, gnome_first, gnome_second):
         gnome_first_action = gnome_first.strategy[gnome_first.event_counter]
         gnome_second_action = gnome_second.strategy[gnome_second.event_counter]
         encounter = f"{gnome_first.user} used {gnome_first_action} and {gnome_second.user} used {gnome_second_action}"
@@ -44,7 +53,8 @@ class ActionManager:
                 gnome_second.actual_points += 1
                 gnome_second.kill_count += 1
                 gnome_first.actual_points -= 1
-                outcome = f"{gnome_second.user} won"
+                gnome_first.lose_count += 1
+                outcome = f"{gnome_second.name} won"
                 fight_message_dict["outcome"] = outcome
                 return fight_message_dict
             case ("rock", "scissor") | ("paper", "rock") | ("scissor", "paper"):
@@ -52,7 +62,8 @@ class ActionManager:
                 gnome_first.actual_points += 1
                 gnome_first.kill_count += 1
                 gnome_second.actual_points -= 1
-                outcome = f"{gnome_first.user} won"
+                gnome_second.lose_count += 1
+                outcome = f"{gnome_first.name} won"
                 fight_message_dict["outcome"] = outcome
                 return fight_message_dict
             case _:

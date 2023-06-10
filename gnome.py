@@ -9,6 +9,7 @@ class Gnome:
         self.event_counter = 0
         self.actual_points = 0
         self.kill_count = 0
+        self.lose_count = 0
 
     def spawn_gnome(self, map):
         self.location["x"] = random.randint(0, map.x_coordinate)
