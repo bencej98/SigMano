@@ -102,10 +102,10 @@ class Gameserver:
         for connection_id in new_messages:
             curr_msg = new_messages[connection_id]
             if curr_msg.type:
-                if curr_msg.type == "Action":
-                    self.send_response(connection_id,
-                        {'Type': 'Action', 'Payload': {'1': 'hit', '2': 'defend'}})
-                elif curr_msg.type == "Registration":
+                # if curr_msg.type == "Action":
+                #     self.send_response(connection_id,
+                #         {'Type': 'Action', 'Payload': {'1': 'hit', '2': 'defend'}})
+                if curr_msg.type == "Registration":
                     self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
                 elif curr_msg.type == "Closed":
                     self.connections[connection_id].close()
