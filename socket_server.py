@@ -128,15 +128,10 @@ class Gameserver:
                 gnome = Gnome(f"loluser{n}")
                 gnomes_list.append(gnome)
 
-            map = Map(19, 19, 5)
             for gnome in gnomes_list:
-                map.add_gnome_to_gnome_queue(gnome)
-            map.transfer_gnomes_to_active_gnomes()
-
-            for gnome_name, gnome in map.active_gnomes.items():
-                for valami in range(20):
-                    gnome.random_move(map)
-            position_dict = map.move_all_gnomes()
+                self.travel.add_gnome_to_gnome_queue(gnome)
+            self.travel.transfer_gnomes_to_active_gnomes()
+            position_dict = self.travel.move_all_gnomes()
             self.broadcast_message(position_dict)
             print(position_dict)
             time.sleep(2)
