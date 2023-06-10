@@ -144,6 +144,8 @@ class Outgoing:
 # endregion
 # region INCOMING MESSAGES:
 class Incomming:
+
+    counter = 0
     def __init__(self) -> None:
         self.positions = None
         self.event = None
@@ -155,6 +157,10 @@ class Incomming:
 
     def accept_incoming(self, client_socket, set_socket_cb, frame_destroy):
         set_socket_cb(client_socket)
+
+        #módosítja a pozíciókat
+        change_json = threading.Thread(target=self.pop_queue)
+        change_json.start()
 
         while True:                
             try: 
@@ -177,9 +183,6 @@ class Incomming:
                     destroy_frame_thread = threading.Thread(target=self.destroy_login_ui, args=(frame_destroy, ))
                     destroy_frame_thread.start()
 
-                #módosítja a pozíciókat
-                change_json = threading.Thread(target=self.pop_queue)
-                change_json.start()
 
                 #nyitja az arenát felületet
                 if not self.is_started:
@@ -194,7 +197,8 @@ class Incomming:
 
     def destroy_login_ui(self, frame_destroy):
         self.is_logged_in = True
-        messagebox.showinfo("User registered", "Registration success!")
+        #messagebox.showinfo("User registered", "Registration success!")
+        print("User registered", "Registration success!")
         frame_destroy()
 
 
@@ -206,15 +210,20 @@ class Incomming:
 
     def pop_queue(self):
         while True:
-            incoming = self.incoming_queue.get()
-            print("incoming queue:", incoming)
-            if incoming["type"] == "position":
-                self.change_data(incoming['payload'])
-            time.sleep(2)
+            if not self.incoming_queue.empty():
+                incoming = self.incoming_queue.get()
+                print(f"{Incomming.counter} incoming queue:", incoming)
+                Incomming.counter += 1
+                if incoming["type"] == "position":
+                    self.change_data(incoming['payload'])
+            time.sleep(1)
 
     def parse_incoming(self, data):
         data = data.decode("utf-8")
         parsed = json.loads(data)
-        self.incoming_queue.put(parsed)
+
+        if parsed["type"] == "position":
+            self.incoming_queue.put(parsed)
+            
         return parsed
 # endregion
