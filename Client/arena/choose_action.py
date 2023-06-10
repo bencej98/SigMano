@@ -57,9 +57,9 @@ class ChooseAction(tk.Frame):
 
         # buttons
         add_action = tk.Button(self, text="Add", background="green", fg="white",
-                    command=lambda: self.add_action(), font=self.controller.button_font, width=5)
+                    command=self.add_action, font=self.controller.button_font, width=5)
         remove_action = tk.Button(self, text="Remove", background="red", fg="white",
-                    command=lambda: self.remove_action(), font=self.controller.button_font, width=5)
+                    command=self.remove_action, font=self.controller.button_font, width=5)
         fight_button = tk.Button(self, text="Fight", background="orange", fg="white",
             command=lambda: self.fight(), font=self.controller.button_font, width=5)
         
@@ -96,6 +96,7 @@ class ChooseAction(tk.Frame):
                     index_counter += 1
 
             messagebox.showinfo("FIGHT", "You are going to fight!")
+            print("Returns choosed actions...")
             return fight_dict
 
         else:
@@ -121,9 +122,11 @@ class ChooseAction(tk.Frame):
 
     def remove_action(self):
         """ Removes action that has been seleced """
-        if self.tree.size() != (0,0):
+        if self.tree.selection() != (): # eg.: () or ('I003',)
             selected_item = self.tree.selection()[0]
             self.tree.delete(selected_item)
+        else:
+            messagebox.showinfo("No item selected", "Select an item to remove.")
 
 if __name__ == '__main__':
     app = MainApp()
