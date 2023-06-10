@@ -144,6 +144,7 @@ class Gameserver:
                 for valami in range(20):
                     gnome.random_move(map)
             position_dict = map.move_all_gnomes()
+            self.broadcast_message(position_dict)
             print(position_dict)
             time.sleep(2)
 
