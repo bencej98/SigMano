@@ -5,7 +5,7 @@ from tkinter import ttk
 
 class MainApp(tk.Tk):
 
-    def __init__(self, add_user_name_password  ,*args, **kwargs):
+    def __init__(self, add_user_name_password: callable  ,*args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.frame_width = 400
         self.frame_height = 400
@@ -54,24 +54,24 @@ class LoginPage(tk.Frame):
         self.add_user_to_login = add_user_to_login
         self.frame_parent = controller
 
-        tk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent, bg="skyblue")
         self.controller = controller
         title_label = tk.Label(self, text="Login Page", font=self.controller.title_font)
         title_label.pack(side="top", fill="x", pady=10)
 
         # username
-        label_1 = tk.Label(self, text="User name", font=self.controller.label_font)
+        label_1 = tk.Label(self, text="User name", font=self.controller.label_font, background="skyblue")
         username = tk.StringVar()
         username_input_field = tk.Entry(self, textvariable=username)
         # password
-        label_2 = tk.Label(self, text="Password", font=self.controller.label_font)
+        label_2 = tk.Label(self, text="Password", font=self.controller.label_font, background="skyblue")
         password = tk.StringVar()
         password_input_field = tk.Entry(self, textvariable=password)
         # buttons
         login_button = tk.Button(self, text="Login",
-                            command=lambda: self.logging_in(username, password), font=self.controller.button_font, width=10)
+                            command=lambda: self.logging_in(username, password), font=self.controller.button_font, width=10, background="Navy", fg="white")
         register_button = tk.Button(self, text="Register",
-                            command=lambda: controller.show_frame("RegisterPage"), font=self.controller.button_font, width=10)
+                            command=lambda: controller.show_frame("RegisterPage"), font=self.controller.button_font, width=10, background="RoyalBlue", fg="white")
         
         label_1.pack()
         username_input_field.pack()
