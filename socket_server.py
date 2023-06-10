@@ -109,13 +109,6 @@ class Gameserver:
                     self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
                 elif curr_msg.type == "Closed":
                     self.connections[connection_id].close()
-                elif curr_msg.type == "Position":
-                    self.broadcast_message({
-                        "Type": "Position",
-                        "Payload": {
-                            "User": ['x', 'y']
-                        }
-                    })
                 elif curr_msg.type == "Event":
                     self.send_response( connection_id, {
                         "Type": "Event",
