@@ -106,28 +106,28 @@ class RegisterPage(tk.Frame):
         self.add_user_to_login = add_user_to_login 
         self.frame_parent = controller
 
-        tk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent, background="skyblue")
         self.controller = controller
         title_label = tk.Label(self, text="Register Page", font=controller.title_font)
         title_label.pack(side="top", fill="x", pady=10)
 
         # # username
-        username_label = tk.Label(self, text="User name: ", font=controller.label_font)
+        username_label = tk.Label(self, text="User name: ", font=controller.label_font, background="skyblue")
         username = tk.StringVar()
         self.username_entry = tk.Entry(self, textvariable=username, font=controller.label_font)
         # password 1
-        password_label_1 = tk.Label(self, text="Password: ", font=controller.label_font)
+        password_label_1 = tk.Label(self, text="Password: ", font=controller.label_font, background="skyblue")
         password_1 = tk.StringVar()
         self.password_entry_1 = tk.Entry(self, textvariable=password_1, font=controller.label_font)
         # password 2
-        password_label_2 = tk.Label(self, text="Password again: ", font=controller.label_font)
+        password_label_2 = tk.Label(self, text="Password again: ", font=controller.label_font, background="skyblue")
         password_2 = tk.StringVar()
         self.password_entry_2 = tk.Entry(self, textvariable=password_2,font=controller.label_font)
 
         register_button = tk.Button(self, text="Register",
-                           command=lambda: self._register_user(username, password_1, password_2), font=self.controller.button_font, width=10)
+                           command=lambda: self._register_user(username, password_1, password_2), font=self.controller.button_font, width=10, background="RoyalBlue", fg="white")
         go_to_login_button = tk.Button(self, text="Back to Login",
-                           command=lambda: controller.show_frame("LoginPage"), font=self.controller.button_font, width=10)
+                           command=lambda: controller.show_frame("LoginPage"), font=self.controller.button_font, width=10, background="Navy", fg="white")
         # pack all
         username_label.pack()
         self.username_entry.pack()
