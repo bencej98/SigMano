@@ -70,7 +70,7 @@ class Gameserver:
         self.server_socket.listen()
         self.connections = {}
         self.db = Gnome_Database()
-        self.travel = Map(19, 19)
+        self.travel = Map(19, 19, 5)
         self.connections_lock = threading.Lock()
         self.incoming_connections_thread = threading.Thread(
             target=self.new_connection, daemon=True)
@@ -130,13 +130,22 @@ class Gameserver:
                 self.broadcast_message(999)  # Send code 999 for missing type
     def tik_data(self):
         while True:
-            gnome1 = Gnome("lol", "loluser")
-            gnome2 = Gnome("lol2", "loluser2")
-            self.travel.add_gnome_to_active_gnomes(gnome1, gnome2)
-            travel = self.travel.move_all_gnomes()
-            # self.broadcast_message(travel)
-            print(travel)
-            time.sleep(1)
+            gnomes_list = []
+            for n in range (10):
+                gnome = Gnome(f"loluser{n}")
+                gnomes_list.append(gnome)
+
+            map = Map(19, 19, 5)
+            for gnome in gnomes_list:
+                map.add_gnome_to_gnome_queue(gnome)
+            map.transfer_gnomes_to_active_gnomes()
+
+            for gnome_name, gnome in map.active_gnomes.items():
+                for valami in range(20):
+                    gnome.random_move(map)
+            position_dict = map.move_all_gnomes()
+            print(position_dict)
+            time.sleep(2)
 
     def run_tik_data_thread(self):
         tik_thread = threading.Thread(target=self.tik_data)
