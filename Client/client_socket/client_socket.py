@@ -37,71 +37,17 @@ class ClientConnection:
 
             incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(self.socket_client,self.init_socket, self.destroy_frames))
             incomming_messages.start()
-            
 
             while not self.socket_client:
                 print("Wait for init socket", self.socket_client)
                 time.sleep(1)
 
             auth_screen_app = MainApp(self.get_user_name_password_from_form)
-            auth_screen_app.mainloop()        
+            auth_screen_app.mainloop()
             
-            #region MANUAL LOOP 
-
-            #TODO:switch on authentication
-            # self.send_message(client_socket, self.init_message)
-            # is_authenticated = False
-            # while not is_authenticated:
-            #     self.user_name = input("Kérem a nevét:")
-            #     self.user_password = input("Kérem a jelszót:")
-
-            #     is_authenticated = self.auth_client(client_socket,self.user_name, self.user_password)
-            #     if not is_authenticated:                        
-            #         print("Authentication failed!")
-            #     else:
-            #         break
-
-            while False:
-                print("ACTIONS:")
-                for index, actions_text in enumerate(self.action_types):
-                    print(f"{index}:{actions_text}")
-
-                choosen = input("\nAction >> ")
-                if choosen == "q":
-                    break
-                try:
-                    selected_number = int(choosen)
-
-                except ValueError:
-                    print("Számot kérek!")
-                    continue
-
-                if selected_number < 0 or selected_number >= len(self.action_types):
-                    print("A listából válassz!")
-                    continue
-
-                action = self.action_types[selected_number]
-
-                match action:
-                    case "Action":
-                        test_action = {"1": "hit", "2": "defend"}
-                        self.send_message(client_socket, self.outgoing.action_message(test_action))
-
-                    case "Registration":
-                        test_user_name = {"username": "xy", "password": "xy"}
-                        self.send_message(client_socket, self.outgoing.registration_message(test_user_name))
-
-                    case "Closed":
-                        self.send_message(client_socket, self.outgoing.close_message())
-                        break
-
-            #client_socket.close()
-
-            #endregion
-
+         
     def destroy_frames(self):
-        self.frame_destroy()
-        
+        self.frame_destroy()        
 
     def get_user_name_password_from_form(self, log_type, name, password, frame_destroy):
         self.frame_destroy = frame_destroy
@@ -218,12 +164,16 @@ class Incomming:
                     self.change_data(incoming['payload'])
             time.sleep(1)
 
+    def put_queue(self, parsed):
+        self.incoming_queue.put(parsed)
+
+
     def parse_incoming(self, data):
         data = data.decode("utf-8")
         parsed = json.loads(data)
 
         if parsed["type"] == "position":
-            self.incoming_queue.put(parsed)
+            self.put_queue(parsed)
             
         return parsed
 # endregion
