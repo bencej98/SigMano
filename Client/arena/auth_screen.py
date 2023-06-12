@@ -66,7 +66,7 @@ class LoginPage(tk.Frame):
         # password
         label_2 = tk.Label(self, text="Password", font=self.controller.label_font, background="skyblue")
         password = tk.StringVar()
-        password_input_field = tk.Entry(self, textvariable=password)
+        password_input_field = tk.Entry(self, textvariable=password, show="*")
         # buttons
         login_button = tk.Button(self, text="Login",
                             command=lambda: self.logging_in(username, password), font=self.controller.button_font, width=10, background="Navy", fg="white")
@@ -118,11 +118,11 @@ class RegisterPage(tk.Frame):
         # password 1
         password_label_1 = tk.Label(self, text="Password: ", font=controller.label_font, background="skyblue")
         password_1 = tk.StringVar()
-        self.password_entry_1 = tk.Entry(self, textvariable=password_1, font=controller.label_font)
+        self.password_entry_1 = tk.Entry(self, textvariable=password_1, font=controller.label_font, show="*")
         # password 2
         password_label_2 = tk.Label(self, text="Password again: ", font=controller.label_font, background="skyblue")
         password_2 = tk.StringVar()
-        self.password_entry_2 = tk.Entry(self, textvariable=password_2,font=controller.label_font)
+        self.password_entry_2 = tk.Entry(self, textvariable=password_2,font=controller.label_font, show="*")
 
         register_button = tk.Button(self, text="Register",
                            command=lambda: self._register_user(username, password_1, password_2), font=self.controller.button_font, width=10, background="RoyalBlue", fg="white")
