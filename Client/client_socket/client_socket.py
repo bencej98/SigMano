@@ -19,7 +19,7 @@ class ClientConnection:
 
         self.socket_client = None
         
-        self.frame_destroy = None
+        self.loginRegister_frame_destroy = None
 
         self.incomming = Incomming()
         self.outgoing = Outgoing()
@@ -38,19 +38,14 @@ class ClientConnection:
             incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(self.socket_client,self.init_socket, self.destroy_frames))
             incomming_messages.start()
 
-            while not self.socket_client:
-                print("Wait for init socket", self.socket_client)
-                time.sleep(1)
-
             auth_screen_app = MainApp(self.get_user_name_password_from_form)
-            auth_screen_app.mainloop()
-            
+            auth_screen_app.mainloop()            
          
     def destroy_frames(self):
-        self.frame_destroy()        
+        self.loginRegister_frame_destroy()        
 
     def get_user_name_password_from_form(self, log_type, name, password, frame_destroy):
-        self.frame_destroy = frame_destroy
+        self.loginRegister_frame_destroy = frame_destroy
 
         if log_type == "Auth":
             self.auth_client(self.outgoing.authentication_message, name,password)
@@ -99,6 +94,10 @@ class Incomming:
         self.is_logged_in = False
         self.is_started = False
 
+        self.is_login_success = False
+
+        
+
         self.incoming_queue = queue.Queue()        
 
     def accept_incoming(self, client_socket, set_socket_cb, frame_destroy):
@@ -118,35 +117,36 @@ class Incomming:
                 print(e)
             else:
                 incoming = self.parse_incoming(data)
+                self.process_incoming(incoming)
 
-                #sikeres regisztáció
-                if incoming["type"] == "Registration" or incoming["type"] == "Auth":
-                    self.failed_login(incoming)
-                    continue
-                    
-                #zárja a login felületet
-                if not self.is_logged_in:
+                if self.is_login_success:
+                    #zárja a regisztárciót:
                     destroy_frame_thread = threading.Thread(target=self.destroy_login_ui, args=(frame_destroy, ))
                     destroy_frame_thread.start()
 
-
-                #nyitja az arenát felületet
-                if not self.is_started:
+                    #nyitja az arenát felületet:
                     start_arena = threading.Thread(target=self.start_arena)
                     start_arena.start()
-                    self.is_started = True
+                    self.is_login_success = False
 
-    def failed_login(self, incoming):
+    def process_incoming(self, incoming):
+        if incoming["type"] == "Registration" or incoming["type"] == "Auth":
+            self.is_login_success = self.login_status(incoming)
+
+        if incoming["type"] == "position":
+            self.put_queue(incoming)
+        
+    def login_status(self, incoming):
         if not incoming["payload"]:
             messagebox.showinfo("Message", f"{'Registration' if incoming['type']=='Registration' else 'Authentication'} failed!")
-            return
+            return False
+        return True
 
     def destroy_login_ui(self, frame_destroy):
         self.is_logged_in = True
         #messagebox.showinfo("User registered", "Registration success!")
         print("User registered", "Registration success!")
         frame_destroy()
-
 
     def start_arena(self):
         start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
@@ -169,11 +169,12 @@ class Incomming:
 
 
     def parse_incoming(self, data):
-        data = data.decode("utf-8")
-        parsed = json.loads(data)
+        try:
+            data = data.decode("utf-8")
+            parsed = json.loads(data)
 
-        if parsed["type"] == "position":
-            self.put_queue(parsed)
-            
-        return parsed
+            return parsed
+        except Exception as e:
+            print("DATA CONGESTIONS!", data)
+
 # endregion
