@@ -66,7 +66,7 @@ def remove_obj_from_list(obj_list:list, json_dict:dict):
       obj.name1.clear()
       del obj
 
-def dict_data_for_screen(json_dict:dict, object_list:list):
+def dict_data_for_screen(json_dict:dict, object_list:list=[]):
    obj_names = obj_names_from_list(object_list)
    remove_obj_from_list(object_list,json_dict)
    for name, coordinates in json_dict.items():
@@ -78,26 +78,38 @@ def dict_data_for_screen(json_dict:dict, object_list:list):
          object_list.append(obj)
 
 object_list = []
+json_temp = {'loluser': [2, 3], 'loluser2': [18, 9]}
+
+def set_temp_json(dict_obj):
+   global json_temp
+   json_temp = dict_obj
+
+# def temp_valami():
+   # for i in range(10):
+   #    x = random.randint(0,19)
+   #    y = random.randint(0,19)
+   #    name = random.randint(1,2)
+   #    x2 = random.randint(0,19)
+   #    y2 = random.randint(0,19)
+   #    name2 = random.randint(3,4)
+   #    json = {name:[x,y], name2:[x2,y2]}
+   #    dict_data_for_screen(json, object_list)
+   #    time.sleep(1)
+
 
 def temp_valami():
-   for i in range(10):
-      x = random.randint(0,19)
-      y = random.randint(0,19)
-      name = random.randint(1,2)
-      x2 = random.randint(0,19)
-      y2 = random.randint(0,19)
-      name2 = random.randint(3,4)
-      json = {name:[x,y], name2:[x2,y2]}
-      dict_data_for_screen(json, object_list)
+   while True:
+      dict_data_for_screen(json_temp, object_list)
       time.sleep(1)
 
 
-def start_loop():
+def start_loop(json):
    # TODO: Flexible window later
    turtle.setup(tile_size*tile_number, tile_size*tile_number, None, None)
    window = turtle.Screen()
    window.title("Arena")
    window.bgcolor("lightgreen")
+
    temp_valami()
    window.mainloop()
 
