@@ -109,13 +109,11 @@ class Gameserver:
                     self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
                 elif curr_msg.type == "Closed":
                     self.connections[connection_id].close()
-                elif curr_msg.type == "Event":
+                elif curr_msg.type == "Auth":
                     self.send_response( connection_id, {
-                        "Type": "Event",
-                        "Payload": {
-                            "happening": "msg",
-                            "outcome": "msg"
-                        }
+                        "type": "Auth",
+                        "payload": True
+                        
                     }) 
                 else:
                     self.broadcast_message(800)  # Send code 999 for unknown type
