@@ -164,7 +164,7 @@ class Gameserver:
             self.connections.pop(id)
 
 def main():
-        travel = Map(19, 19, 5)
+        travel = Map(5, 5, 5)
         action = ActionManager()
         server = Gameserver(travel, action)
         server.db.create_table()
