@@ -127,10 +127,19 @@ class Incomming:
                     start_arena.start()
                     self.is_login_success = False
 
+                    # choose actions
+                    start_choosing_action = threading.Thread(target=self.start_arena)
+                    start_arena.start()
+                    self.is_login_success = False
+
+    def choose_action(self):
+        print("Fighting....")
+
     def process_incoming(self, incoming):
         print("BEFORE Broken:",incoming)
         if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
             self.is_login_success = self.login_status(incoming)
+
 
         if incoming["Type"] == "Position":
             self.put_queue(incoming)
