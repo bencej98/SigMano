@@ -15,7 +15,10 @@ class Gnome:
         self.location["x"] = random.randint(0, map.x_coordinate)
         self.location["y"] = random.randint(0, map.y_coordinate)
 
-    def check_random_direction(self, map):
+    def update_strategy(self, strategy_list: list):
+        self.strategy = strategy_list
+
+    def _check_random_direction(self, map):
         x = self.location["x"]
         y = self.location["y"]
         map_x = map.x_coordinate
@@ -115,8 +118,9 @@ class Map:
             gnome.random_move(self)
             position = (gnome.location["x"], gnome.location["y"])
             position_update_dict[gnome.user] = position
-        position_update_for_client = {"type": "position", "payload": position_update_dict}
+        position_update_for_client = {"Type": "Position", "Payload": position_update_dict}
         return position_update_for_client
+    
 #function check
 if __name__ == "__main__":
     gnomes_list = []
