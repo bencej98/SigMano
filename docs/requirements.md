@@ -64,8 +64,10 @@
 {
 	"Type": "Event",
 	"Payload": {
+		"user": {
 		"happening": "msg",
 		"outcome": "msg"
+		}
 	}
 }
 ```
