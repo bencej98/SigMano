@@ -128,12 +128,14 @@ class Incomming:
                     self.is_login_success = False
 
     def process_incoming(self, incoming):
-        print("BEFORE Broken:",incoming)
         if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
             self.is_login_success = self.login_status(incoming)
 
         if incoming["Type"] == "Position":
             self.put_queue(incoming)
+
+        if incoming["Type"] == "Event":
+            print("EVENT:",incoming)
         
     def login_status(self, incoming):
         if not incoming["Payload"]:
