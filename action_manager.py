@@ -4,21 +4,21 @@ class ActionManager:
     def __init__(self) -> None:
         self.collided_gnomes = []
         self.event_dictionary = {}
+        self.user_strategies = {}
         
     def _get_collided_gnomes(self, map: Map):
         self.collided_gnomes = map.check_collisions()
     
     def update_gnomes_strategy(self, map: Map, client_strategy: dict, username: str):
-        update_strategy_message = {}
-        update_strategy_message[username] = client_strategy["strategy"]
-        for user, strategy in update_strategy_message:
+        self.user_strategies[username] = client_strategy["strategy"]
+        for user, strategy in self.user_strategies:
             if user in map.active_gnomes:
                 pass
             else:
                 for gnome in map.gnome_queue:
                     if gnome.user == user:
                         gnome.update_strategy(strategy)
-                        del update_strategy_message[user]
+                        del self.user_strategies[user]
         
 
     def fight(self, map):
