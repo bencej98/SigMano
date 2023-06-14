@@ -95,9 +95,7 @@ class Incomming:
         self.is_started = False
 
         self.is_login_success = False
-
         
-
         self.incoming_queue = queue.Queue()        
 
     def accept_incoming(self, client_socket, set_socket_cb, frame_destroy):
