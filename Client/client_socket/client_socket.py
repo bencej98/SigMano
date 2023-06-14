@@ -151,10 +151,10 @@ class Incomming:
         return True
 
     def destroy_login_ui(self, frame_destroy):
-        self.is_logged_in = True
-        #messagebox.showinfo("User registered", "Registration success!")
+        #self.is_logged_in = True
         print("Registration success!")
         frame_destroy()
+        #messagebox.showinfo("User registered", "Registration success!")
 
     def start_arena(self):
         start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
