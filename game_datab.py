@@ -163,9 +163,26 @@ class Gnome_Database:
             if validator is None:
                 gnome_name = f"gnome_{user_lower}"
                 self.create_user(user_lower, password, gnome_name)
-                print(self.send_auth_json(True))
+                return self.send_auth_json(True)
             else:
-                print(self.send_auth_json(False))
+                return self.send_auth_json(False)
+
+    def login_user(self, username, password):
+            user_lower = username.lower()
+            self.cursor.execute(   """
+                SELECT username, password
+                FROM user
+                WHERE username = ?
+                """
+                , (user_lower,))
+            user_data = self.cursor.fetchone()
+            if user_data is None:
+                return self.send_auth_json(False)
+            else:
+                if user_data[1] == password:
+                    return self.send_auth_json(True)
+                else:
+                    return self.send_auth_json(False)
 
     
 # Set up logging configuration
@@ -184,6 +201,3 @@ except sqlite3.Error as e:
 
 
 jatek = Gnome_Database()
-jatek.check_user_upon_registration("gÁbOR", "Teszt")
-jatek.check_user_upon_registration("gÁbOR2", "Teszt")
-jatek.check_user_upon_registration("bence2", "Teszt")
