@@ -5,7 +5,7 @@ import socket
 import threading
 from game_datab import *
 from gnome import *
-
+from action_manager import *
 
 class Message:
     def __init__(self, type, payload) -> None:
@@ -62,15 +62,16 @@ class Connection:
                 self.close()
 
 class Gameserver:
-    def __init__(self, ip="0.0.0.0", port=10000) -> None:
+    def __init__(self, travel, action_managger:ActionManager, ip="0.0.0.0", port=10000, ) -> None:
         self.messages = []
         self.server_socket = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.bind((ip, port))
         self.server_socket.listen()
         self.connections = {}
+        self.travel = travel
+        self.action_managger= action_managger
         self.db = Gnome_Database()
-        self.travel = Map(19, 19, 5)
         self.connections_lock = threading.Lock()
         self.incoming_connections_thread = threading.Thread(
             target=self.new_connection, daemon=True)
@@ -102,10 +103,11 @@ class Gameserver:
         for connection_id in new_messages:
             curr_msg = new_messages[connection_id]
             if curr_msg.type:
-                # if curr_msg.type == "Action":
-                #     self.send_response(connection_id,
-                #         {'Type': 'Action', 'Payload': {'1': 'hit', '2': 'defend'}})
+                if curr_msg.type == "Action":
+                    usname = self.connections[connection_id].name 
+                    self.action_managger.update_gnomes_strategy(self.travel, curr_msg.payload, usname) 
                 if curr_msg.type == "Registration":
+                    self.connections[connection_id].name = curr_msg.payload['username']
                     self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
                 elif curr_msg.type == "Closed":
                     self.connections[connection_id].close()
@@ -122,16 +124,23 @@ class Gameserver:
     def tik_data(self):
         while True:
             gnomes_list = []
+            strategy_list = ["rock", "rock", "rock", "rock", "scissor", "paper","paper", "paper","scissor","paper"]
             for n in range (10):
                 gnome = Gnome(f"loluser{n}")
                 gnomes_list.append(gnome)
+                gnome.strategy = strategy_list
 
             for gnome in gnomes_list:
                 self.travel.add_gnome_to_gnome_queue(gnome)
             self.travel.transfer_gnomes_to_active_gnomes()
             position_dict = self.travel.move_all_gnomes()
             self.broadcast_message(position_dict)
+            act_fight = self.action_managger.fight(self.travel)
             print(position_dict)
+            if len(act_fight) != 0:
+                self.broadcast_message({"Type": "Event", "Payload" : act_fight}) 
+                print(act_fight)
+                self.broadcast_message(self.action_managger.check_gnome_death(self.travel))
             time.sleep(2)
 
     def run_tik_data_thread(self):
@@ -155,7 +164,9 @@ class Gameserver:
             self.connections.pop(id)
 
 def main():
-        server = Gameserver()
+        travel = Map(19, 19, 5)
+        action = ActionManager()
+        server = Gameserver(travel, action)
         server.db.create_table()
         server.run_tik_data_thread()
         while True:            

@@ -8,13 +8,11 @@ class ActionManager:
     def _get_collided_gnomes(self, map: Map):
         self.collided_gnomes = map.check_collisions()
     
-    def update_gnomes_strategy(self, map: Map, client_strategy: dict, username: str):
+    def update_gnomes_strategy(self, map: Map, client_strategy: list, username: str):
         update_strategy_message = {}
-        update_strategy_message[username] = client_strategy["strategy"]
+        update_strategy_message[username] = client_strategy
         for user, strategy in update_strategy_message:
-            if user in map.active_gnomes:
-                pass
-            else:
+            if user not in map.active_gnomes:
                 for gnome in map.gnome_queue:
                     if gnome.user == user:
                         gnome.update_strategy(strategy)
@@ -22,6 +20,7 @@ class ActionManager:
         
 
     def fight(self, map):
+        self.event_dictionary = {}
         self._get_collided_gnomes(map)
         if len(self.collided_gnomes) > 0:
             for gnomes in self.collided_gnomes:
@@ -51,6 +50,10 @@ class ActionManager:
         
         for gnome_name in gnome_deathnote:
             dead_gnome = map.active_gnomes.pop(gnome_name)
+            dead_gnome.event_counter = 0
+            dead_gnome.actual_points = 0
+            dead_gnome.kill_count = 0
+            dead_gnome.lose_count = 0
             map.add_gnome_to_gnome_queue(dead_gnome)
         
         return {

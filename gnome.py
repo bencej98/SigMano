@@ -50,7 +50,7 @@ class Gnome:
         return direction
 
     def random_move(self, map):
-        direction=self.check_random_direction(map)
+        direction=self._check_random_direction(map)
         match direction:
             # 0 is up then clockwise
             case 0: 
