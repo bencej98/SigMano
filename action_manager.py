@@ -37,7 +37,13 @@ class ActionManager:
                 gnome_deathnote.append(gnome_name)
         
         for gnome_name in gnome_deathnote:
-            del map.active_gnomes[gnome_name]
+            dead_gnome = map.active_gnomes.pop(gnome_name)
+            map.add_gnome_to_gnome_queue(dead_gnome)
+        
+        return {
+            "Type": "Death",
+            "Payload": gnome_deathnote
+                }
 
     def _check_fight_option(self, gnome_first, gnome_second):
         gnome_first_action = gnome_first.strategy[gnome_first.event_counter]
