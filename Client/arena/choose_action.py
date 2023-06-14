@@ -3,7 +3,7 @@ from tkinter import font as tkfont
 from tkinter import ttk
 from tkinter import messagebox
 
-class MainApp(tk.Tk):
+class ActionApp(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -128,5 +128,5 @@ class ChooseAction(tk.Frame):
             messagebox.showinfo("No item selected", "Select an item to remove.")
 
 if __name__ == '__main__':
-    app = MainApp()
+    app = ActionApp()
     app.mainloop()
