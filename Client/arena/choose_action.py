@@ -66,7 +66,7 @@ class ChooseAction(tk.Frame):
         # option menu
         default_value = tk.StringVar()
         default_value.set("Please Choose")
-        self.option_menu = tk.OptionMenu(self, default_value, "Kő", "Papír", "Olló", command=self.save_chosen_action)
+        self.option_menu = tk.OptionMenu(self, default_value, "rock", "paper", "scissor", command=self.save_chosen_action)
 
         # treeview
         columns = ('actions')
@@ -87,17 +87,16 @@ class ChooseAction(tk.Frame):
 
     def fight(self) -> dict:
         """ Starts fight - returns a dictionary containing fight actions """
-        fight_dict = {"type": "action", "payload": {}} # "payload": {"1": "Kő", "2": "Olló"}
+        fight_data = {"type": "Action", "payload": []}
         if len(self.tree.get_children()) == 10:
-            index_counter = 1
             for line in self.tree.get_children():
                 for value in self.tree.item(line)['values']:
-                    fight_dict["payload"][index_counter] = value
-                    index_counter += 1
+                    fight_data["payload"].append(value)
 
             messagebox.showinfo("FIGHT", "You are going to fight!")
             print("Returns choosed actions...")
-            return fight_dict
+            print("Choose actions:", fight_data)
+            return fight_data
 
         else:
             messagebox.showinfo("Choose action", "You don't have anough action to fight.\n Choose 10 action.")

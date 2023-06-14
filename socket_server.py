@@ -111,8 +111,8 @@ class Gameserver:
                     self.connections[connection_id].close()
                 elif curr_msg.type == "Auth":
                     self.send_response( connection_id, {
-                        "type": "Auth",
-                        "payload": True
+                        "Type": "Auth",
+                        "Payload": True
                         
                     }) 
                 else:

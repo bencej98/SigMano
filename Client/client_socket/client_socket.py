@@ -128,15 +128,16 @@ class Incomming:
                     self.is_login_success = False
 
     def process_incoming(self, incoming):
-        if incoming["type"] == "Registration" or incoming["type"] == "Auth":
+        print("BEFORE Broken:",incoming)
+        if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
             self.is_login_success = self.login_status(incoming)
 
-        if incoming["type"] == "position":
+        if incoming["Type"] == "Position":
             self.put_queue(incoming)
         
     def login_status(self, incoming):
-        if not incoming["payload"]:
-            messagebox.showinfo("Message", f"{'Registration' if incoming['type']=='Registration' else 'Authentication'} failed!")
+        if not incoming["Payload"]:
+            messagebox.showinfo("Message", f"{'Registration' if incoming['Type']=='Registration' else 'Authentication'} failed!")
             return False
         return True
 
@@ -158,8 +159,8 @@ class Incomming:
                 incoming = self.incoming_queue.get()
                 print(f"{Incomming.counter} incoming queue:", incoming)
                 Incomming.counter += 1
-                if incoming["type"] == "position":
-                    self.change_data(incoming['payload'])
+                if incoming["Type"] == "Position":
+                    self.change_data(incoming['Payload'])
             time.sleep(1)
 
     def put_queue(self, parsed):
