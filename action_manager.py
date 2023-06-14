@@ -10,7 +10,6 @@ class ActionManager:
         self.collided_gnomes = map.check_collisions()
     
     def update_gnomes_strategy(self, map: Map, client_strategy: list, username: str):
-        self.user_strategies = {}
         self.user_strategies[username] = client_strategy
         for user, strategy in self.user_strategies:
             if user not in map.active_gnomes:
