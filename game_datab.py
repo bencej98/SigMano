@@ -2,7 +2,7 @@ import sqlite3
 import os.path
 import logging
 from datetime import datetime
-
+import json
 
 class Gnome_Database:
     path = "game_database.db"
@@ -143,6 +143,14 @@ class Gnome_Database:
             logging.error(error_msg)
             print(error_msg)
 
+    def send_auth_json(self, authentication_bool):
+        
+        authentication_data = {
+                                "Type": "Auth","Payload": authentication_bool
+
+                            }
+        return json.dumps(authentication_data)
+    
     def check_user_upon_registration(self, username, password):
             user_lower = username.lower()
             self.cursor.execute(   """
@@ -155,10 +163,28 @@ class Gnome_Database:
             if validator is None:
                 gnome_name = f"gnome_{user_lower}"
                 self.create_user(user_lower, password, gnome_name)
-                return True
+                return self.send_auth_json(True)
             else:
-                return False
+                return self.send_auth_json(False)
 
+    def login_user(self, username, password):
+            user_lower = username.lower()
+            self.cursor.execute(   """
+                SELECT username, password
+                FROM user
+                WHERE username = ?
+                """
+                , (user_lower,))
+            user_data = self.cursor.fetchone()
+            if user_data is None:
+                return self.send_auth_json(False)
+            else:
+                if user_data[1] == password:
+                    return self.send_auth_json(True)
+                else:
+                    return self.send_auth_json(False)
+
+    
 # Set up logging configuration
 logging.basicConfig(
     level=logging.INFO,
@@ -175,4 +201,3 @@ except sqlite3.Error as e:
 
 
 jatek = Gnome_Database()
-jatek.check_user_upon_registration("gÁbOR", "Teszt")
