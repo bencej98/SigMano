@@ -36,13 +36,13 @@ class Gnome:
                     break
                 elif (x == map_x and y == 0) and (direction in (0, 6, 7)):
                     break
-                elif x == 0 and (0 <= direction <= 4):
+                elif (x == 0 and y != map_y and y != 0) and (0 <= direction <= 4):
                     break
-                elif y == 0 and (0 <= direction <= 2 or direction in (6, 7)):
+                elif (y == 0 and x != map_x and x != 0) and (0 <= direction <= 2 or direction in (6, 7)):
                     break
-                elif x == map_x and (direction == 0 or 4 <= direction <= 7):
+                elif (x == map_x and y != 0 and y != map_y) and (direction == 0 or 4 <= direction <= 7):
                     break
-                elif y == map_y and (2 <= direction <= 6):
+                elif (y == map_y and x != 0 and x != map_x) and (2 <= direction <= 6):
                     break
             else:
                 break
