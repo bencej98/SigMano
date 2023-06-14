@@ -75,3 +75,8 @@
 	"Type": "Auth","Payload": true // false
 }
 ```
+```json for dead gnomes
+{
+	"Type": "Death", "Payload":["gnome_name1", "gnome_name2", ...]
+}
+```
