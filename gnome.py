@@ -15,6 +15,9 @@ class Gnome:
         self.location["x"] = random.randint(0, map.x_coordinate)
         self.location["y"] = random.randint(0, map.y_coordinate)
 
+    def update_strategy(self, strategy_list: list):
+        self.strategy = strategy_list
+
     def check_random_direction(self, map):
         x = self.location["x"]
         y = self.location["y"]
