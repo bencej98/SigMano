@@ -1,8 +1,8 @@
 import sqlite3
-import os.path
 import logging
 from datetime import datetime
 import json
+
 
 class Gnome_Database:
     path = "game_database.db"
@@ -55,7 +55,7 @@ class Gnome_Database:
             logging.error(error_msg)
             print(error_msg)
 
-    def create_user(self, username, password, gnome_name):
+    def create_user(self, username: str, password: str, gnome_name) -> bool | None:
         """Inserts user into database"""
         try:
             self.cursor.execute(
@@ -73,7 +73,8 @@ class Gnome_Database:
             logging.error(error_msg)
             print(error_msg)
 
-    def delete_user(self, username):
+    def delete_user(self, username: str) -> None:
+        """Deletes user from the database"""
         try:
             self.cursor.execute("DELETE FROM user WHERE username = ?", (username,))
             row_count = self.cursor.rowcount
@@ -89,7 +90,8 @@ class Gnome_Database:
             logging.error(error_msg)
             print(error_msg)
 
-    def print_sum_point(self, username):
+    def print_sum_point(self, username: str) -> None:
+        """Prints out the sum of the points of the user"""
         try:
             self.cursor.execute(
                 """
@@ -106,7 +108,8 @@ class Gnome_Database:
             logging.error(error_msg)
             print(error_msg)
 
-    def add_results_upon_death(self, username, kill_count, score):
+    def add_results_upon_death(self, username: str, kill_count: int, score: int) -> None:
+        """Adds results upon death to the database"""
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         try:
             self.cursor.execute(
@@ -125,7 +128,8 @@ class Gnome_Database:
             logging.error(error_msg)
             print(error_msg)
 
-    def update_sumscore_upon_death(self, username, score):
+    def update_sumscore_upon_death(self, username: str, score: int) -> None:
+        """"Updates the sum of the point uf the user upon death"""
         try:
             self.cursor.execute(
                 """
@@ -143,48 +147,49 @@ class Gnome_Database:
             logging.error(error_msg)
             print(error_msg)
 
-    def send_auth_json(self, authentication_bool):
-        
+    def send_auth_json(self, authentication_bool: bool) -> json:
+        """Sends back the result of the authentication or registartion to the client"""
         authentication_data = {
-                                "Type": "Auth","Payload": authentication_bool
-
+                                "Type": "Auth", "Payload": authentication_bool
                             }
         return json.dumps(authentication_data)
-    
-    def check_user_upon_registration(self, username, password):
-            user_lower = username.lower()
-            self.cursor.execute(   """
-                          SELECT *
-                          FROM user
-                          WHERE username = ?
-                          """
-                          , (user_lower,))
-            validator = self.cursor.fetchone()
-            if validator is None:
-                gnome_name = f"gnome_{user_lower}"
-                self.create_user(user_lower, password, gnome_name)
+
+    def check_user_upon_registration(self, username: str, password: str):
+        """Checks if a user already exists in the database in case of registration"""
+        user_lower = username.lower()
+        self.cursor.execute("""
+                        SELECT *
+                        FROM user
+                        WHERE username = ?
+                        """
+                        , (user_lower,))
+        validator = self.cursor.fetchone()
+        if validator is None:
+            gnome_name = f"gnome_{user_lower}"
+            self.create_user(user_lower, password, gnome_name)
+            return self.send_auth_json(True)
+        else:
+            return self.send_auth_json(False)
+
+    def login_user(self, username: str, password: str):
+        """Validates the user in case of login"""
+        user_lower = username.lower()
+        self.cursor.execute("""
+            SELECT username, password
+            FROM user
+            WHERE username = ?
+            """
+            , (user_lower,))
+        user_data = self.cursor.fetchone()
+        if user_data is None:
+            return self.send_auth_json(False)
+        else:
+            if user_data[1] == password:
                 return self.send_auth_json(True)
             else:
                 return self.send_auth_json(False)
 
-    def login_user(self, username, password):
-            user_lower = username.lower()
-            self.cursor.execute(   """
-                SELECT username, password
-                FROM user
-                WHERE username = ?
-                """
-                , (user_lower,))
-            user_data = self.cursor.fetchone()
-            if user_data is None:
-                return self.send_auth_json(False)
-            else:
-                if user_data[1] == password:
-                    return self.send_auth_json(True)
-                else:
-                    return self.send_auth_json(False)
 
-    
 # Set up logging configuration
 logging.basicConfig(
     level=logging.INFO,
