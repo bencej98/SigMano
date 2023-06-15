@@ -53,6 +53,7 @@ class LoginPage(tk.Frame):
     def __init__(self, parent, controller, add_user_to_login):
         self.add_user_to_login = add_user_to_login
         self.frame_parent = controller
+        self.direct_frame_parent = parent
 
         tk.Frame.__init__(self, parent, bg="skyblue")
         self.controller = controller
@@ -86,8 +87,9 @@ class LoginPage(tk.Frame):
             self.add_user_to_login("Auth", username.get(), password.get(), self._destroy)
 
     def _destroy(self):
-        self.frame_parent.destroy()
-
+        self.frame_parent.quit()
+        # self.frame_parent.destroy()
+        # self.direct_frame_parent.destroy()
 
     def _control_input(self, username: tk.StringVar, password: tk.StringVar):
         """ Controls the input from the user """
