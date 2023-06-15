@@ -106,17 +106,19 @@ class Gameserver:
                 if curr_msg.type == "Action":
                     usname = self.connections[connection_id].name 
                     self.action_managger.update_gnomes_strategy(self.travel, curr_msg.payload, usname) 
-                if curr_msg.type == "Registration":
+                elif curr_msg.type == "Registration":
                     self.connections[connection_id].name = curr_msg.payload['username']
                     self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
+                elif curr_msg.type == "Login":
+                    is_valid = json.loads(self.db.login_user(curr_msg.payload['username'], curr_msg.payload['password']))
+                    if is_valid["Payload"]:
+                        self.connections[connection_id].name = curr_msg.payload['username']
+                        self.send_response(connection_id, is_valid)
+                        print(self.send_response(connection_id, is_valid))
+                    else:
+                        self.send_response(connection_id, is_valid)
                 elif curr_msg.type == "Closed":
                     self.connections[connection_id].close()
-                elif curr_msg.type == "Auth":
-                    self.send_response( connection_id, {
-                        "Type": "Auth",
-                        "Payload": True
-                        
-                    }) 
                 else:
                     self.broadcast_message(800)  # Send code 999 for unknown type
             else:
@@ -164,7 +166,7 @@ class Gameserver:
             self.connections.pop(id)
 
 def main():
-        travel = Map(5, 5, 5)
+        travel = Map(19, 19, 2)
         action = ActionManager()
         server = Gameserver(travel, action)
         server.db.create_table()
