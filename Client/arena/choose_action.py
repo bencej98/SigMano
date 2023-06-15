@@ -90,11 +90,11 @@ class ChooseAction(tk.Frame):
 
     def fight(self) -> dict:
         """ Starts fight - returns a dictionary containing fight actions """
-        fight_data = {"type": "Action", "payload": []}
+        fight_data = {"Type": "Action", "Payload": []}
         if len(self.tree.get_children()) == 10:
             for line in self.tree.get_children():
                 for value in self.tree.item(line)['values']:
-                    fight_data["payload"].append(value)
+                    fight_data["Payload"].append(value)
 
             messagebox.showinfo("FIGHT", "You are going to fight!")
             print("Returns choosed actions...")
