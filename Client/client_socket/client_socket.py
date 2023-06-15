@@ -140,7 +140,8 @@ class Incomming:
                     # print("ACTIONSSSSSS", self.action_payload)
 
                     #akciók küldése a szerver részére
-                    self.outgoing.action_message(self.action_payload["Payload"])
+                    
+                    client_socket.sendall(json.dumps(self.outgoing.action_message(self.action_payload["Payload"])).encode("utf-8"))
 
                     #zárja a regisztárciót:
                     self.destroy_login_ui(frame_destroy)
