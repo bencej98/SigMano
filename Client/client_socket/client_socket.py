@@ -140,7 +140,7 @@ class Incomming:
                     # print("ACTIONSSSSSS", self.action_payload)
 
                     #akciók küldése a szerver részére
-                    self.outgoing.action_message(self.action_payload["payload"])
+                    self.outgoing.action_message(self.action_payload["Payload"])
 
                     #zárja a regisztárciót:
                     self.destroy_login_ui(frame_destroy)
