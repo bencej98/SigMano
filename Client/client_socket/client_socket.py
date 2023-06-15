@@ -81,7 +81,7 @@ class Outgoing:
     
     def authentication_message(self, user_name_and_password:dict ):
         # example: {"Type": "Auth","Payload": {"username": "xy","password": "xy"}}
-        return {"Type": "Auth", "Payload": user_name_and_password}
+        return {"Type": "Login", "Payload": user_name_and_password}
 
     def action_message(self, action: dict) -> dict:
         # example: {"Type": "Action","Payload": {"1": "hit","2": "defend"}}
@@ -193,6 +193,7 @@ class Incomming:
         try:
             data = data.decode("utf-8")
             parsed = json.loads(data)
+            print("PAAAYLOOAD: ", parsed)
 
             return parsed
         except Exception as e:
