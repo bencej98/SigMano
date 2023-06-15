@@ -42,14 +42,10 @@ class ClientConnection:
             incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(self.socket_client,self.init_socket, self.destroy_frames))
             incomming_messages.start()
 
-            # if self.login_closed == True:
-            #     a = ActionApp()
-            #     a.mainloop()
-
             auth_screen_app = MainApp(self.get_user_name_password_from_form)
             auth_screen_app.mainloop() 
 
-            # a = ActionApp()
+            # a = ActionApp(self.get_user_name_password_from_form)
             # a.mainloop()          
          
     def destroy_frames(self):
@@ -109,7 +105,7 @@ class Incomming:
 
         self.is_login_success = False
 
-        self.action_destroy_frame = None
+        self.action_payload = None
         
         self.incoming_queue = queue.Queue()        
 
@@ -136,8 +132,10 @@ class Incomming:
                     self.is_login_success = False
 
                     #nyitja a choose_action képrenyőt
-                    a = ActionApp(self._destroy_choose_action_screen)
+                    a = ActionApp(self._get_action_payload)
                     a.mainloop()
+
+                    print("ACTIONSSSSSS", self.action_payload)
 
                     #zárja a regisztárciót:
                     destroy_frame_thread = threading.Thread(target=self.destroy_login_ui, args=(frame_destroy, ))
@@ -147,8 +145,8 @@ class Incomming:
                     start_arena = threading.Thread(target=self.start_arena)
                     start_arena.start()
 
-    def _destroy_choose_action_screen(self, action_destroy_frame: callable):
-        self.action_destroy_frame = action_destroy_frame
+    def _get_action_payload(self, action_payload: dict):
+        self.action_payload = action_payload
 
     def process_incoming(self, incoming):
         # print("BEFORE Broken:",incoming)

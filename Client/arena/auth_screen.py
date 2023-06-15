@@ -88,6 +88,7 @@ class LoginPage(tk.Frame):
 
     def _destroy(self):
         self.frame_parent.quit()
+        # self.frame_parent.destroy()
         # self.direct_frame_parent.destroy()
 
     def _control_input(self, username: tk.StringVar, password: tk.StringVar):

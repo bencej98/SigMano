@@ -5,12 +5,12 @@ from tkinter import messagebox
 
 class ActionApp(tk.Tk):
 
-    def __init__(self, get_destroy_frame, *args, **kwargs):
+    def __init__(self, get_action_payload, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.frame_width = 400
         self.frame_height = 400
         self.resizable(False, False)
-        self.destroy_frame = get_destroy_frame
+        self.action_payload = get_action_payload
         # fonts
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
         self.label_font = tkfont.Font(family='Arial', size=14)
@@ -35,7 +35,7 @@ class ActionApp(tk.Tk):
         # create a frame dict. and put each page into it
         self.frames = {}
         # create sub-frame and place it into self.frames
-        frame = ChooseAction(destroy_frame=self.destroy_frame, parent=container, controller=self)
+        frame = ChooseAction(action_payload=self.action_payload, parent=container, controller=self)
         self.frames[ChooseAction.__name__] = frame
         frame.grid(row=0, column=0, sticky="nsew")
 
@@ -49,14 +49,14 @@ class ActionApp(tk.Tk):
 
 class ChooseAction(tk.Frame):
 
-    def __init__(self, destroy_frame, parent, controller):
+    def __init__(self, action_payload, parent, controller):
         tk.Frame.__init__(self, parent)
         self.config(background="skyblue")
         self.controller = controller
         title_label = tk.Label(self, text="Choose action", font=self.controller.title_font)
         title_label.pack(side="top", fill="x", pady=10)
         self.current_action = None
-        self.destroy_frame = destroy_frame
+        self.action_payload = action_payload
 
         # buttons
         add_action = tk.Button(self, text="Add", background="green", fg="white",
@@ -100,14 +100,15 @@ class ChooseAction(tk.Frame):
             print("Returns choosed actions...")
             print("Choose actions:", fight_data)
             # self.destroy_frame(self._destroy_action_frame)
-            self._destroy_action_frame()
-            # return fight_data
+            # self._get_action_payload()
+            self.action_payload(fight_data)
+            self.controller.destroy()
 
         else:
             messagebox.showinfo("Choose action", "You don't have anough action to fight.\n Choose 10 action.")
 
-    def _destroy_action_frame(self):
-        self.controller.destroy()
+    # def _get_action_payload(self, payload):
+    #     return payload
 
     def save_chosen_action(self, action):
         """ Saves the chosen action to a variable """
