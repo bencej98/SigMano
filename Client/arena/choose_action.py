@@ -89,9 +89,12 @@ class ChooseAction(tk.Frame):
         scrollbar.place(x=285, y=260, height=140)
 
     def fight(self) -> dict:
+        chosen_actions_length = len(self.tree.get_children())
         """ Starts fight - returns a dictionary containing fight actions """
         fight_data = {"Type": "Action", "Payload": []}
-        if len(self.tree.get_children()) == 10:
+        # if len(self.tree.get_children()) == 10:
+
+        if len(self.tree.get_children()) >= 5:
             for line in self.tree.get_children():
                 for value in self.tree.item(line)['values']:
                     fight_data["Payload"].append(value)
@@ -105,7 +108,8 @@ class ChooseAction(tk.Frame):
             self.controller.destroy()
 
         else:
-            messagebox.showinfo("Choose action", "You don't have anough action to fight.\n Choose 10 action.")
+            messagebox.showinfo("Choose action", "You don't have anough action to fight" \
+                                "\n Choose 5 action at least.")
 
     # def _get_action_payload(self, payload):
     #     return payload
@@ -121,9 +125,9 @@ class ChooseAction(tk.Frame):
             messagebox.showinfo("Choose", "Choose an action!")
             return
         else:
-            item_count = number_of_added_items
-            if item_count >= 10:
-                messagebox.showinfo("Full", "Can't add any more action.")
+            if number_of_added_items >= 20:
+                messagebox.showinfo("Full", "Can't add any more action." \
+                                    "\nMaximum number of actions: 20")
             else:
                 self.tree.insert('', tk.END, values=self.current_action)
 
