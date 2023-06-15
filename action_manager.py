@@ -11,7 +11,7 @@ class ActionManager:
     
     def update_gnomes_strategy(self, map: Map, client_strategy: list, username: str):
         self.user_strategies[username] = client_strategy
-        for user, strategy in self.user_strategies:
+        for user, strategy in self.user_strategies.items():
             if user not in map.active_gnomes:
                 for gnome in map.gnome_queue:
                     if gnome.user == user:
