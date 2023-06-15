@@ -107,7 +107,8 @@ class Incomming:
 
         self.action_payload = None
         
-        self.incoming_queue = queue.Queue()        
+        self.incoming_queue = queue.Queue()  
+        self.outgoing = Outgoing()      
 
     def accept_incoming(self, client_socket, set_socket_cb, frame_destroy):
         set_socket_cb(client_socket)
@@ -125,8 +126,9 @@ class Incomming:
             except OSError as e:
                 print(e)
             else:
+                print("DATA:", data)
                 incoming = self.parse_incoming(data)
-                self.process_incoming(incoming)
+                self.process_incoming(incoming, frame_destroy)
 
                 if self.is_login_success:
                     self.is_login_success = False
@@ -135,11 +137,13 @@ class Incomming:
                     a = ActionApp(self._get_action_payload)
                     a.mainloop()
 
-                    print("ACTIONSSSSSS", self.action_payload)
+                    # print("ACTIONSSSSSS", self.action_payload)
+
+                    #akciók küldése a szerver részére
+                    self.outgoing.action_message(self.action_payload["payload"])
 
                     #zárja a regisztárciót:
-                    destroy_frame_thread = threading.Thread(target=self.destroy_login_ui, args=(frame_destroy, ))
-                    destroy_frame_thread.start()
+                    self.destroy_login_ui(frame_destroy)
 
                     #nyitja az arenát felületet:
                     start_arena = threading.Thread(target=self.start_arena)
@@ -148,16 +152,15 @@ class Incomming:
     def _get_action_payload(self, action_payload: dict):
         self.action_payload = action_payload
 
-    def process_incoming(self, incoming):
-        # print("BEFORE Broken:",incoming)
+    def process_incoming(self, incoming, frame_destroy):
         if incoming is not None:
             if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
-                self.is_login_success = self.login_status(incoming)
+                self.is_login_success = self.login_status(incoming, frame_destroy)
 
             if incoming["Type"] == "Position":
                 self.put_queue(incoming)
         
-    def login_status(self, incoming):
+    def login_status(self, incoming, frame_destroy):
         if not incoming["Payload"]:
             messagebox.showinfo("Message", f"{'Registration' if incoming['Type']=='Registration' else 'Authentication'} failed!")
             return False
