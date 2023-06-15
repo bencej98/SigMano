@@ -88,6 +88,7 @@ class Map:
         self.maximum_gnomes = maximum_gnomes
         self.active_gnomes = {}
         self.gnome_queue = []
+        self.all_gnomes = {}
 
     def add_gnome_to_gnome_queue(self, gnome: Gnome) -> None:
         self.gnome_queue.append(gnome)
