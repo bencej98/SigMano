@@ -43,6 +43,14 @@
             "program": "Client/arena/auth_screen.py",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "socket_server.py",
+            "type": "python",
+            "request": "launch",
+            "program": "socket_server.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
 }

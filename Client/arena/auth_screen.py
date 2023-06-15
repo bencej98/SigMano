@@ -53,6 +53,7 @@ class LoginPage(tk.Frame):
     def __init__(self, parent, controller, add_user_to_login):
         self.add_user_to_login = add_user_to_login
         self.frame_parent = controller
+        self.direct_frame_parent = parent
 
         tk.Frame.__init__(self, parent, bg="skyblue")
         self.controller = controller
@@ -86,8 +87,8 @@ class LoginPage(tk.Frame):
             self.add_user_to_login("Auth", username.get(), password.get(), self._destroy)
 
     def _destroy(self):
-        self.frame_parent.destroy()
-
+        self.frame_parent.quit()
+        # self.direct_frame_parent.destroy()
 
     def _control_input(self, username: tk.StringVar, password: tk.StringVar):
         """ Controls the input from the user """
@@ -119,12 +120,10 @@ class RegisterPage(tk.Frame):
         password_label_1 = tk.Label(self, text="Password: ", font=controller.label_font, background="skyblue")
         password_1 = tk.StringVar()
         self.password_entry_1 = tk.Entry(self, textvariable=password_1, font=controller.label_font, show="*")
-        self.password_entry_1.bind("<1>", self.warn_about_password)
         # password 2
         password_label_2 = tk.Label(self, text="Password again: ", font=controller.label_font, background="skyblue")
         password_2 = tk.StringVar()
         self.password_entry_2 = tk.Entry(self, textvariable=password_2,font=controller.label_font, show="*")
-        self.password_entry_2.bind("<1>", self.warn_about_password)
 
         register_button = tk.Button(self, text="Register",
                            command=lambda: self._register_user(username, password_1, password_2), font=self.controller.button_font, width=10, background="RoyalBlue", fg="white")
@@ -190,9 +189,6 @@ class RegisterPage(tk.Frame):
 
         hashed_pw = password.get()
         return hashed_pw
-    
-    def warn_about_password(self, *arg):
-        messagebox.showinfo("Warning", "Don't use important password here!")
     
     def _empty_entry_fields(self):
         """Empties all entry fields"""

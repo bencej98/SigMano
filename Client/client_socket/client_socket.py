@@ -7,6 +7,7 @@ import queue
 
 from tkinter import messagebox
 from arena.auth_screen import MainApp
+from arena.choose_action import ActionApp
 from arena.arena import start_loop, dict_data_for_screen, json_temp, set_temp_json
 
 class ClientConnection:
@@ -20,6 +21,9 @@ class ClientConnection:
         self.socket_client = None
         
         self.loginRegister_frame_destroy = None
+
+        self.login_closed = False
+        self.auth_screen_app = None
 
         self.incomming = Incomming()
         self.outgoing = Outgoing()
@@ -38,14 +42,23 @@ class ClientConnection:
             incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(self.socket_client,self.init_socket, self.destroy_frames))
             incomming_messages.start()
 
+            # if self.login_closed == True:
+            #     a = ActionApp()
+            #     a.mainloop()
+
             auth_screen_app = MainApp(self.get_user_name_password_from_form)
-            auth_screen_app.mainloop()            
+            auth_screen_app.mainloop() 
+
+            # a = ActionApp()
+            # a.mainloop()          
          
     def destroy_frames(self):
         self.loginRegister_frame_destroy()        
 
     def get_user_name_password_from_form(self, log_type, name, password, frame_destroy):
         self.loginRegister_frame_destroy = frame_destroy
+        self.login_closed = True
+
 
         if log_type == "Auth":
             self.auth_client(self.outgoing.authentication_message, name,password)
@@ -95,6 +108,8 @@ class Incomming:
         self.is_started = False
 
         self.is_login_success = False
+
+        self.action_destroy_frame = None
         
         self.incoming_queue = queue.Queue()        
 
@@ -118,6 +133,12 @@ class Incomming:
                 self.process_incoming(incoming)
 
                 if self.is_login_success:
+                    self.is_login_success = False
+
+                    #nyitja a choose_action képrenyőt
+                    a = ActionApp(self._destroy_choose_action_screen)
+                    a.mainloop()
+
                     #zárja a regisztárciót:
                     destroy_frame_thread = threading.Thread(target=self.destroy_login_ui, args=(frame_destroy, ))
                     destroy_frame_thread.start()
@@ -125,24 +146,18 @@ class Incomming:
                     #nyitja az arenát felületet:
                     start_arena = threading.Thread(target=self.start_arena)
                     start_arena.start()
-                    self.is_login_success = False
 
-                    # choose actions
-                    start_choosing_action = threading.Thread(target=self.start_arena)
-                    start_arena.start()
-                    self.is_login_success = False
-
-    def choose_action(self):
-        print("Fighting....")
+    def _destroy_choose_action_screen(self, action_destroy_frame: callable):
+        self.action_destroy_frame = action_destroy_frame
 
     def process_incoming(self, incoming):
-        print("BEFORE Broken:",incoming)
-        if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
-            self.is_login_success = self.login_status(incoming)
+        # print("BEFORE Broken:",incoming)
+        if incoming is not None:
+            if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
+                self.is_login_success = self.login_status(incoming)
 
-
-        if incoming["Type"] == "Position":
-            self.put_queue(incoming)
+            if incoming["Type"] == "Position":
+                self.put_queue(incoming)
         
     def login_status(self, incoming):
         if not incoming["Payload"]:
@@ -151,10 +166,10 @@ class Incomming:
         return True
 
     def destroy_login_ui(self, frame_destroy):
-        #self.is_logged_in = True
+        self.is_logged_in = True
+        #messagebox.showinfo("User registered", "Registration success!")
         print("Registration success!")
         frame_destroy()
-        #messagebox.showinfo("User registered", "Registration success!")
 
     def start_arena(self):
         start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
