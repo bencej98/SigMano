@@ -75,7 +75,7 @@ class Gnome:
                 self.location["y"] += 1         
     
     def increase_event_counter(self):
-        if self.event_counter < 9:
+        if self.event_counter < len(self.strategy) - 1:
             self.event_counter += 1
         else:
             self.event_counter = 0
