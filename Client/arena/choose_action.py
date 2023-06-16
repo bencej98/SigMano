@@ -23,8 +23,8 @@ class ActionApp(tk.Tk):
         screen_height = self.winfo_screenheight()
         x = (screen_width/2) - (self.frame_width/2)
         y = (screen_height/2) - (self.frame_height/1)
-        # self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, y))
-        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, 0, 300))
+        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, y))
+        # self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, 0, 300))
 
         # stack frames onto each other in container
         container = tk.Frame(self)
@@ -89,11 +89,8 @@ class ChooseAction(tk.Frame):
         scrollbar.place(x=285, y=260, height=140)
 
     def fight(self) -> dict:
-        chosen_actions_length = len(self.tree.get_children())
         """ Starts fight - returns a dictionary containing fight actions """
         fight_data = {"Type": "Action", "Payload": []}
-        # if len(self.tree.get_children()) == 10:
-
         if len(self.tree.get_children()) >= 5:
             for line in self.tree.get_children():
                 for value in self.tree.item(line)['values']:
@@ -102,17 +99,12 @@ class ChooseAction(tk.Frame):
             messagebox.showinfo("FIGHT", "You are going to fight!")
             print("Returns choosed actions...")
             print("Choose actions:", fight_data)
-            # self.destroy_frame(self._destroy_action_frame)
-            # self._get_action_payload()
             self.action_payload(fight_data)
             self.controller.destroy()
 
         else:
             messagebox.showinfo("Choose action", "You don't have anough action to fight" \
                                 "\n Choose 5 action at least.")
-
-    # def _get_action_payload(self, payload):
-    #     return payload
 
     def save_chosen_action(self, action):
         """ Saves the chosen action to a variable """
@@ -138,7 +130,3 @@ class ChooseAction(tk.Frame):
             self.tree.delete(selected_item)
         else:
             messagebox.showinfo("No item selected", "Select an item to remove.")
-
-if __name__ == '__main__':
-    app = ActionApp()
-    app.mainloop()
