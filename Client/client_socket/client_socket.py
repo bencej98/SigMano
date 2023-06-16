@@ -150,6 +150,9 @@ class Incomming:
         self.action_payload = action_payload
 
     def process_incoming(self, incoming, frame_destroy):
+        death_messages = ["Good day to die!", "Oh my God!", "Rest My Peace!", "Holy sh**t!"]
+        death_msg_len = len(death_messages)
+
         if incoming is not None:
             try:
                 if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
@@ -166,16 +169,14 @@ class Incomming:
                 if incoming["Type"] == "Event":
                     get_payload = incoming["Payload"]
                     for (user, fight_list) in get_payload.items:
-                        print(get_payload)              
-
+                        print(get_payload)       
                         
-
-
                 #FIXME: {"Type": "Death", "Payload": []}' Minden Event-l együtt jön üresen is!
                 if incoming["Type"] == "Death":
                     if len(incoming["Payload"]) > 0:
-                        print("Today heros....RIP !!!")
-                        print(*incoming["Payload"])
+                        rand_msg_index = random.randrange(0,death_msg_len-1)
+                        print(*incoming["Payload"], end=":")
+                        print(death_messages[rand_msg_index])
                     
             except:
                 pass
