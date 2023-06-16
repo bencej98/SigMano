@@ -158,11 +158,25 @@ class Incomming:
                 if incoming["Type"] == "Position":
                     self.put_queue(incoming)
 
+                #{"Type": "Event", 
+                # "Payload": {
+                #   "Attila": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}], 
+                #   "Andras": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}]}
+                # }
                 if incoming["Type"] == "Event":
-                    pass
+                    get_payload = incoming["Payload"]
+                    for (user, fight_list) in get_payload.items:
+                        print(get_payload)              
 
+                        
+
+
+                #FIXME: {"Type": "Death", "Payload": []}' Minden Event-l együtt jön üresen is!
                 if incoming["Type"] == "Death":
-                    pass
+                    if len(incoming["Payload"]) > 0:
+                        print("Today heros....RIP !!!")
+                        print(*incoming["Payload"])
+                    
             except:
                 pass
         
@@ -194,14 +208,6 @@ class Incomming:
                     self.change_data(incoming['Payload'])
             
             time.sleep(1)
-
-#{"Type": "Event", 
-# "Payload": {
-#   "Attila": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}], 
-#   "Andras": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}]}
-# }
-#
-# {"Type": "Death", "Payload": []}'
 
     def put_queue(self, parsed):
         self.incoming_queue.put(parsed)
