@@ -161,6 +161,7 @@ class Incomming:
                 if incoming["Type"] == "Position":
                     self.put_queue(incoming)
 
+                #FIXME:
                 #{"Type": "Event", 
                 # "Payload": {
                 #   "Attila": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}], 
@@ -170,7 +171,7 @@ class Incomming:
                     get_payload = incoming["Payload"]
                     for (user, fight_list) in get_payload.items:
                         print(get_payload)       
-                        
+
                 #FIXME: {"Type": "Death", "Payload": []}' Minden Event-l együtt jön üresen is!
                 if incoming["Type"] == "Death":
                     if len(incoming["Payload"]) > 0:
