@@ -125,7 +125,7 @@ class Incomming:
             except OSError as e:
                 print(e)
             else:
-                print("DATA:", data)
+                #print("DATA:", data)
                 incoming = self.parse_incoming(data)
                 self.process_incoming(incoming, frame_destroy)
 
@@ -157,6 +157,12 @@ class Incomming:
 
                 if incoming["Type"] == "Position":
                     self.put_queue(incoming)
+
+                if incoming["Type"] == "Event":
+                    pass
+
+                if incoming["Type"] == "Death":
+                    pass
             except:
                 pass
         
@@ -186,7 +192,16 @@ class Incomming:
                 Incomming.counter += 1
                 if incoming["Type"] == "Position":
                     self.change_data(incoming['Payload'])
+            
             time.sleep(1)
+
+#{"Type": "Event", 
+# "Payload": {
+#   "Attila": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}], 
+#   "Andras": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}]}
+# }
+#
+# {"Type": "Death", "Payload": []}'
 
     def put_queue(self, parsed):
         self.incoming_queue.put(parsed)
@@ -196,7 +211,7 @@ class Incomming:
         try:
             data = data.decode("utf-8")
             parsed = json.loads(data)
-            print("PAAAYLOOAD: ", parsed)
+            #print("PAAAYLOOAD: ", parsed)
 
             return parsed
         except Exception as e:
