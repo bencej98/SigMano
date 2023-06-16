@@ -105,7 +105,9 @@ class Gameserver:
             if curr_msg.type:
                 if curr_msg.type == "Action":
                     usname = self.connections[connection_id].name 
-                    self.action_managger.update_gnomes_strategy(self.travel, curr_msg.payload, usname) 
+                    gnome = Gnome(usname)
+                    self.travel.add_gnome_to_gnome_queue(gnome)
+                    self.action_managger.update_gnomes_strategy(self.travel, curr_msg.payload, usname)
                 elif curr_msg.type == "Registration":
                     self.connections[connection_id].name = curr_msg.payload['username']
                     self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
@@ -125,15 +127,6 @@ class Gameserver:
                 self.broadcast_message(999)  # Send code 999 for missing type
     def tik_data(self):
         while True:
-            gnomes_list = []
-            strategy_list = ["rock", "rock", "rock", "rock", "scissor", "paper","paper", "paper","scissor","paper"]
-            for n in range (10):
-                gnome = Gnome(f"loluser{n}")
-                gnomes_list.append(gnome)
-                gnome.strategy = strategy_list
-
-            for gnome in gnomes_list:
-                self.travel.add_gnome_to_gnome_queue(gnome)
             self.travel.transfer_gnomes_to_active_gnomes()
             position_dict = self.travel.move_all_gnomes()
             self.broadcast_message(position_dict)
@@ -166,7 +159,7 @@ class Gameserver:
             self.connections.pop(id)
 
 def main():
-        travel = Map(19, 19, 2)
+        travel = Map(2, 2, 2)
         action = ActionManager()
         server = Gameserver(travel, action)
         server.db.create_table()
