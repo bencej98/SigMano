@@ -116,7 +116,6 @@ class Gameserver:
                     if is_valid["Payload"]:
                         self.connections[connection_id].name = curr_msg.payload['username']
                         self.send_response(connection_id, is_valid)
-                        print(self.send_response(connection_id, is_valid))
                     else:
                         self.send_response(connection_id, is_valid)
                 elif curr_msg.type == "Closed":
