@@ -74,7 +74,9 @@ class Gnome:
                 self.location["x"] -= 1 
             case 7: 
                 self.location["x"] -= 1
-                self.location["y"] += 1         
+                self.location["y"] += 1  
+
+    def move(self, direction):       
     
     def increase_event_counter(self):
         if self.event_counter < len(self.strategy) - 1:
@@ -132,15 +134,18 @@ class Map:
                     other_gnome = self.active_gnomes[other_gnome_name]
                     gnome.other_gnomes_dist[other_gnome_name] = self.calculate_distance(gnome, other_gnome)
 
-    def calculate_distance(gnome: Gnome, other_gnome: Gnome):
+    def calculate_distance(self, gnome: Gnome, other_gnome: Gnome):
         x = gnome.location["x"] - other_gnome.location["x"]
         y = gnome.location["y"] - other_gnome.location["y"]
 
         distance = math.sqrt((x * x) + (y * y))
-
-        return [distance, x, y]
+        
+        return [distance, self._convert_unit_to_direction([x, y])]
     
-    def convert_dist_vector_to_unit(x: int, y: int):
+    def _convert_dist_vector_to_unit(vector):
+        x = vector[0]
+        y = vector[1]
+
         if x < - 0.5:
             x = -1
         elif -0.5 <= x <= 0.5:
@@ -157,10 +162,11 @@ class Map:
 
         return x, y
 
-    def convert_unit_to_direction(unit):
+    def _convert_unit_to_direction(self, vector):
+        converted_vector = self._convert_dist_vector_to_unit(vector)
         direction = 0
-        x = unit[0]
-        y = unit[1]
+        x = converted_vector[0]
+        y = converted_vector[1]
         if x == -1:
             if y == -1:
                 direction = 5
