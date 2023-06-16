@@ -133,13 +133,16 @@ class Gameserver:
             self.travel.transfer_gnomes_to_active_gnomes()
             position_dict = self.travel.move_all_gnomes()
             self.broadcast_message(position_dict)
+            time.sleep(0.1)
             act_fight = self.action_managger.fight(self.travel)
             print(position_dict)
             if len(act_fight) != 0:
                 self.broadcast_message({"Type": "Event", "Payload" : act_fight})
-                time.sleep(0.5)
+                time.sleep(0.1)
                 print(act_fight)
-                self.broadcast_message(self.action_managger.check_gnome_death(self.travel))
+                death_check = self.action_managger.check_gnome_death(self.travel)
+                if death_check["Payload"]:
+                    self.broadcast_message(death_check)
             time.sleep(2)
 
     def run_tik_data_thread(self):
@@ -163,7 +166,7 @@ class Gameserver:
             self.connections.pop(id)
 
 def main():
-        travel = Map(2, 2, 2)
+        travel = Map(2, 2, 3)
         action = ActionManager()
         server = Gameserver(travel, action)
         server.db.create_table()
