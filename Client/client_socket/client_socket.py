@@ -55,7 +55,6 @@ class ClientConnection:
         self.loginRegister_frame_destroy = frame_destroy
         self.login_closed = True
 
-
         if log_type == "Auth":
             self.auth_client(self.outgoing.authentication_message, name,password)
 
@@ -133,18 +132,15 @@ class Incomming:
                 if self.is_login_success:
                     self.is_login_success = False
 
+                    #zárja a regisztárciót:
+                    self.destroy_login_ui(frame_destroy)
+
                     #nyitja a choose_action képrenyőt
                     a = ActionApp(self._get_action_payload)
                     a.mainloop()
 
-                    # print("ACTIONSSSSSS", self.action_payload)
-
                     #akciók küldése a szerver részére
-                    
                     client_socket.sendall(json.dumps(self.outgoing.action_message(self.action_payload["Payload"])).encode("utf-8"))
-
-                    #zárja a regisztárciót:
-                    self.destroy_login_ui(frame_destroy)
 
                     #nyitja az arenát felületet:
                     start_arena = threading.Thread(target=self.start_arena)

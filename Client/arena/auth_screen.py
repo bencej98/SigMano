@@ -14,7 +14,6 @@ class MainApp(tk.Tk):
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
         self.label_font = tkfont.Font(family='Arial', size=14)
         self.button_font = tkfont.Font(family='Helvetica', size=12, weight="bold")
-
         self.geometry("400x400")
         self.title("Sigmano War")
         # screen opens in the middle
@@ -70,7 +69,7 @@ class LoginPage(tk.Frame):
         password_input_field = tk.Entry(self, textvariable=password, show="*")
         # buttons
         login_button = tk.Button(self, text="Login",
-                            command=lambda: self.logging_in(username, password), font=self.controller.button_font, width=10, background="Navy", fg="white")
+                            command=lambda: self._logging_in(username, password), font=self.controller.button_font, width=10, background="Navy", fg="white")
         register_button = tk.Button(self, text="Register",
                             command=lambda: controller.show_frame("RegisterPage"), font=self.controller.button_font, width=10, background="RoyalBlue", fg="white")
         
@@ -81,15 +80,14 @@ class LoginPage(tk.Frame):
         login_button.pack(ipady=10, ipadx=10, pady=10)
         register_button.pack(ipady=10, ipadx=10)
 
-    def logging_in(self, username: tk.StringVar, password: tk.StringVar)-> dict | None:
+    def _logging_in(self, username: tk.StringVar, password: tk.StringVar)-> dict | None:
+        """Controls user input and passes user datas and _destroy fucntion to client_socket.py"""
         if self._control_input(username, password):
-            print("logging in...")
             self.add_user_to_login("Auth", username.get(), password.get(), self._destroy)
 
     def _destroy(self):
-        self.frame_parent.quit()
-        # self.frame_parent.destroy()
-        # self.direct_frame_parent.destroy()
+        """Withdraws the login screen once the login is successful"""
+        self.frame_parent.withdraw()
 
     def _control_input(self, username: tk.StringVar, password: tk.StringVar):
         """ Controls the input from the user """
@@ -141,12 +139,8 @@ class RegisterPage(tk.Frame):
         go_to_login_button.pack(ipady=10, ipadx=10)
 
     def _register_user(self, username: tk.StringVar, password_1: tk.StringVar, password_2: tk.StringVar):
+        """Controls user credentials and passes user data, _destroy() to client_socket.py"""
         if self._control_user_credentials(username, password_1, password_2):
-            # hashed_pw = self._hash_user_password(password_1)
-            print("Sending user credentials...")
-            
-            print("username: ", username.get())
-            print("password: ", password_1.get())
             self.add_user_to_login("Registration", username.get(), password_1.get(), self._destroy)
 
             self._empty_entry_fields()
@@ -154,12 +148,12 @@ class RegisterPage(tk.Frame):
             self.controller.show_frame("LoginPage")
 
     def _destroy(self):
+        """Destroys register frame"""
         self.frame_parent.destroy()
 
     def _control_user_credentials(self, username: tk.StringVar, password_1: tk.StringVar, password_2: tk.StringVar):
         """Controls if user gave correct credentials
         Checks if passwords match"""
-
         if username.get().strip() == "":
             messagebox.showinfo("Empty field", "User name field can't be empty!")
         elif password_1.get().strip() == "" or password_2.get().strip() == "":
@@ -172,7 +166,9 @@ class RegisterPage(tk.Frame):
                 messagebox.showinfo("Passwords do not match", "Passwords must match!")
             else:
                 return True
+            
     def _check_special_characters(self, username: str):
+        """Controls username based on the current rule"""
         allowed_chars = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
         special_characters = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*',
                               '+', ',', '-', '.', '/', ':', ';', '<', '=', '>',
@@ -184,24 +180,13 @@ class RegisterPage(tk.Frame):
                 return False
         return True
 
-
     def _hash_user_password(self, password: tk.StringVar) -> str:
         """Hashes the passwrod of the user"""
-
         hashed_pw = password.get()
         return hashed_pw
     
     def _empty_entry_fields(self):
         """Empties all entry fields"""
-
         self.username_entry.delete(0,tk.END)
         self.password_entry_1.delete(0,tk.END)
         self.password_entry_2.delete(0,tk.END)
-
-def get_user_name_password_from_form():
-    print("TEST METHOD")
-
-if __name__ == "__main__":
-    
-    app = MainApp(get_user_name_password_from_form)
-    app.mainloop()
