@@ -7,6 +7,7 @@ import queue
 
 from tkinter import messagebox
 from arena.auth_screen import MainApp
+from arena.choose_action import ActionApp
 from arena.arena import start_loop, dict_data_for_screen, json_temp, set_temp_json
 
 class ClientConnection:
@@ -20,6 +21,9 @@ class ClientConnection:
         self.socket_client = None
         
         self.loginRegister_frame_destroy = None
+
+        self.login_closed = False
+        self.auth_screen_app = None
 
         self.incomming = Incomming()
         self.outgoing = Outgoing()
@@ -39,13 +43,17 @@ class ClientConnection:
             incomming_messages.start()
 
             auth_screen_app = MainApp(self.get_user_name_password_from_form)
-            auth_screen_app.mainloop()            
+            auth_screen_app.mainloop() 
+
+            # a = ActionApp(self.get_user_name_password_from_form)
+            # a.mainloop()          
          
     def destroy_frames(self):
         self.loginRegister_frame_destroy()        
 
     def get_user_name_password_from_form(self, log_type, name, password, frame_destroy):
         self.loginRegister_frame_destroy = frame_destroy
+        self.login_closed = True
         self.user_name = name
 
         if log_type == "Auth":
@@ -73,7 +81,7 @@ class Outgoing:
     
     def authentication_message(self, user_name_and_password:dict ):
         # example: {"Type": "Auth","Payload": {"username": "xy","password": "xy"}}
-        return {"Type": "Auth", "Payload": user_name_and_password}
+        return {"Type": "Login", "Payload": user_name_and_password}
 
     def action_message(self, action: dict) -> dict:
         # example: {"Type": "Action","Payload": {"1": "hit","2": "defend"}}
@@ -96,8 +104,11 @@ class Incomming:
         self.is_started = False
 
         self.is_login_success = False
+
+        self.action_payload = None
         
-        self.incoming_queue = queue.Queue()        
+        self.incoming_queue = queue.Queue()  
+        self.outgoing = Outgoing()      
 
     def accept_incoming(self, client_socket, set_socket_cb, frame_destroy, user_name):
         set_socket_cb(client_socket)
@@ -115,29 +126,44 @@ class Incomming:
             except OSError as e:
                 print(e)
             else:
+                print("DATA:", data)
                 incoming = self.parse_incoming(data)
-                self.process_incoming(incoming)
+                self.process_incoming(incoming, frame_destroy)
 
                 if self.is_login_success:
+                    self.is_login_success = False
+
                     #zárja a regisztárciót:
-                    destroy_frame_thread = threading.Thread(target=self.destroy_login_ui, args=(frame_destroy, ))
-                    destroy_frame_thread.start()
+                    self.destroy_login_ui(frame_destroy)
+
+                    #nyitja a choose_action képrenyőt
+                    a = ActionApp(self._get_action_payload)
+                    a.mainloop()
+
+                    #akciók küldése a szerver részére
+                    client_socket.sendall(json.dumps(self.outgoing.action_message(self.action_payload["Payload"])).encode("utf-8"))
 
                     #nyitja az arenát felületet:
                     start_arena = threading.Thread(target=self.start_arena)
                     start_arena.start()
-                    self.is_login_success = False
 
-    def process_incoming(self, incoming):
-        if incoming["type"] == "Registration" or incoming["type"] == "Auth":
-            self.is_login_success = self.login_status(incoming)
+    def _get_action_payload(self, action_payload: dict):
+        self.action_payload = action_payload
 
-        if incoming["type"] == "position":
-            self.put_queue(incoming)
+    def process_incoming(self, incoming, frame_destroy):
+        if incoming is not None:
+            try:
+                if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
+                    self.is_login_success = self.login_status(incoming, frame_destroy)
+
+                if incoming["Type"] == "Position":
+                    self.put_queue(incoming)
+            except:
+                pass
         
-    def login_status(self, incoming):
-        if not incoming["payload"]:
-            messagebox.showinfo("Message", f"{'Registration' if incoming['type']=='Registration' else 'Authentication'} failed!")
+    def login_status(self, incoming, frame_destroy):
+        if not incoming["Payload"]:
+            messagebox.showinfo("Message", f"{'Registration' if incoming['Type']=='Registration' else 'Authentication'} failed!")
             return False
         return True
 
@@ -159,8 +185,8 @@ class Incomming:
                 incoming = self.incoming_queue.get()
                 print(f"{Incomming.counter} incoming queue:", incoming)
                 Incomming.counter += 1
-                if incoming["type"] == "position":
-                    self.change_data(incoming['payload'], user_name)
+                if incoming["Type"] == "Position":
+                    self.change_data(incoming['Payload'], user_name)
             time.sleep(1)
 
     def put_queue(self, parsed):
@@ -171,6 +197,7 @@ class Incomming:
         try:
             data = data.decode("utf-8")
             parsed = json.loads(data)
+            print("PAAAYLOOAD: ", parsed)
 
             return parsed
         except Exception as e:

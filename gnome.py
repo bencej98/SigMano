@@ -15,7 +15,10 @@ class Gnome:
         self.location["x"] = random.randint(0, map.x_coordinate)
         self.location["y"] = random.randint(0, map.y_coordinate)
 
-    def check_random_direction(self, map):
+    def update_strategy(self, strategy_list: list):
+        self.strategy = strategy_list
+
+    def _check_random_direction(self, map):
         x = self.location["x"]
         y = self.location["y"]
         map_x = map.x_coordinate
@@ -33,13 +36,13 @@ class Gnome:
                     break
                 elif (x == map_x and y == 0) and (direction in (0, 6, 7)):
                     break
-                elif x == 0 and (0 <= direction <= 4):
+                elif (x == 0 and y != map_y and y != 0) and (0 <= direction <= 4):
                     break
-                elif y == 0 and (0 <= direction <= 2 or direction in (6, 7)):
+                elif (y == 0 and x != map_x and x != 0) and (0 <= direction <= 2 or direction in (6, 7)):
                     break
-                elif x == map_x and (direction == 0 or 4 <= direction <= 7):
+                elif (x == map_x and y != 0 and y != map_y) and (direction == 0 or 4 <= direction <= 7):
                     break
-                elif y == map_y and (2 <= direction <= 6):
+                elif (y == map_y and x != 0 and x != map_x) and (2 <= direction <= 6):
                     break
             else:
                 break
@@ -47,7 +50,7 @@ class Gnome:
         return direction
 
     def random_move(self, map):
-        direction=self.check_random_direction(map)
+        direction=self._check_random_direction(map)
         match direction:
             # 0 is up then clockwise
             case 0: 
@@ -72,7 +75,7 @@ class Gnome:
                 self.location["y"] += 1         
     
     def increase_event_counter(self):
-        if self.event_counter < 9:
+        if self.event_counter < len(self.strategy) - 1:
             self.event_counter += 1
         else:
             self.event_counter = 0
@@ -85,6 +88,7 @@ class Map:
         self.maximum_gnomes = maximum_gnomes
         self.active_gnomes = {}
         self.gnome_queue = []
+        self.all_gnomes = {}
 
     def add_gnome_to_gnome_queue(self, gnome: Gnome) -> None:
         self.gnome_queue.append(gnome)
@@ -115,8 +119,9 @@ class Map:
             gnome.random_move(self)
             position = (gnome.location["x"], gnome.location["y"])
             position_update_dict[gnome.user] = position
-        position_update_for_client = {"type": "position", "payload": position_update_dict}
+        position_update_for_client = {"Type": "Position", "Payload": position_update_dict}
         return position_update_for_client
+    
 #function check
 if __name__ == "__main__":
     gnomes_list = []

@@ -3,13 +3,14 @@ from tkinter import font as tkfont
 from tkinter import ttk
 from tkinter import messagebox
 
-class MainApp(tk.Tk):
+class ActionApp(tk.Tk):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, get_action_payload, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.frame_width = 400
         self.frame_height = 400
         self.resizable(False, False)
+        self.action_payload = get_action_payload
         # fonts
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
         self.label_font = tkfont.Font(family='Arial', size=14)
@@ -23,6 +24,7 @@ class MainApp(tk.Tk):
         x = (screen_width/2) - (self.frame_width/2)
         y = (screen_height/2) - (self.frame_height/1)
         self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, y))
+        # self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, 0, 300))
 
         # stack frames onto each other in container
         container = tk.Frame(self)
@@ -33,7 +35,7 @@ class MainApp(tk.Tk):
         # create a frame dict. and put each page into it
         self.frames = {}
         # create sub-frame and place it into self.frames
-        frame = ChooseAction(parent=container, controller=self)
+        frame = ChooseAction(action_payload=self.action_payload, parent=container, controller=self)
         self.frames[ChooseAction.__name__] = frame
         frame.grid(row=0, column=0, sticky="nsew")
 
@@ -47,13 +49,14 @@ class MainApp(tk.Tk):
 
 class ChooseAction(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, action_payload, parent, controller):
         tk.Frame.__init__(self, parent)
         self.config(background="skyblue")
         self.controller = controller
         title_label = tk.Label(self, text="Choose action", font=self.controller.title_font)
         title_label.pack(side="top", fill="x", pady=10)
         self.current_action = None
+        self.action_payload = action_payload
 
         # buttons
         add_action = tk.Button(self, text="Add", background="green", fg="white",
@@ -87,20 +90,21 @@ class ChooseAction(tk.Frame):
 
     def fight(self) -> dict:
         """ Starts fight - returns a dictionary containing fight actions """
-        fight_data = {"type": "Action", "payload": []}
-        if len(self.tree.get_children()) == 10:
+        fight_data = {"Type": "Action", "Payload": []}
+        if len(self.tree.get_children()) >= 5:
             for line in self.tree.get_children():
                 for value in self.tree.item(line)['values']:
-                    fight_data["payload"].append(value)
+                    fight_data["Payload"].append(value)
 
             messagebox.showinfo("FIGHT", "You are going to fight!")
             print("Returns choosed actions...")
             print("Choose actions:", fight_data)
-            return fight_data
+            self.action_payload(fight_data)
+            self.controller.destroy()
 
         else:
-            messagebox.showinfo("Choose action", "You don't have anough action to fight.\n Choose 10 action.")
-
+            messagebox.showinfo("Choose action", "You don't have anough action to fight" \
+                                "\n Choose 5 action at least.")
 
     def save_chosen_action(self, action):
         """ Saves the chosen action to a variable """
@@ -113,9 +117,9 @@ class ChooseAction(tk.Frame):
             messagebox.showinfo("Choose", "Choose an action!")
             return
         else:
-            item_count = number_of_added_items
-            if item_count >= 10:
-                messagebox.showinfo("Full", "Can't add any more action.")
+            if number_of_added_items >= 20:
+                messagebox.showinfo("Full", "Can't add any more action." \
+                                    "\nMaximum number of actions: 20")
             else:
                 self.tree.insert('', tk.END, values=self.current_action)
 
@@ -126,7 +130,3 @@ class ChooseAction(tk.Frame):
             self.tree.delete(selected_item)
         else:
             messagebox.showinfo("No item selected", "Select an item to remove.")
-
-if __name__ == '__main__':
-    app = MainApp()
-    app.mainloop()
