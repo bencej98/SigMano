@@ -104,10 +104,14 @@ class Gameserver:
             curr_msg = new_messages[connection_id]
             if curr_msg.type:
                 if curr_msg.type == "Action":
-                    usname = self.connections[connection_id].name 
-                    gnome = Gnome(usname)
-                    self.travel.add_gnome_to_gnome_queue(gnome)
-                    self.action_managger.update_gnomes_strategy(self.travel, curr_msg.payload, usname)
+                    usname = self.connections[connection_id].name
+                    if usname not in self.travel.all_gnomes.keys():
+                        gnome = Gnome(usname)
+                        gnome.strategy = curr_msg.payload
+                        self.travel.all_gnomes[usname] = gnome
+                        self.travel.add_gnome_to_gnome_queue(gnome)
+                    else:
+                        self.action_managger.update_gnomes_strategy(self.travel, curr_msg.payload, usname)
                 elif curr_msg.type == "Registration":
                     self.connections[connection_id].name = curr_msg.payload['username']
                     self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
@@ -132,7 +136,8 @@ class Gameserver:
             act_fight = self.action_managger.fight(self.travel)
             print(position_dict)
             if len(act_fight) != 0:
-                self.broadcast_message({"Type": "Event", "Payload" : act_fight}) 
+                self.broadcast_message({"Type": "Event", "Payload" : act_fight})
+                time.sleep(0.5)
                 print(act_fight)
                 self.broadcast_message(self.action_managger.check_gnome_death(self.travel))
             time.sleep(2)
