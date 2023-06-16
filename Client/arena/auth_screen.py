@@ -70,7 +70,7 @@ class LoginPage(tk.Frame):
         password_input_field = tk.Entry(self, textvariable=password, show="*")
         # buttons
         login_button = tk.Button(self, text="Login",
-                            command=lambda: self.logging_in(username, password), font=self.controller.button_font, width=10, background="Navy", fg="white")
+                            command=lambda: self._logging_in(username, password), font=self.controller.button_font, width=10, background="Navy", fg="white")
         register_button = tk.Button(self, text="Register",
                             command=lambda: controller.show_frame("RegisterPage"), font=self.controller.button_font, width=10, background="RoyalBlue", fg="white")
         
@@ -81,15 +81,14 @@ class LoginPage(tk.Frame):
         login_button.pack(ipady=10, ipadx=10, pady=10)
         register_button.pack(ipady=10, ipadx=10)
 
-    def logging_in(self, username: tk.StringVar, password: tk.StringVar)-> dict | None:
+    def _logging_in(self, username: tk.StringVar, password: tk.StringVar)-> dict | None:
+        """Controls user input and passes user datas and _destroy fucntion to client_socket.py"""
         if self._control_input(username, password):
-            print("logging in...")
             self.add_user_to_login("Auth", username.get(), password.get(), self._destroy)
 
     def _destroy(self):
-        self.frame_parent.quit()
-        # self.frame_parent.destroy()
-        # self.direct_frame_parent.destroy()
+        """Withdraws the login screen once the login is successful"""
+        self.frame_parent.withdraw()
 
     def _control_input(self, username: tk.StringVar, password: tk.StringVar):
         """ Controls the input from the user """
