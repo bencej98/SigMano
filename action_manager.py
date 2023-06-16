@@ -17,6 +17,7 @@ class ActionManager:
                 for gnome in map.gnome_queue:
                     if gnome.user == user:
                         gnome.update_strategy(strategy)
+                        gnome.event_counter = 0
                         updated_gnomes.append(user)
         for user in updated_gnomes:
             del self.user_strategies[user]
