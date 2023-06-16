@@ -26,33 +26,48 @@ class Gnome:
         map_x = map.x_coordinate
         map_y = map.y_coordinate
         direction_list = [0, 1, 2, 3, 4, 5, 6, 7]
-        while True:
+        is_valid2 = True
+        while is_valid2:
             rand = random.randint(0, len(direction_list) - 1)
             direction = direction_list.pop(rand)
+            is_valid2 = False
+            while not self.validate_movement(x, y, direction, map_x, map_y):
+                is_valid2 = True
+                break
+        return direction
+    
+    def check_direction(self, map, location, direction):
+        pass
+
+    def validate_movement(self, x, y, direction, map_x, map_y):
+            is_valid = False
             if x == 0 or y == 0 or x == map_x or y == map_y:
                 if (x == 0 and y == 0) and (0 <= direction <= 2):
-                    break
+                    is_valid = True
                 elif (x == map_x and y == map_y) and (4 <= direction <= 6):
-                    break
+                    is_valid = True
                 elif (x == 0 and y == map_y) and (2 <= direction <= 4):
-                    break
+                    is_valid = True
                 elif (x == map_x and y == 0) and (direction in (0, 6, 7)):
-                    break
+                   is_valid = True
                 elif (x == 0 and y != map_y and y != 0) and (0 <= direction <= 4):
-                    break
+                    is_valid = True
                 elif (y == 0 and x != map_x and x != 0) and (0 <= direction <= 2 or direction in (6, 7)):
-                    break
+                    is_valid = True
                 elif (x == map_x and y != 0 and y != map_y) and (direction == 0 or 4 <= direction <= 7):
-                    break
+                    is_valid = True
                 elif (y == map_y and x != 0 and x != map_x) and (2 <= direction <= 6):
-                    break
+                   is_valid = True
             else:
-                break
+                is_valid = True
+            return is_valid
 
-        return direction
-
+    
     def random_move(self, map):
         direction=self._check_random_direction(map)
+        self.move_by_direction(direction)
+
+    def move_by_direction(self, direction):
         match direction:
             # 0 is up then clockwise
             case 0: 
@@ -74,10 +89,8 @@ class Gnome:
                 self.location["x"] -= 1 
             case 7: 
                 self.location["x"] -= 1
-                self.location["y"] += 1  
-
-    def move(self, direction):       
-    
+                self.location["y"] += 1    
+        
     def increase_event_counter(self):
         if self.event_counter < len(self.strategy) - 1:
             self.event_counter += 1
@@ -199,7 +212,7 @@ if __name__ == "__main__":
         gnome = Gnome(f"loluser{n}")
         gnomes_list.append(gnome)
 
-    map = Map(19, 19, 5)
+    map = Map(5, 5, 5)
     for gnome in gnomes_list:
         map.add_gnome_to_gnome_queue(gnome)
     map.transfer_gnomes_to_active_gnomes()
