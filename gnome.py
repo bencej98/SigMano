@@ -1,4 +1,5 @@
 import random
+import math
 
 
 class Gnome:
@@ -6,6 +7,7 @@ class Gnome:
         self.user = user
         self.location = {}
         self.strategy = []
+        self.other_gnomes_dist = {}
         self.event_counter = 0
         self.actual_points = 0
         self.kill_count = 0
@@ -121,6 +123,24 @@ class Map:
             position_update_dict[gnome.user] = position
         position_update_for_client = {"Type": "Position", "Payload": position_update_dict}
         return position_update_for_client
+    
+    def update_gnomes_distances(self):
+        for gnome_name in self.active_gnomes:
+            for other_gnome_name in self.active_gnomes:
+                if gnome_name != other_gnome_name:
+                    gnome = self.active_gnomes[gnome_name]
+                    other_gnome = self.active_gnomes[other_gnome_name]
+                    gnome.other_gnomes_dist[other_gnome_name] = self.calculate_distance(gnome, other_gnome)
+
+    def calculate_distance(gnome: Gnome, other_gnome: Gnome):
+        x = gnome.location["x"] - other_gnome.location["x"]
+        y = gnome.location["y"] - other_gnome.location["y"]
+
+        distance = math.sqrt((x * x) + (y * y))
+
+        return [distance, x, y]
+
+    
     
 #function check
 if __name__ == "__main__":
