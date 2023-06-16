@@ -139,7 +139,51 @@ class Map:
         distance = math.sqrt((x * x) + (y * y))
 
         return [distance, x, y]
+    
+    def convert_dist_vector_to_unit(x: int, y: int):
+        if x < - 0.5:
+            x = -1
+        elif -0.5 <= x <= 0.5:
+            x = 0
+        elif 0.5 < x:
+            x = 1    
 
+        if y < - 0.5:
+            y = -1
+        elif -0.5 <= y <= 0.5:
+            y = 0
+        elif 0.5 < y:
+            y = 1
+
+        return x, y
+
+    def convert_unit_to_direction(unit):
+        direction = 0
+        x = unit[0]
+        y = unit[1]
+        if x == -1:
+            if y == -1:
+                direction = 5
+            elif y == 0:
+                direction = 6
+            elif y ==1:
+                direction = 7
+        elif x == 0:
+            if y == -1:
+                direction = 4
+            elif y == 0:
+                direction = random.randint(0, 7)
+            elif y ==1:
+                direction = 0
+        elif x == 1:
+            if y == -1:
+                direction = 3
+            elif y == 0:
+                direction = 2
+            elif y ==1:
+                direction = 1
+
+        return direction
     
     
 #function check
