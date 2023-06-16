@@ -151,11 +151,14 @@ class Incomming:
 
     def process_incoming(self, incoming, frame_destroy):
         if incoming is not None:
-            if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
-                self.is_login_success = self.login_status(incoming, frame_destroy)
+            try:
+                if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
+                    self.is_login_success = self.login_status(incoming, frame_destroy)
 
-            if incoming["Type"] == "Position":
-                self.put_queue(incoming)
+                if incoming["Type"] == "Position":
+                    self.put_queue(incoming)
+            except:
+                pass
         
     def login_status(self, incoming, frame_destroy):
         if not incoming["Payload"]:
