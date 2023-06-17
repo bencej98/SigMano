@@ -27,7 +27,6 @@ class ActionApp(tk.Tk):
         x = (screen_width/2) - (self.frame_width/2)
         y = (screen_height/2) - (self.frame_height/1)
         self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, y))
-        # self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, 0, 300))
 
         # stack frames onto each other in container
         container = tk.Frame(self)
@@ -155,24 +154,6 @@ class ChooseAction(tk.Frame):
         self.tree.pack(side=tk.TOP)
         scrollbar.place(x=380, y=260, height=140)
 
-    # def fight(self) -> dict:
-    #     """ Starts fight - returns a dictionary containing fight actions """
-    #     fight_data = {"Type": "Action", "Payload": []}
-    #     if len(self.tree.get_children()) >= 5:
-    #         for line in self.tree.get_children():
-    #             for value in self.tree.item(line)['values']:
-    #                 fight_data["Payload"].append(value)
-
-    #         messagebox.showinfo("FIGHT", "You are going to fight!")
-    #         print("Returns choosed actions...")
-    #         print("Choose actions:", fight_data)
-    #         self.action_payload(fight_data)
-    #         self.controller.destroy()
-
-    #     else:
-    #         messagebox.showinfo("Choose action", "You don't have anough action to fight" \
-    #                             "\n Choose 5 action at least.")
-
     def fight(self) -> dict:
         """ Starts fight - returns a dictionary containing fight actions """
         fight_data = {"Type": "Action", "Payload": []} # e.g.: "Payload": [{"Attack": "If weaker opponent"}, {"Defend": "If fight nearby"}]
@@ -227,7 +208,6 @@ class ChooseAction(tk.Frame):
 
     def action_pair_exists(self) -> bool:
         """ Checks if current action event pair already added """
-        # current_action_pair = {}
         current_action = None
         current_event = None
         for line in self.tree.get_children():
@@ -237,7 +217,6 @@ class ChooseAction(tk.Frame):
                     current_action = value
                 else:
                     current_event = value
-                    # current_action_pair[current_action] = current_event
                     if self.current_event == current_event and self.current_action == current_action:
                         return True
                 counter += 1
