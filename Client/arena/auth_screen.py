@@ -18,7 +18,8 @@ class MainApp(tk.Tk):
         self.wm_iconbitmap('logo/sigma_logo.ico')
         # fonts
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
-        self.label_font = tkfont.Font(family='Arial', size=14)
+        self.label_font = tkfont.Font(family='Arial', size=12, weight="bold")
+        self.login_label_font = tkfont.Font(family='Arial', size=10)
         self.button_font = tkfont.Font(family='Helvetica', size=12, weight="bold")
         self.geometry("400x400")
         self.title("Sigmano War")
@@ -68,11 +69,11 @@ class LoginPage(tk.Frame):
         # username
         label_1 = tk.Label(self, text="User name", font=self.controller.label_font, background=controller.background_color, fg=self.controller.font_color)
         username = tk.StringVar()
-        username_input_field = tk.Entry(self, textvariable=username, fg=self.controller.font_color)
+        username_input_field = tk.Entry(self, textvariable=username, font=controller.label_font)
         # password
         label_2 = tk.Label(self, text="Password", font=self.controller.label_font, background=controller.background_color, fg=self.controller.font_color)
         password = tk.StringVar()
-        password_input_field = tk.Entry(self, textvariable=password, show="*")
+        password_input_field = tk.Entry(self, textvariable=password, show="*", font=controller.label_font)
         # buttons
         login_button = tk.Button(self, text="Login",
                             command=lambda: self._logging_in(username, password), font=self.controller.button_font, width=10, background=self.controller.login_background_color, fg="white")
