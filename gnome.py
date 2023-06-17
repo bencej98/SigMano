@@ -31,7 +31,7 @@ class Gnome:
             rand = random.randint(0, len(direction_list) - 1)
             direction = direction_list.pop(rand)
             is_valid2 = False
-            while not self.validate_movement(x, y, direction, map_x, map_y):
+            while not self._validate_movement(x, y, direction, map_x, map_y):
                 is_valid2 = True
                 break
         return direction
@@ -39,7 +39,7 @@ class Gnome:
     def check_direction(self, map, location, direction):
         pass
 
-    def validate_movement(self, x, y, direction, map_x, map_y):
+    def _validate_movement(self, x, y, direction, map_x, map_y):
             is_valid = False
             if x == 0 or y == 0 or x == map_x or y == map_y:
                 if (x == 0 and y == 0) and (0 <= direction <= 2):
@@ -65,9 +65,9 @@ class Gnome:
     
     def random_move(self, map):
         direction=self._check_random_direction(map)
-        self.move_by_direction(direction)
+        self._move_by_direction(direction)
 
-    def move_by_direction(self, direction):
+    def _move_by_direction(self, direction):
         match direction:
             # 0 is up then clockwise
             case 0: 
@@ -131,6 +131,7 @@ class Map:
         return collided_gnomes
 
     def move_all_gnomes(self):
+        self._update_gnomes_distances()
         position_update_dict = {}
         for gnome_name, gnome in self.active_gnomes.items():
             gnome.random_move(self)
@@ -139,7 +140,7 @@ class Map:
         position_update_for_client = {"Type": "Position", "Payload": position_update_dict}
         return position_update_for_client
     
-    def update_gnomes_distances(self):
+    def _update_gnomes_distances(self):
         for gnome_name in self.active_gnomes:
             for other_gnome_name in self.active_gnomes:
                 if gnome_name != other_gnome_name:
@@ -155,22 +156,18 @@ class Map:
         
         return [distance, self._convert_unit_to_direction([x, y])]
     
-    def _convert_dist_vector_to_unit(vector):
+    def _convert_dist_vector_to_unit(self, vector):
         x = vector[0]
         y = vector[1]
 
-        if x < - 0.5:
+        if x < 0:
             x = -1
-        elif -0.5 <= x <= 0.5:
-            x = 0
-        elif 0.5 < x:
+        elif 0 < x:
             x = 1    
 
-        if y < - 0.5:
+        if y < 0:
             y = -1
-        elif -0.5 <= y <= 0.5:
-            y = 0
-        elif 0.5 < y:
+        elif 0 < y:
             y = 1
 
         return x, y
@@ -217,12 +214,15 @@ if __name__ == "__main__":
         map.add_gnome_to_gnome_queue(gnome)
     map.transfer_gnomes_to_active_gnomes()
 
-    for gnome_name, gnome in map.active_gnomes.items():
-        print(gnome_name, gnome.location["x"], gnome.location["y"])
-        for valami in range(20):
-            gnome.random_move(map)
-            print(gnome_name, gnome.location["x"], gnome.location["y"])
-    position_dict = map.move_all_gnomes()
-    print(position_dict)
-    print(map.active_gnomes)
-    print(map.gnome_queue)
+    # for gnome_name, gnome in map.active_gnomes.items():
+    #     print(gnome_name, gnome.location["x"], gnome.location["y"])
+    #     for valami in range(20):
+    #         gnome.random_move(map)
+    #         print(gnome_name, gnome.location["x"], gnome.location["y"])
+    for i in range(10):
+        position_dict = map.move_all_gnomes()
+        for gnome_n, gnome in map.active_gnomes.items():
+            print(gnome.other_gnomes_dist)
+    # print(position_dict)
+    # print(map.active_gnomes)
+    # print(map.gnome_queue)
