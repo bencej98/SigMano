@@ -13,6 +13,9 @@ class ActionApp(tk.Tk):
         self.action_payload = get_action_payload
         self.background_color = "#535356"
         self.points_frame_background = "#3c3c3c"
+        self.remove_button_background = "#a40c13"
+        self.font_color = "white"
+        self.wm_iconbitmap('logo/sigma_logo.ico')
 
         # fonts
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
@@ -58,6 +61,7 @@ class ChooseAction(tk.Frame):
         self.current_action = None
         self.action_payload = action_payload
         self.total_points = 0
+        self.action_point_frame_background = "#3c3c3c"
         self.action_points = {
             "Run away - 1": 1,
             "Go there - 1": 1,
@@ -76,7 +80,7 @@ class ChooseAction(tk.Frame):
         self.someStyle.configure('my.TMenubutton',font=('Futura',20))
 
         # title label
-        title_label = tk.Label(self, text="Strategy", font=self.controller.title_font, background="#6b0404", fg="white")
+        title_label = tk.Label(self, text="Strategy", font=self.controller.title_font, background="#6b0404", fg=self.controller.font_color)
         title_label.pack(side="top", fill="x", pady=10)
         # tree frame
         tree_frame = tk.Frame(self, height=5, width=1, padx=3)
@@ -85,7 +89,7 @@ class ChooseAction(tk.Frame):
         button_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
         button_frame.pack(padx=10, pady=10)
         # action point frame
-        action_point_frame = tk.Frame(self, height=5, width=10, background="#3c3c3c")
+        action_point_frame = tk.Frame(self, height=5, width=10, background=self.action_point_frame_background)
         action_point_frame.pack(padx=10, pady=10)
         # label frame
         label_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
@@ -95,18 +99,18 @@ class ChooseAction(tk.Frame):
         option_meun_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
         option_meun_frame.pack(padx=10, pady=10)
         # labels
-        event_label = tk.Label(label_frame, text="Choose event", fg="white", background=self.controller.background_color, font=self.controller.label_font)
-        action_label = tk.Label(label_frame, text="Choose action", fg="white", background=self.controller.background_color, font=self.controller.label_font)
-        self.action_points_label = tk.Label(action_point_frame, text="0", fg="white", background=self.controller.points_frame_background, font=self.controller.label_font)
-        self.points_label = tk.Label(action_point_frame, text="points", fg="white", background=self.controller.points_frame_background, font=self.controller.label_font)
+        event_label = tk.Label(label_frame, text="Choose event", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font)
+        action_label = tk.Label(label_frame, text="Choose action", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font)
+        self.action_points_label = tk.Label(action_point_frame, text="0", fg=self.controller.font_color, background=self.controller.points_frame_background, font=self.controller.label_font)
+        self.points_label = tk.Label(action_point_frame, text="points", fg=self.controller.font_color, background=self.controller.points_frame_background, font=self.controller.label_font)
         # buttons
-        add_action = tk.Button(button_frame, text="Add", background="#1c1c24", fg="white",
+        add_action = tk.Button(button_frame, text="Add", background="#1c1c24", fg=self.controller.font_color,
                     command=self.add_action, font=self.controller.button_font, width=5)
-        remove_action = tk.Button(button_frame, text="Remove", background="#e92224", fg="white",
+        remove_action = tk.Button(button_frame, text="Remove", background=self.controller.remove_button_background, fg=self.controller.font_color,
                     command=self.remove_action, font=self.controller.button_font, width=5)
-        fight_button = tk.Button(button_frame, text="Fight", background="#040404", fg="white",
+        fight_button = tk.Button(button_frame, text="Fight", background="#040404", fg=self.controller.font_color,
             command=lambda: self.fight(), font=self.controller.button_font, width=5)
-        calculate_points_button = tk.Button(action_point_frame, text="Calculate", fg="white", background=self.controller.background_color, font=self.controller.label_font, command=self.calculate_action_points)
+        calculate_points_button = tk.Button(action_point_frame, text="Calculate", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self.calculate_action_points)
         
         # event option menu
         default_value_event = tk.StringVar()
@@ -244,7 +248,7 @@ class ChooseAction(tk.Frame):
                 counter += 1
 
         self.total_points = current_action_points + current_event_points
-        self.action_points_label.config(text=self.total_points, fg="white")
+        self.action_points_label.config(text=self.total_points, fg=self.controller.font_color)
         if self.total_points > 10:
             self.action_points_label.config(fg="red")
             messagebox.showinfo("Too much point!", "You can have a maximum of 10 points!")
