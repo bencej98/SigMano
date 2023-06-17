@@ -10,6 +10,12 @@ class MainApp(tk.Tk):
         self.frame_width = 400
         self.frame_height = 400
         self.resizable(False, False)
+        self.background_color = "#535356"
+        self.title_line_color = "#6b0404"
+        self.login_background_color = "#2b2b2c"
+        self.register_button_background = "#a40c13"
+        self.font_color = "white"
+        self.wm_iconbitmap('logo/sigma_logo.ico')
         # fonts
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
         self.label_font = tkfont.Font(family='Arial', size=14)
@@ -54,24 +60,24 @@ class LoginPage(tk.Frame):
         self.frame_parent = controller
         self.direct_frame_parent = parent
 
-        tk.Frame.__init__(self, parent, bg="skyblue")
+        tk.Frame.__init__(self, parent, bg=controller.background_color)
         self.controller = controller
-        title_label = tk.Label(self, text="Login Page", font=self.controller.title_font)
+        title_label = tk.Label(self, text="Login Page", font=self.controller.title_font, background=self.controller.title_line_color, fg="white")
         title_label.pack(side="top", fill="x", pady=10)
 
         # username
-        label_1 = tk.Label(self, text="User name", font=self.controller.label_font, background="skyblue")
+        label_1 = tk.Label(self, text="User name", font=self.controller.label_font, background=controller.background_color, fg=self.controller.font_color)
         username = tk.StringVar()
-        username_input_field = tk.Entry(self, textvariable=username)
+        username_input_field = tk.Entry(self, textvariable=username, fg=self.controller.font_color)
         # password
-        label_2 = tk.Label(self, text="Password", font=self.controller.label_font, background="skyblue")
+        label_2 = tk.Label(self, text="Password", font=self.controller.label_font, background=controller.background_color, fg=self.controller.font_color)
         password = tk.StringVar()
         password_input_field = tk.Entry(self, textvariable=password, show="*")
         # buttons
         login_button = tk.Button(self, text="Login",
-                            command=lambda: self._logging_in(username, password), font=self.controller.button_font, width=10, background="Navy", fg="white")
+                            command=lambda: self._logging_in(username, password), font=self.controller.button_font, width=10, background=self.controller.login_background_color, fg="white")
         register_button = tk.Button(self, text="Register",
-                            command=lambda: controller.show_frame("RegisterPage"), font=self.controller.button_font, width=10, background="RoyalBlue", fg="white")
+                            command=lambda: controller.show_frame("RegisterPage"), font=self.controller.button_font, width=10, background=self.controller.register_button_background, fg="white")
         
         label_1.pack()
         username_input_field.pack()
@@ -106,28 +112,28 @@ class RegisterPage(tk.Frame):
         self.add_user_to_login = add_user_to_login 
         self.frame_parent = controller
 
-        tk.Frame.__init__(self, parent, background="skyblue")
+        tk.Frame.__init__(self, parent, background=controller.background_color)
         self.controller = controller
-        title_label = tk.Label(self, text="Register Page", font=controller.title_font)
+        title_label = tk.Label(self, text="Register Page", font=controller.title_font, background=self.controller.title_line_color, fg=self.controller.font_color)
         title_label.pack(side="top", fill="x", pady=10)
 
         # # username
-        username_label = tk.Label(self, text="User name: ", font=controller.label_font, background="skyblue")
+        username_label = tk.Label(self, text="User name: ", font=controller.label_font, background=controller.background_color, fg=self.controller.font_color)
         username = tk.StringVar()
         self.username_entry = tk.Entry(self, textvariable=username, font=controller.label_font)
         # password 1
-        password_label_1 = tk.Label(self, text="Password: ", font=controller.label_font, background="skyblue")
+        password_label_1 = tk.Label(self, text="Password: ", font=controller.label_font, background=controller.background_color, fg=self.controller.font_color)
         password_1 = tk.StringVar()
         self.password_entry_1 = tk.Entry(self, textvariable=password_1, font=controller.label_font, show="*")
         # password 2
-        password_label_2 = tk.Label(self, text="Password again: ", font=controller.label_font, background="skyblue")
+        password_label_2 = tk.Label(self, text="Password again: ", font=controller.label_font, background=controller.background_color, fg=self.controller.font_color)
         password_2 = tk.StringVar()
         self.password_entry_2 = tk.Entry(self, textvariable=password_2,font=controller.label_font, show="*")
 
         register_button = tk.Button(self, text="Register",
-                           command=lambda: self._register_user(username, password_1, password_2), font=self.controller.button_font, width=10, background="RoyalBlue", fg="white")
+                           command=lambda: self._register_user(username, password_1, password_2), font=self.controller.button_font, width=10, background=self.controller.register_button_background, fg="white")
         go_to_login_button = tk.Button(self, text="Back to Login",
-                           command=lambda: controller.show_frame("LoginPage"), font=self.controller.button_font, width=10, background="Navy", fg="white")
+                           command=lambda: controller.show_frame("LoginPage"), font=self.controller.button_font, width=10, background=self.controller.login_background_color, fg="white")
         # pack all
         username_label.pack()
         self.username_entry.pack()
@@ -190,3 +196,10 @@ class RegisterPage(tk.Frame):
         self.username_entry.delete(0,tk.END)
         self.password_entry_1.delete(0,tk.END)
         self.password_entry_2.delete(0,tk.END)
+
+def mock_functon():
+    print("MOCK")
+
+if __name__ == '__main__':
+    a = MainApp(mock_functon)
+    a.mainloop()
