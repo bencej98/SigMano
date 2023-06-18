@@ -93,7 +93,8 @@ class ActionManager:
         closest_fight_distance = map.x_coordinate
         closest_fight_direction = 0
         for fight_location in self.collided_gnomes:
-            figth_vector = map.calculate_distance(gnome.location, fight_location)
+            position_dict = {"x": fight_location[0], "y":fight_location[1]}
+            figth_vector = map.calculate_distance(gnome.location, position_dict)
             if figth_vector["distance"] < closest_fight_distance:
                 closest_fight_distance = figth_vector["distance"]
                 closest_fight_direction = figth_vector["direction"]
