@@ -144,7 +144,7 @@ class Map:
     def check_collisions(self):
         position_dict = {}
         for gnome_name, gnome in self.active_gnomes.items():
-            position = {"x": gnome.location["x"], "y": gnome.location["y"]}
+            position = (gnome.location["x"], gnome.location["y"])
             if position in position_dict:
                 position_dict[position].append(gnome)
             else:
