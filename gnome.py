@@ -22,15 +22,11 @@ class Gnome:
 
     def _check_random_direction(self, map):
         direction_list = [0, 1, 2, 3, 4, 5, 6, 7]
-        is_valid2 = True
-        while is_valid2:
+        while True:
             rand = random.randint(0, len(direction_list) - 1)
             direction = direction_list.pop(rand)
-            is_valid2 = False
-            while not self._validate_movement(direction, map):
-                is_valid2 = True
-                break
-        return direction
+            if self._validate_movement(direction, map):
+                return direction
 
     def _validate_movement(self, direction, map):
         is_valid = False
@@ -252,8 +248,8 @@ if __name__ == "__main__":
     for gnome_name, gnome in map.active_gnomes.items():
         print(gnome_name, gnome.location["x"], gnome.location["y"])
         for valami in range(20):
-            #gnome.random_move(map)
-            gnome.move_against_direction(5, map)
+            gnome.random_move(map)
+            #gnome.move_against_direction(5, map)
             print(gnome_name, gnome.location["x"], gnome.location["y"])
     # for i in range(10):
     #     position_dict = map.move_all_gnomes()
