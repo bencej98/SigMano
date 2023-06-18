@@ -130,6 +130,7 @@ class Map:
         self.active_gnomes = {}
         self.gnome_queue = []
         self.all_gnomes = {}
+        self.fight_locations = {}
 
     def add_gnome_to_gnome_queue(self, gnome: Gnome) -> None:
         self.gnome_queue.append(gnome)
@@ -141,7 +142,6 @@ class Map:
             self.active_gnomes[gnome.user] = gnome
 
     def check_collisions(self):
-        collided_gnomes = []
         position_dict = {}
         for gnome_name, gnome in self.active_gnomes.items():
             position = (gnome.location["x"], gnome.location["y"])
@@ -149,33 +149,20 @@ class Map:
                 position_dict[position].append(gnome)
             else:
                 position_dict[position] = [gnome]
-        for position, gnomes in position_dict.items():
-            if len(gnomes) > 1:
-                collided_gnomes.append(gnomes)
-        return collided_gnomes
-
-    def move_all_gnomes(self):
-        self._update_gnomes_distances()
-        position_update_dict = {}
-        for gnome_name, gnome in self.active_gnomes.items():
-            gnome.random_move(self)
-            position = (gnome.location["x"], gnome.location["y"])
-            position_update_dict[gnome.user] = position
-        position_update_for_client = {"Type": "Position", "Payload": position_update_dict}
-        return position_update_for_client
+        return position_dict
     
-    def _update_gnomes_distances(self):
+    def update_gnomes_distances(self):
         for gnome_name in self.active_gnomes:
             gnome = self.active_gnomes[gnome_name]
             gnome.other_gnomes_dist = {}
             for other_gnome_name in self.active_gnomes:
                 if gnome_name != other_gnome_name:
                     other_gnome = self.active_gnomes[other_gnome_name]
-                    gnome.other_gnomes_dist[other_gnome_name] = self._calculate_distance(gnome, other_gnome)
+                    gnome.other_gnomes_dist[other_gnome_name] = self.calculate_distance(gnome.location, other_gnome.location)
 
-    def _calculate_distance(self, gnome: Gnome, other_gnome: Gnome):
-        x = gnome.location["x"] - other_gnome.location["x"]
-        y = gnome.location["y"] - other_gnome.location["y"]
+    def calculate_distance(self, base_location, target_location):
+        x = base_location["x"] - target_location["x"]
+        y = base_location["y"] - target_location["y"]
         abs_y = abs(y)
         abs_x = abs(x)
 
@@ -251,6 +238,8 @@ if __name__ == "__main__":
             gnome.random_move(map)
             #gnome.move_against_direction(5, map)
             print(gnome_name, gnome.location["x"], gnome.location["y"])
+    map.update_gnomes_distances()
+    print(map.active_gnomes["loluser0"].other_gnomes_dist)
     # for i in range(10):
     #     position_dict = map.move_all_gnomes()
     #     for gnome_n, gnome in map.active_gnomes.items():
