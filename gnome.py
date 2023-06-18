@@ -21,51 +21,79 @@ class Gnome:
         self.strategy = strategy_list
 
     def _check_random_direction(self, map):
-        x = self.location["x"]
-        y = self.location["y"]
-        map_x = map.x_coordinate
-        map_y = map.y_coordinate
         direction_list = [0, 1, 2, 3, 4, 5, 6, 7]
         is_valid2 = True
         while is_valid2:
             rand = random.randint(0, len(direction_list) - 1)
             direction = direction_list.pop(rand)
             is_valid2 = False
-            while not self._validate_movement(x, y, direction, map_x, map_y):
+            while not self._validate_movement(direction, map):
                 is_valid2 = True
                 break
         return direction
-    
-    def check_direction(self, map, location, direction):
-        pass
 
-    def _validate_movement(self, x, y, direction, map_x, map_y):
-            is_valid = False
-            if x == 0 or y == 0 or x == map_x or y == map_y:
-                if (x == 0 and y == 0) and (0 <= direction <= 2):
-                    is_valid = True
-                elif (x == map_x and y == map_y) and (4 <= direction <= 6):
-                    is_valid = True
-                elif (x == 0 and y == map_y) and (2 <= direction <= 4):
-                    is_valid = True
-                elif (x == map_x and y == 0) and (direction in (0, 6, 7)):
-                   is_valid = True
-                elif (x == 0 and y != map_y and y != 0) and (0 <= direction <= 4):
-                    is_valid = True
-                elif (y == 0 and x != map_x and x != 0) and (0 <= direction <= 2 or direction in (6, 7)):
-                    is_valid = True
-                elif (x == map_x and y != 0 and y != map_y) and (direction == 0 or 4 <= direction <= 7):
-                    is_valid = True
-                elif (y == map_y and x != 0 and x != map_x) and (2 <= direction <= 6):
-                   is_valid = True
-            else:
+    def _validate_movement(self, direction, map):
+        is_valid = False
+        x = self.location["x"]
+        y = self.location["y"]
+        map_x = map.x_coordinate
+        map_y = map.y_coordinate
+        if x == 0 or y == 0 or x == map_x or y == map_y:
+            if (x == 0 and y == 0) and (0 <= direction <= 2):
                 is_valid = True
-            return is_valid
-
+            elif (x == map_x and y == map_y) and (4 <= direction <= 6):
+                is_valid = True
+            elif (x == 0 and y == map_y) and (2 <= direction <= 4):
+                is_valid = True
+            elif (x == map_x and y == 0) and (direction in (0, 6, 7)):
+                is_valid = True
+            elif (x == 0 and y != map_y and y != 0) and (0 <= direction <= 4):
+                is_valid = True
+            elif (y == 0 and x != map_x and x != 0) and (0 <= direction <= 2 or direction in (6, 7)):
+                is_valid = True
+            elif (x == map_x and y != 0 and y != map_y) and (direction == 0 or 4 <= direction <= 7):
+                is_valid = True
+            elif (y == map_y and x != 0 and x != map_x) and (2 <= direction <= 6):
+                is_valid = True
+        else:
+            is_valid = True
+        return is_valid
     
     def random_move(self, map):
         direction=self._check_random_direction(map)
         self._move_by_direction(direction)
+
+    def move_towards_direction(self, direction, map):
+        is_direction_valid = self._validate_movement(direction, map)
+        if is_direction_valid:
+            self._move_by_direction(direction)
+        else:
+            first_alter_direction = self._direction_converter(direction + 1)
+            second_alter_direction = self._direction_converter(direction - 1)
+            if self._validate_movement(first_alter_direction, map):
+                self._move_by_direction(first_alter_direction)
+            elif self._validate_movement(second_alter_direction, map):
+                self._move_by_direction(second_alter_direction)
+            else:
+                self.random_move(map)
+
+    def _direction_converter(self,direction):
+        converted_direction = direction
+        if direction == 8:
+            converted_direction = 0
+        elif direction == -1:
+            converted_direction = 7
+        
+        return converted_direction
+
+    def move_against_direction(self, direction, map):
+        direction_to_move = 0
+        if direction == 0 or direction == 1 or direction == 2 or direction == 3:
+            direction_to_move = direction + 4
+        else:
+            direction_to_move = direction - 4
+
+        self.move_towards_direction(direction_to_move, map)
 
     def _move_by_direction(self, direction):
         match direction:
@@ -142,19 +170,26 @@ class Map:
     
     def _update_gnomes_distances(self):
         for gnome_name in self.active_gnomes:
+            gnome = self.active_gnomes[gnome_name]
+            gnome.other_gnomes_dist = {}
             for other_gnome_name in self.active_gnomes:
                 if gnome_name != other_gnome_name:
-                    gnome = self.active_gnomes[gnome_name]
                     other_gnome = self.active_gnomes[other_gnome_name]
-                    gnome.other_gnomes_dist[other_gnome_name] = self.calculate_distance(gnome, other_gnome)
+                    gnome.other_gnomes_dist[other_gnome_name] = self._calculate_distance(gnome, other_gnome)
 
-    def calculate_distance(self, gnome: Gnome, other_gnome: Gnome):
+    def _calculate_distance(self, gnome: Gnome, other_gnome: Gnome):
         x = gnome.location["x"] - other_gnome.location["x"]
         y = gnome.location["y"] - other_gnome.location["y"]
+        abs_y = abs(y)
+        abs_x = abs(x)
 
-        distance = math.sqrt((x * x) + (y * y))
+        if abs_x <= abs_y:
+            distance = abs_y
+        else:
+            distance = abs_x
+            #distance = math.sqrt((x * x) + (y * y))
         
-        return [distance, self._convert_unit_to_direction([x, y])]
+        return {"distance": distance, "direction": self._convert_unit_to_direction([x, y])}
     
     def _convert_dist_vector_to_unit(self, vector):
         x = vector[0]
@@ -163,7 +198,7 @@ class Map:
         if x < 0:
             x = -1
         elif 0 < x:
-            x = 1    
+            x = 1
 
         if y < 0:
             y = -1
@@ -214,15 +249,16 @@ if __name__ == "__main__":
         map.add_gnome_to_gnome_queue(gnome)
     map.transfer_gnomes_to_active_gnomes()
 
-    # for gnome_name, gnome in map.active_gnomes.items():
-    #     print(gnome_name, gnome.location["x"], gnome.location["y"])
-    #     for valami in range(20):
-    #         gnome.random_move(map)
-    #         print(gnome_name, gnome.location["x"], gnome.location["y"])
-    for i in range(10):
-        position_dict = map.move_all_gnomes()
-        for gnome_n, gnome in map.active_gnomes.items():
-            print(gnome.other_gnomes_dist)
+    for gnome_name, gnome in map.active_gnomes.items():
+        print(gnome_name, gnome.location["x"], gnome.location["y"])
+        for valami in range(20):
+            #gnome.random_move(map)
+            gnome.move_against_direction(5, map)
+            print(gnome_name, gnome.location["x"], gnome.location["y"])
+    # for i in range(10):
+    #     position_dict = map.move_all_gnomes()
+    #     for gnome_n, gnome in map.active_gnomes.items():
+    #         print(gnome.other_gnomes_dist)
     # print(position_dict)
     # print(map.active_gnomes)
     # print(map.gnome_queue)
