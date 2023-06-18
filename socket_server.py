@@ -131,7 +131,7 @@ class Gameserver:
     def tik_data(self):
         while True:
             self.travel.transfer_gnomes_to_active_gnomes()
-            position_dict = self.travel.move_all_gnomes()
+            position_dict = self.action_managger.move_all_gnomes(self.travel)
             self.broadcast_message(position_dict)
             time.sleep(0.1)
             act_fight = self.action_managger.fight(self.travel)

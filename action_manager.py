@@ -31,7 +31,7 @@ class ActionManager:
         self._get_collided_gnomes(map)
         if len(self.collided_gnomes) > 0:
             self.was_fight = True
-            for gnomes in self.collided_gnomes:
+            for gnomes in self.collided_gnomes.values():
                 for i, gnome in enumerate(gnomes):
                     if i < len(gnomes) - 1:
                         for j in range(i+1, len(gnomes)):
@@ -82,7 +82,7 @@ class ActionManager:
     def move_all_gnomes(self, map: Map):
         map.update_gnomes_distances()
         position_update_dict = {}
-        for gnome_name, gnome in self.active_gnomes.items():
+        for gnome_name, gnome in map.active_gnomes.items():
             gnome.random_move(map)
             position = (gnome.location["x"], gnome.location["y"])
             position_update_dict[gnome.user] = position
