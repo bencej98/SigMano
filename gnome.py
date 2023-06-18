@@ -144,12 +144,16 @@ class Map:
     def check_collisions(self):
         position_dict = {}
         for gnome_name, gnome in self.active_gnomes.items():
-            position = (gnome.location["x"], gnome.location["y"])
+            position = {"x": gnome.location["x"], "y": gnome.location["y"]}
             if position in position_dict:
                 position_dict[position].append(gnome)
             else:
                 position_dict[position] = [gnome]
-        return position_dict
+        positions_with_collided_gnomes = {}
+        for position, gnomes in position_dict.items():
+            if len(gnomes) > 1:
+                positions_with_collided_gnomes[position] = gnomes
+        return positions_with_collided_gnomes
     
     def update_gnomes_distances(self):
         for gnome_name in self.active_gnomes:
