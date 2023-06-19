@@ -79,7 +79,10 @@ class ActionManager:
             outcome = f"{gnome_first.user} killed {gnome_second.user}"
         fight_message_dict["outcome"] = outcome
         return fight_message_dict
-        
+    
+    def participation_award(self, map: Map):
+        for gnome in map.active_gnomes.values():
+            gnome.actual_points += 1
 
     def fight(self, map):
         self.was_fight = False
