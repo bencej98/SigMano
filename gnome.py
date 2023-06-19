@@ -25,7 +25,28 @@ class Gnome:
             self.target_location = {}
             return True
         return False
+    
+    def set_runaway_target_location(self, map, target_location):
+        vector_to_target = {
+            "x": target_location["x"] - self.location["x"],
+            "y": target_location["y"] - self.location["y"]
+        }
 
+        vector_away_from_target = {
+            "x": -vector_to_target["x"],
+            "y": -vector_to_target["y"]
+        }
+
+        new_target_location = {
+            "x": self.location["x"] + vector_away_from_target["x"],
+            "y": self.location["y"] + vector_away_from_target["y"]
+        }
+
+        new_target_location["x"] = max(0, min(map.x_coordinate, new_target_location["x"]))
+        new_target_location["y"] = max(0, min(map.y_coordinate, new_target_location["y"]))
+
+        self.target_location = new_target_location
+        
     def update_strategy(self, strategy_list: list):
         self.strategy = strategy_list
 
