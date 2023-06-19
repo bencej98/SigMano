@@ -53,7 +53,7 @@ class ActionManager:
                 gnome_deathnote.append(gnome_name)
         
         death_payload = []
-        for gnome_name in gnome_deathnote():
+        for gnome_name in gnome_deathnote:
             death_dict = {}
             dead_gnome = map.active_gnomes[gnome_name]
             death_dict["user"] = dead_gnome.user

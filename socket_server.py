@@ -62,7 +62,7 @@ class Connection:
                 self.close()
 
 class Gameserver:
-    def __init__(self, travel, action_managger:ActionManager, ip="0.0.0.0", port=10000, ) -> None:
+    def __init__(self, travel, action_manager:ActionManager, ip="0.0.0.0", port=10000, ) -> None:
         self.messages = []
         self.server_socket = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM)
@@ -70,7 +70,7 @@ class Gameserver:
         self.server_socket.listen()
         self.connections = {}
         self.travel = travel
-        self.action_managger= action_managger
+        self.action_manager= action_manager
         self.db = Gnome_Database()
         self.connections_lock = threading.Lock()
         self.incoming_connections_thread = threading.Thread(
@@ -111,7 +111,7 @@ class Gameserver:
                         self.travel.all_gnomes[usname] = gnome
                         self.travel.add_gnome_to_gnome_queue(gnome)
                     else:
-                        self.action_managger.update_gnomes_strategy(self.travel, curr_msg.payload, usname)
+                        self.action_manager.update_gnomes_strategy(self.travel, curr_msg.payload, usname)
                 elif curr_msg.type == "Registration":
                     self.connections[connection_id].name = curr_msg.payload['username']
                     self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
@@ -128,22 +128,27 @@ class Gameserver:
                     self.broadcast_message(800)  # Send code 999 for unknown type
             else:
                 self.broadcast_message(999)  # Send code 999 for missing type
+    
     def tik_data(self):
         while True:
             self.travel.transfer_gnomes_to_active_gnomes()
             position_dict = self.travel.move_all_gnomes()
             self.broadcast_message(position_dict)
             time.sleep(0.1)
-            act_fight = self.action_managger.fight(self.travel)
+            act_fight = self.action_manager.fight(self.travel)
             print(position_dict)
             if len(act_fight) != 0:
-                self.broadcast_message({"Type": "Event", "Payload" : act_fight})
+                self.broadcast_message({"Type": "Event", "Payload": act_fight})
                 time.sleep(0.1)
                 print(act_fight)
-                death_check = self.action_managger.check_gnome_death(self.travel)
+                death_check = self.action_manager.check_gnome_death(self.travel)
                 if death_check["Payload"]:
                     self.broadcast_message(death_check)
+                    for death in death_check["Payload"]:
+                        self.db.add_results_upon_death(death["user"], death["score"], death["kills"])
+                    self.broadcast_message(self.db.get_sumscores())
             time.sleep(2)
+
 
     def run_tik_data_thread(self):
         tik_thread = threading.Thread(target=self.tik_data)
