@@ -180,7 +180,7 @@ class Gameserver:
             self.connections.pop(id)
 
 def main():
-        travel = Map(10, 10, 5)
+        travel = Map(5, 5, 5)
         action = ActionManager()
         server = Gameserver(travel, action)
         gnome1 = Gnome("Gnome1")
@@ -201,10 +201,10 @@ def main():
                                                   {"Event": "Gnomes in vicinity",
                                                    "Action": "Defend"}]
         gnome1.strategy = strategy1
-        gnome2.strategy = strategy2
-        gnome3.strategy = strategy3
+        gnome2.strategy = strategy1
+        gnome3.strategy = strategy1
         gnome4.strategy = strategy1
-        gnome5.strategy = strategy2
+        gnome5.strategy = strategy1
 
 
         server.travel.add_gnome_to_gnome_queue(gnome1)

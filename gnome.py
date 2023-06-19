@@ -43,10 +43,11 @@ class Gnome:
     def spawn_gnome(self, map):
         self.location["x"] = random.randint(0, map.x_coordinate)
         self.location["y"] = random.randint(0, map.y_coordinate)
-        self.target_location = self.location.copy()
+        self.target_location["x"] = self.location["x"]
+        self.target_location["y"] = self.location["y"]
 
     def has_reached_target(self):
-        if self.location == self.target_location:
+        if self.target_location["x"] == self.location["x"] and self.target_location["y"] == self.location["y"]:
             # self.target_location = {}
             self.action_mode = None
             return True
