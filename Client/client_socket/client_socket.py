@@ -136,7 +136,6 @@ class Incomming:
 
                 if self.is_login_success:
                     self.is_login_success = False
-                    
 
                     #zárja a regisztárciót:
                     self.destroy_login_ui(frame_destroy)
@@ -179,7 +178,11 @@ class Incomming:
         frame_destroy()
 
     def start_arena(self):
-        start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
+        # TODO pass selected color
+        username = ClientConnection.static_user_name
+        print("USRR", username)
+        start_loop(username)
+        # start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
 
     def change_data(self, positions, username):
         set_temp_json(positions, username)
