@@ -7,7 +7,7 @@ import queue
 
 from tkinter import messagebox
 from arena.auth_screen import MainApp
-from arena.choose_action import ActionApp
+from arena.new_strategy_ui import ActionApp
 from arena.arena import start_loop, dict_data_for_screen, json_temp, set_temp_json
 
 class ClientConnection:
@@ -138,6 +138,8 @@ class Incomming:
                     #nyitja a choose_action képrenyőt
                     a = ActionApp(self._get_action_payload)
                     a.mainloop()
+
+                    print("ACTION: ", self.action_payload)
 
                     #akciók küldése a szerver részére
                     client_socket.sendall(json.dumps(self.outgoing.action_message(self.action_payload["Payload"])).encode("utf-8"))
