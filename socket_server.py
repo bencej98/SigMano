@@ -104,10 +104,14 @@ class Gameserver:
             curr_msg = new_messages[connection_id]
             if curr_msg.type:
                 if curr_msg.type == "Action":
-                    usname = self.connections[connection_id].name 
-                    gnome = Gnome(usname)
-                    self.travel.add_gnome_to_gnome_queue(gnome)
-                    self.action_managger.update_gnomes_strategy(self.travel, curr_msg.payload, usname)
+                    usname = self.connections[connection_id].name
+                    if usname not in self.travel.all_gnomes.keys():
+                        gnome = Gnome(usname)
+                        gnome.strategy = curr_msg.payload
+                        self.travel.all_gnomes[usname] = gnome
+                        self.travel.add_gnome_to_gnome_queue(gnome)
+                    else:
+                        self.action_managger.update_gnomes_strategy(self.travel, curr_msg.payload, usname)
                 elif curr_msg.type == "Registration":
                     self.connections[connection_id].name = curr_msg.payload['username']
                     self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
@@ -129,12 +133,16 @@ class Gameserver:
             self.travel.transfer_gnomes_to_active_gnomes()
             position_dict = self.travel.move_all_gnomes()
             self.broadcast_message(position_dict)
+            time.sleep(0.1)
             act_fight = self.action_managger.fight(self.travel)
             print(position_dict)
             if len(act_fight) != 0:
-                self.broadcast_message({"Type": "Event", "Payload" : act_fight}) 
+                self.broadcast_message({"Type": "Event", "Payload" : act_fight})
+                time.sleep(0.1)
                 print(act_fight)
-                self.broadcast_message(self.action_managger.check_gnome_death(self.travel))
+                death_check = self.action_managger.check_gnome_death(self.travel)
+                if death_check["Payload"]:
+                    self.broadcast_message(death_check)
             time.sleep(2)
 
     def run_tik_data_thread(self):
@@ -158,7 +166,7 @@ class Gameserver:
             self.connections.pop(id)
 
 def main():
-        travel = Map(2, 2, 2)
+        travel = Map(2, 2, 3)
         action = ActionManager()
         server = Gameserver(travel, action)
         server.db.create_table()
