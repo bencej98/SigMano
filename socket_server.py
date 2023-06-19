@@ -156,7 +156,7 @@ class Gameserver:
                     for death in death_check["Payload"]:
                         self.db.add_results_upon_death(death["user"].lower(), death["score"], death["kills"])
                     self.broadcast_message(self.db.get_sumscores())
-            time.sleep(1)
+            time.sleep(2)
 
 
     def run_tik_data_thread(self):
@@ -221,7 +221,7 @@ def main():
                       f"{gnome_name}current_location: {gnome.location} \n"
                       f"{type(gnome.strategy)} {gnome.strategy}"
                       f"bug_test:{gnome.bug_test} \n")
-            time.sleep(1)
+            time.sleep(2)
 
 if __name__ == "__main__":
     try:

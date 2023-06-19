@@ -15,7 +15,7 @@ class Gnome:
         self.target_location = {}
         self.direction = None
         self.max_health = 100
-        self.current_health = 30
+        self.current_health = 100
         self.attack = 5
         self.defense = 2
         self.isdead = False
@@ -114,6 +114,7 @@ class Gnome:
     def random_move(self, map):
         direction=self._check_random_direction(map)
         self._move_by_direction(direction)
+        self.update_direction(map)
 
     def move_towards_direction(self, map):
         is_direction_valid = self._validate_movement(self.direction, map)
@@ -132,7 +133,9 @@ class Gnome:
 
     def update_direction(self, map):
         self.bug_test = self.target_location
-        self.direction = map.convert_unit_to_direction([self.target_location["x"], self.target_location["y"]])
+        relative_x = self.target_location["x"] - self.location["x"]
+        relative_y = self.target_location["y"] - self.location["y"]
+        self.direction = map.convert_unit_to_direction((relative_x, relative_y))
 
     def _direction_converter(self,direction):
         converted_direction = direction
@@ -242,6 +245,7 @@ class Map:
             y = -1
         elif 0 < y:
             y = 1
+
 
         return x, y
 
