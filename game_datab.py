@@ -8,7 +8,7 @@ class Gnome_Database:
     path = "game_database.db"
 
     def __init__(self) -> None:
-        self.connect = sqlite3.connect(self.path, check_same_thread=False)
+        self.connect = sqlite3.connect(self.path)
         self.cursor = self.connect.cursor()
         self.create_table()
 
@@ -63,7 +63,7 @@ class Gnome_Database:
                             INSERT INTO user
                             VALUES(?, ?, ?, ?, ?)
                             """,
-                (None, username, password, gnome_name, 0),
+                (None, username, password, gnome_name, None),
             )
             self.connect.commit()
             logging.info("New user created: %s", username)
@@ -108,7 +108,7 @@ class Gnome_Database:
             logging.error(error_msg)
             print(error_msg)
 
-    def add_results_upon_death(self, username: str, score: int, kill_count: int) -> None:
+    def add_results_upon_death(self, username: str, kill_count: int, score: int) -> None:
         """Adds results upon death to the database"""
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         try:
@@ -121,8 +121,8 @@ class Gnome_Database:
             )
 
             self.connect.commit()
-            logging.info("Results added upon death for user: %s. Score: %s, kill count: %s", username, score, kill_count)
-            self.update_sumscore_upon_death(username, kill_count)
+            logging.info("Results added upon death for user: %s. Kill count: %s, Score: %s", username, kill_count, score)
+            self.update_sumscore_upon_death(username, score)
         except sqlite3.Error as e:
             error_msg = "Error adding results upon death: %s" % str(e)
             logging.error(error_msg)
@@ -189,28 +189,7 @@ class Gnome_Database:
             else:
                 return self.send_auth_json(False)
 
-    def get_sumscores(self):
-        player_base_list = []
-        temp_dict = {}
-        self.cursor.execute("""
-                            SELECT * 
-                            FROM user
-                            """)
-        users_all_data = self.cursor.fetchall()
-        for row in users_all_data:
-            temp_dict[f"{row[1]}"] = row[4]
-            player_base_list.append(temp_dict)
-            temp_dict = {}
-        return self.send_user_sumscore(player_base_list)
 
-
-    def send_user_sumscore(self, player_base_list: list):
-        
-        user_score_json = {
-                                "Type": "Leader", "Payload": player_base_list
-                            }
-        return json.dumps(user_score_json)
-    
 # Set up logging configuration
 logging.basicConfig(
     level=logging.INFO,

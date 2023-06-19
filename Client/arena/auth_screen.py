@@ -109,8 +109,6 @@ class LoginPage(tk.Frame):
 
 class RegisterPage(tk.Frame):
 
-    # FIXME when username and password are the same then it says the registration was successful
-
     def __init__(self, parent, controller, add_user_to_login):
         self.add_user_to_login = add_user_to_login 
         self.frame_parent = controller
