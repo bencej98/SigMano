@@ -42,7 +42,7 @@ class ClientConnection:
             self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket_client.connect((HOST, PORT))
 
-            incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(self.socket_client,self.init_socket, self.destroy_frames))
+            incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(self.socket_client,self.init_socket, self.destroy_frames, self.user_name,))
             incomming_messages.start()
 
             auth_screen_app = MainApp(self.get_user_name_password_from_form)
@@ -58,6 +58,7 @@ class ClientConnection:
         ClientConnection.static_user_name = name
         self.loginRegister_frame_destroy = frame_destroy
         self.login_closed = True
+        self.user_name = name
 
         if log_type == "Auth":
             self.auth_client(self.outgoing.authentication_message, name,password)
@@ -98,13 +99,11 @@ class Outgoing:
 # region INCOMING MESSAGES:
 class Incomming:
 
-    static_user_name = "missing - in incomming"
-
     counter = 0
     def __init__(self) -> None:
         self.positions = None
         self.event = None
-
+        self.user_name = None
         self.is_logged_in = False
         self.is_started = False
 
@@ -115,7 +114,7 @@ class Incomming:
         self.incoming_queue = queue.Queue()  
         self.outgoing = Outgoing()      
 
-    def accept_incoming(self, client_socket, set_socket_cb, frame_destroy):
+    def accept_incoming(self, client_socket, set_socket_cb, frame_destroy, user_name):
         set_socket_cb(client_socket)
 
         #módosítja a pozíciókat
@@ -189,12 +188,12 @@ class Incomming:
         username = None
         while True:
             username = ClientConnection.static_user_name
-            print("NAME? ", ClientConnection.static_user_name)
             if not self.incoming_queue.empty():
                 incoming = self.incoming_queue.get()
                 print(f"{Incomming.counter} incoming queue:", incoming)
                 Incomming.counter += 1
                 if incoming["Type"] == "Position":
+                    print("HALLO")
                     self.change_data(incoming['Payload'], username)
             time.sleep(1)
 
