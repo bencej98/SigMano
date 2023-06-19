@@ -177,27 +177,27 @@ class Incomming:
                 #   "Andras": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}]}
                 # }
                 if incoming["Type"] == "Event":
-                    get_payload = incoming["Payload"]
-                    for (user, fight_list) in get_payload.items:
-                        print(get_payload)
+                    restul_text = self.process_fight_events(incoming["Payload"])
+                    print(restul_text)
 
                 #TODO:
                 # {"Type": "Death", "Payload": []}' Minden Event-l együtt jön üresen is!
                 if incoming["Type"] == "Death":
                     if len(incoming["Payload"]) > 0:
-                        self.print_dead_msg(incoming)
+                        payload_list = incoming["Payload"]
+                        death_msg_text = self.print_dead_msg(payload_list)
+                        print(death_msg_text)
 
                 #TODO:
                 # Type : Leader , Payload: [{"Andras": 5}, {"Bela": 6 } , { }]
                 if incoming["Type"] == "Leader":
                     if len(incoming["Payload"]) > 0:
                         ordered_leaders = sorted(incoming["Payload"], key=self.get_values_for_sort, reverse=True)
-                        print("LEADER board", ordered_leaders)                  
-
+                        print("LEADER board", ordered_leaders)                
                     
             except:
                 pass
-        
+
     def get_values_for_sort(self, leader_list):
         return list(leader_list.values())[0]            
 
@@ -205,9 +205,18 @@ class Incomming:
         death_messages = ["Good day to die!", "Oh my God!", "Rest My Peace!", "Holy sh**t!"]
         death_msg_len = len(death_messages)
         
-        rand_msg_index = random.randrange(0,death_msg_len-1)
-        print(*incoming["Payload"], end=":")
-        print(death_messages[rand_msg_index])
+        for dead_user in incoming:
+            rand_msg_index = random.randrange(0,death_msg_len-1)
+            return f"{dead_user}: {death_messages[rand_msg_index]}"
+
+    def process_fight_events(self,incoming_payload_event):
+        for (user, fight_list) in incoming_payload_event.items():
+            payload_list = list(fight_list[0].values())
+
+            encounter_msg = payload_list[0]
+            result_msg = payload_list[1]
+
+            return f"{encounter_msg}, result is {result_msg}!" 
 
     def login_status(self, incoming, frame_destroy):
         if not incoming["Payload"]:
