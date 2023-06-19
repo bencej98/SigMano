@@ -81,6 +81,7 @@ class Gnome:
                 self._move_by_direction(second_alter_direction)
             else:
                 self.random_move(map)
+                self.direction = None
 
     def update_direction(self, map):
         self.direction = map.convert_unit_to_direction([self.target_location["x"], self.target_location["y"]])

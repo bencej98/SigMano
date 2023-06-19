@@ -113,7 +113,6 @@ class ActionManager:
         elif strategy["action"] == "approach":
             pass
 
-
     def choose_strategy(self, map: Map):
         for gnome_name, gnome in map.active_gnomes:
             if len(gnome.target_location) == 0:
@@ -121,6 +120,7 @@ class ActionManager:
                     if strategy["event"] == "fight" and self.was_fight:
                         self._set_target_towards_fight(gnome)
                         self.check_action(gnome, strategy)
+                    if strategy["event"] == ""
                     else:
                         gnome.direction = None
 
