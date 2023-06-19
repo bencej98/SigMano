@@ -141,9 +141,10 @@ class Gameserver:
     def tik_data(self):
         while True:
             self.travel.transfer_gnomes_to_active_gnomes()
-            act_fight = self.action_manager.combat(self.travel)
             position_dict = self.action_manager.move_all_gnomes(self.travel)
+            act_fight = self.action_manager.combat(self.travel)
             self.broadcast_message(position_dict)
+            self.action_manager.participation_award(self.travel)
             time.sleep(0.1)
             print(position_dict)
             if len(act_fight) != 0:
@@ -156,7 +157,7 @@ class Gameserver:
                     for death in death_check["Payload"]:
                         self.db.add_results_upon_death(death["user"].lower(), death["score"], death["kills"])
                     self.broadcast_message(self.db.get_sumscores())
-            time.sleep(2)
+            time.sleep(0.5)
 
 
     def run_tik_data_thread(self):
@@ -221,7 +222,7 @@ def main():
                       f"{gnome_name}current_location: {gnome.location} \n"
                       f"{type(gnome.strategy)} {gnome.strategy}"
                       f"bug_test:{gnome.bug_test} \n")
-            time.sleep(2)
+            time.sleep(0.5)
 
 if __name__ == "__main__":
     try:
