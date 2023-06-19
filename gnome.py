@@ -15,6 +15,26 @@ class Gnome:
         self.lose_count = 0
         self.target_location = {}
         self.direction = None
+        self.max_health = 100
+        self.current_health = 100
+        self.attack = 10
+        self.defense = 2
+        self.isdead = False
+        self.action_mode = None
+
+    def fight_gnome(self, gnome):
+        if self.isdead != True and gnome.isdead != True:
+            gnome.current_health -= max(1, self.attack - gnome.defense)
+
+    def apply_action_buffs(self):
+        if self.action_mode == "Approach":
+            self.attack += 5
+        elif self.action_mode == "Defend":
+            self.defense += 3
+    
+    def remove_action_buffs(self):
+        self.attack = 10
+        self.defense = 2
 
     def spawn_gnome(self, map):
         self.location["x"] = random.randint(0, map.x_coordinate)
@@ -23,6 +43,7 @@ class Gnome:
     def has_reached_target(self):
         if self.location == self.target_location:
             self.target_location = {}
+            self.action_mode = None
             return True
         return False
     

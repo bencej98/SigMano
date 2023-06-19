@@ -1,4 +1,5 @@
 from gnome import Map, Gnome
+import random
 
 class ActionManager:
     def __init__(self) -> None:
@@ -24,6 +25,61 @@ class ActionManager:
                         updated_gnomes.append(user)
         for user in updated_gnomes:
             del self.user_strategies[user]
+
+    def combat(self, map):
+        self.was_fight = False
+        self.event_dictionary = {}
+        self._get_collided_gnomes(map)
+        if len(self.collided_gnomes) > 0:
+            self.was_fight = True
+            for gnomes in self.collided_gnomes.values():
+                for i, gnome in enumerate(gnomes):
+                    if i < len(gnomes) - 1:
+                        for j in range(i+1, len(gnomes)):
+                            gnome_first = gnome
+                            gnome_second = gnomes[j]
+                            if gnome_first.isdead != True and gnome_second.isdead != True:
+                                fight_message_dict = self._check_combat_option(gnome_first, gnome_second)
+                                if gnome_first.user in self.event_dictionary:
+                                    self.event_dictionary[gnome_first.user].append(fight_message_dict)
+                                else:
+                                    self.event_dictionary[gnome_first.user] = [fight_message_dict]
+                                if gnome_second.user in self.event_dictionary:
+                                    self.event_dictionary[gnome_second.user].append(fight_message_dict)
+                                else:
+                                    self.event_dictionary[gnome_second.user] = [fight_message_dict]
+        return self.event_dictionary
+
+    def _check_combat_option(self, gnome_one: Gnome, gnome_two: Gnome):
+        gnome_one.apply_action_buffs()
+        gnome_two.apply_action_buffs()
+        encounter = f"{gnome_one.user} and {gnome_two.user} fought"
+        fight_message_dict = {
+                    "encounter": encounter,
+                    "outcome": ""
+                }
+        
+        gnome_first, gnome_second = random.choice([gnome_one, gnome_two])
+        gnome_first.fight_gnome(gnome_second)
+        gnome_second.fight_gnome(gnome_first)
+        gnome_first.actual_points += 15
+        gnome_second.actual_points += 15
+        gnome_first.remove_action_buffs()
+        gnome_second.remove_action_buffs()       
+        outcome = ""
+        if gnome_first.current_health <= 0:
+            gnome_second.kill_count += 1
+            gnome_second.actual_points += 50
+            gnome_first.isdead = True
+            outcome = f"{gnome_second.user} killed {gnome_first.user}"
+        elif gnome_second.current_health <= 0:
+            gnome_first.kill_count += 1
+            gnome_first.actual_points += 50
+            gnome_second.isdead = True
+            outcome = f"{gnome_first.user} killed {gnome_second.user}"
+        fight_message_dict["outcome"] = outcome
+        return fight_message_dict
+        
 
     def fight(self, map):
         self.was_fight = False
@@ -109,12 +165,14 @@ class ActionManager:
                 gnomes_in_range.append(gnome_name)
         return gnomes_in_range
 
-    def check_action(self, gnome: Gnome, map, strategy, target_location):
+    def check_action(self, gnome: Gnome, map, strategy, target_location = None):
         if strategy["Action"] == "Runaway":
             gnome.set_runaway_target_location(map, target_location)
             gnome.update_direction(map)
         elif strategy["Action"] == "Approach":
             gnome.target_location = target_location
+            gnome.update_direction(map)
+        elif strategy["Action"] == "Defend":
             gnome.update_direction(map)
 
     def choose_strategy(self, map: Map):
