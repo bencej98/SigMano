@@ -111,7 +111,7 @@ class Incomming:
 
         self.action_payload = None
         
-        self.incoming_queue = queue.Queue()  
+        self.incoming_queue = incoming_data_queue 
         self.outgoing = Outgoing()      
 
     def accept_incoming(self, client_socket, set_socket_cb, frame_destroy):
