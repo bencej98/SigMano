@@ -182,7 +182,6 @@ class Incomming:
         frame_destroy()
 
     def start_arena(self):
-        # TODO pass selected color
         username = ClientConnection.static_user_name
         print("USRR", username)
         print("COLOR:", self.chosen_color)
