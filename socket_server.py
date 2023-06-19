@@ -96,39 +96,48 @@ class Gameserver:
                 msg_obj = Message(msg["Type"], msg["Payload"])
                 new_messages[connection_id] = msg_obj
         return new_messages
-    
+
     def process_data(self):
         new_messages = self.check_incoming_messages()
         self.check_connections_liveness()
-        for connection_id in new_messages:
-            curr_msg = new_messages[connection_id]
+        for connection_id, curr_msg in new_messages.items():
             if curr_msg.type:
                 if curr_msg.type == "Action":
-                    usname = self.connections[connection_id].name
-                    if usname not in self.travel.all_gnomes.keys():
-                        gnome = Gnome(usname)
-                        gnome.strategy = curr_msg.payload
-                        self.travel.all_gnomes[usname] = gnome
-                        self.travel.add_gnome_to_gnome_queue(gnome)
-                    else:
-                        self.action_manager.update_gnomes_strategy(self.travel, curr_msg.payload, usname)
+                    self.handle_action_message(connection_id, curr_msg.payload)
                 elif curr_msg.type == "Registration":
-                    self.connections[connection_id].name = curr_msg.payload['username']
-                    self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
+                    self.handle_registration_message(connection_id, curr_msg.payload)
                 elif curr_msg.type == "Login":
-                    is_valid = json.loads(self.db.login_user(curr_msg.payload['username'], curr_msg.payload['password']))
-                    if is_valid["Payload"]:
-                        self.connections[connection_id].name = curr_msg.payload['username']
-                        self.send_response(connection_id, is_valid)
-                    else:
-                        self.send_response(connection_id, is_valid)
+                    self.handle_login_message(connection_id, curr_msg.payload)
                 elif curr_msg.type == "Closed":
                     self.connections[connection_id].close()
                 else:
-                    self.broadcast_message(800)  # Send code 999 for unknown type
-            else:
-                self.broadcast_message(999)  # Send code 999 for missing type
-    
+                    self.broadcast_message("Invalid payload")
+
+    def handle_action_message(self, connection_id, payload):
+        username = self.connections[connection_id].name
+        if username not in self.travel.all_gnomes:
+            gnome = Gnome(username)
+            gnome.strategy = payload
+            self.travel.all_gnomes[username] = gnome
+            self.travel.add_gnome_to_gnome_queue(gnome)
+        else:
+            self.action_manager.update_gnomes_strategy(self.travel, payload, username)
+
+    def handle_registration_message(self, connection_id, payload):
+        connection = self.connections[connection_id]
+        connection.name = payload['username']
+        response = self.db.check_user_upon_registration(payload['username'], payload['password'])
+        self.send_response(connection_id, response)
+
+    def handle_login_message(self, connection_id, payload):
+        connection = self.connections[connection_id]
+        is_valid = json.loads(self.db.login_user(payload['username'], payload['password']))
+        if is_valid["Payload"]:
+            connection.name = payload['username']
+            self.send_response(connection_id, is_valid)
+        else:
+            self.send_response(connection_id, is_valid)
+
     def tik_data(self):
         while True:
             self.travel.transfer_gnomes_to_active_gnomes()
@@ -151,7 +160,7 @@ class Gameserver:
 
 
     def run_tik_data_thread(self):
-        tik_thread = threading.Thread(target=self.tik_data)
+        tik_thread = threading.Thread(target=self.tik_data, daemon=True)
         tik_thread.start()
 
     def broadcast_message(self, data):
@@ -181,4 +190,7 @@ def main():
             time.sleep(0.001)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        exit()
