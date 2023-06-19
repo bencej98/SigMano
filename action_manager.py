@@ -52,6 +52,15 @@ class ActionManager:
             if gnome.lose_count >= 3:
                 gnome_deathnote.append(gnome_name)
         
+        death_payload = []
+        for gnome_name in gnome_deathnote():
+            death_dict = {}
+            dead_gnome = map.active_gnomes[gnome_name]
+            death_dict["user"] = dead_gnome.user
+            death_dict["score"] = dead_gnome.actual_points
+            death_dict["lose_count"] = dead_gnome.kill_count
+            death_payload.append(death_dict)
+
         for gnome_name in gnome_deathnote:
             dead_gnome = map.active_gnomes.pop(gnome_name)
             dead_gnome.event_counter = 0
@@ -62,7 +71,7 @@ class ActionManager:
         
         return {
             "Type": "Death",
-            "Payload": gnome_deathnote
+            "Payload": death_dict
                 }
 
     def _check_fight_option(self, gnome_first, gnome_second):
