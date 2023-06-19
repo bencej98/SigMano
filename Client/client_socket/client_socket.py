@@ -7,10 +7,13 @@ import queue
 
 from tkinter import messagebox
 from arena.auth_screen import MainApp
-from arena.choose_action import ActionApp
+from arena.new_strategy_ui import ActionApp
 from arena.arena import start_loop, dict_data_for_screen, json_temp, set_temp_json
 
 class ClientConnection:
+
+    static_user_name = "missing - in client connection"
+
     def __init__(self, host, port) -> None:
         self.init_message = "teszt hello"
         self.action_types = ["Action", "Registration", "Closed"]
@@ -52,6 +55,7 @@ class ClientConnection:
         self.loginRegister_frame_destroy()        
 
     def get_user_name_password_from_form(self, log_type, name, password, frame_destroy):
+        ClientConnection.static_user_name = name
         self.loginRegister_frame_destroy = frame_destroy
         self.login_closed = True
 
@@ -94,6 +98,8 @@ class Outgoing:
 # region INCOMING MESSAGES:
 class Incomming:
 
+    static_user_name = "missing - in incomming"
+
     counter = 0
     def __init__(self) -> None:
         self.positions = None
@@ -131,6 +137,7 @@ class Incomming:
 
                 if self.is_login_success:
                     self.is_login_success = False
+                    
 
                     #zárja a regisztárciót:
                     self.destroy_login_ui(frame_destroy)
@@ -175,17 +182,20 @@ class Incomming:
     def start_arena(self):
         start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
 
-    def change_data(self, positions):
-        set_temp_json(positions)
+    def change_data(self, positions, username):
+        set_temp_json(positions, username)
 
     def pop_queue(self):
+        username = None
         while True:
+            username = ClientConnection.static_user_name
+            print("NAME? ", ClientConnection.static_user_name)
             if not self.incoming_queue.empty():
                 incoming = self.incoming_queue.get()
                 print(f"{Incomming.counter} incoming queue:", incoming)
                 Incomming.counter += 1
                 if incoming["Type"] == "Position":
-                    self.change_data(incoming['Payload'])
+                    self.change_data(incoming['Payload'], username)
             time.sleep(1)
 
     def put_queue(self, parsed):
