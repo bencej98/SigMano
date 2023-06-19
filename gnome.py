@@ -7,15 +7,24 @@ class Gnome:
         self.user = user
         self.location = {}
         self.strategy = []
+        self.event_reactions = []
         self.other_gnomes_dist = {}
         self.event_counter = 0
         self.actual_points = 0
         self.kill_count = 0
         self.lose_count = 0
+        self.target_location = {}
+        self.direction = None
 
     def spawn_gnome(self, map):
         self.location["x"] = random.randint(0, map.x_coordinate)
         self.location["y"] = random.randint(0, map.y_coordinate)
+
+    def has_reached_target(self):
+        if self.location == self.target_location:
+            self.target_location = {}
+            return True
+        return False
 
     def update_strategy(self, strategy_list: list):
         self.strategy = strategy_list
@@ -59,19 +68,22 @@ class Gnome:
         direction=self._check_random_direction(map)
         self._move_by_direction(direction)
 
-    def move_towards_direction(self, direction, map):
-        is_direction_valid = self._validate_movement(direction, map)
+    def move_towards_direction(self, map):
+        is_direction_valid = self._validate_movement(self.direction, map)
         if is_direction_valid:
-            self._move_by_direction(direction)
+            self._move_by_direction(self.direction)
         else:
-            first_alter_direction = self._direction_converter(direction + 1)
-            second_alter_direction = self._direction_converter(direction - 1)
+            first_alter_direction = self._direction_converter(self.direction + 1)
+            second_alter_direction = self._direction_converter(self.direction - 1)
             if self._validate_movement(first_alter_direction, map):
                 self._move_by_direction(first_alter_direction)
             elif self._validate_movement(second_alter_direction, map):
                 self._move_by_direction(second_alter_direction)
             else:
                 self.random_move(map)
+
+    def update_direction(self, map):
+        self.direction = map.convert_unit_to_direction([self.target_location["x"], self.target_location["y"]])
 
     def _direction_converter(self,direction):
         converted_direction = direction
@@ -82,17 +94,14 @@ class Gnome:
         
         return converted_direction
 
-    def move_against_direction(self, direction, map):
-        direction_to_move = 0
-        if direction == 0 or direction == 1 or direction == 2 or direction == 3:
-            direction_to_move = direction + 4
+    def turn_against_direction(self):
+        if self.direction == 0 or self.direction == 1 or self.direction == 2 or self.direction == 3:
+            self.direction + 4
         else:
-            direction_to_move = direction - 4
+            self.direction - 4
 
-        self.move_towards_direction(direction_to_move, map)
-
-    def _move_by_direction(self, direction):
-        match direction:
+    def _move_by_direction(self):
+        match self.direction:
             # 0 is up then clockwise
             case 0: 
                 self.location["y"] += 1 
@@ -176,7 +185,7 @@ class Map:
             distance = abs_x
             #distance = math.sqrt((x * x) + (y * y))
         
-        return {"distance": distance, "direction": self._convert_unit_to_direction([x, y])}
+        return {"distance": distance, "direction": self.convert_unit_to_direction([x, y])}
     
     def _convert_dist_vector_to_unit(self, vector):
         x = vector[0]
@@ -194,7 +203,7 @@ class Map:
 
         return x, y
 
-    def _convert_unit_to_direction(self, vector):
+    def convert_unit_to_direction(self, vector):
         converted_vector = self._convert_dist_vector_to_unit(vector)
         direction = 0
         x = converted_vector[0]
