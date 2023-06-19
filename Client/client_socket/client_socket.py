@@ -177,8 +177,10 @@ class Incomming:
                 #   "Andras": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}]}
                 # }
                 if incoming["Type"] == "Event":
-                    restul_text = self.process_fight_events(incoming["Payload"])
-                    print(restul_text)
+                    event_payloads = incoming["Payload"]
+                    if len(event_payloads) > 0:
+                        restul_text = self.process_fight_events(event_payloads)
+                        print(restul_text)
 
                 #TODO:
                 # {"Type": "Death", "Payload": []}' Minden Event-l együtt jön üresen is!
