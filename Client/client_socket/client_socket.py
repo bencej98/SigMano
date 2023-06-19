@@ -38,8 +38,7 @@ class ClientConnection:
          self.socket_client = socket
     
 
-    def connect_to_server(self, HOST, PORT):
-        
+    def connect_to_server(self, HOST, PORT):        
             self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket_client.connect((HOST, PORT))
 
