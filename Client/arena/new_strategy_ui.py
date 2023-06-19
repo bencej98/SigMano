@@ -30,7 +30,7 @@ class ActionApp(tk.Tk):
         screen_height = self.winfo_screenheight()
         x = (screen_width/2) - (self.frame_width/2)
         y = (screen_height/2) - (self.frame_height/1)
-        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, y))
+        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, (y + 50)))
 
         # stack frames onto each other in container
         container = tk.Frame(self)
@@ -52,6 +52,9 @@ class ActionApp(tk.Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
+    def _get_frame_width(self):
+        return self.frame_width
+
 
 class ChooseAction(tk.Frame):
 
@@ -64,6 +67,9 @@ class ChooseAction(tk.Frame):
         self.total_points = 0
         self.action_point_frame_background = "#3c3c3c"
         self.chosen_color = None
+        # self.ALLOWED_COLORS = ['#8000000', '#FF0000', '#FF4500', '#FFD700', '#008000', '#008080', '#000080']
+        self.ALLOWED_COLORS = ['Maroon', 'Red', 'Orange', 'Gold', 'Green', 'Teal', 'Navy']
+        # self.ALLOWED_COLORS = ['red']
         self.action_points = {
             "Run away - 1": 1,
             "Go there - 1": 1,
@@ -117,7 +123,7 @@ class ChooseAction(tk.Frame):
             command=lambda: self.fight(), font=self.controller.button_font, width=5)
         calculate_points_button = tk.Button(action_point_frame, text="Calculate", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self.calculate_action_points)
         # color picker
-        choose_color_label = tk.Button(color_frame, text="Choose color", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self._get_selected_color)
+        choose_color_label = tk.Button(color_frame, text="Choose color", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self._open_colorchooser)
         
         # event option menu
         default_value_event = tk.StringVar()
@@ -167,11 +173,38 @@ class ChooseAction(tk.Frame):
         self.tree.pack(side=tk.TOP)
         scrollbar.place(x=380, y=260, height=140)
 
-    def _get_selected_color(self) -> None:
-        """ Gets & saves the pciked color """
-        self.chosen_color = askcolor(title="Tkinter Color Chooser")[1]
+    # def _get_selected_color(self):
+    #     """ Gets & saves the pciked color """
+    #     ALLOWED_COLORS = ['#FF0000', '#00FF00', '#0000FF']
+    #     self.grab_set()
+    #     self.chosen_color = askcolor(parent=self, color=ALLOWED_COLORS)[1]
+    #     self.grab_release()
+
+    def _set_selected_color(self, color, top_level: tk.Toplevel):
+        """ Saves the selected color """
+        self.chosen_color = color
+        top_level.withdraw()
+
+    def _open_colorchooser(self):
+        """ Displays available colors """
+        top_level = tk.Toplevel(self)
+        # screen opens in the middle
+        self.top_lvl_frame_width = 400
+        self.top_lvl_frame_height = 580
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width/2) - (self.top_lvl_frame_width/2)
+        y = (screen_height/2) - (self.top_lvl_frame_height/1)
+        top_level.geometry('%dx%d+%d+%d' % (350, 200, x, (y + 50)))
+
+        top_level.attributes('-topmost', True)
+        for color in self.ALLOWED_COLORS:
+            button = tk.Button(top_level, bg=color, width=4,
+                               command=lambda c=color: self._set_selected_color(c, top_level))
+            button.pack(side=tk.LEFT, padx=5, pady=5)
 
     def _color_choosed(self) -> bool:
+        """ Checks if user has choosen color """
         if self.chosen_color is None:
             return False
         return True
