@@ -101,8 +101,8 @@ class Gnome:
         else:
             self.direction - 4
 
-    def _move_by_direction(self):
-        match self.direction:
+    def _move_by_direction(self, direction):
+        match direction:
             # 0 is up then clockwise
             case 0: 
                 self.location["y"] += 1 

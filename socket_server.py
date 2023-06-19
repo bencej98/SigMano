@@ -62,7 +62,7 @@ class Connection:
                 self.close()
 
 class Gameserver:
-    def __init__(self, travel, action_manager:ActionManager, ip="0.0.0.0", port=10000, ) -> None:
+    def __init__(self, travel, action_managger:ActionManager, ip="0.0.0.0", port=10000, ) -> None:
         self.messages = []
         self.server_socket = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM)
@@ -70,7 +70,7 @@ class Gameserver:
         self.server_socket.listen()
         self.connections = {}
         self.travel = travel
-        self.action_manager= action_manager
+        self.action_managger= action_managger
         self.db = Gnome_Database()
         self.connections_lock = threading.Lock()
         self.incoming_connections_thread = threading.Thread(
@@ -96,71 +96,57 @@ class Gameserver:
                 msg_obj = Message(msg["Type"], msg["Payload"])
                 new_messages[connection_id] = msg_obj
         return new_messages
-
+    
     def process_data(self):
         new_messages = self.check_incoming_messages()
         self.check_connections_liveness()
-        for connection_id, curr_msg in new_messages.items():
+        for connection_id in new_messages:
+            curr_msg = new_messages[connection_id]
             if curr_msg.type:
                 if curr_msg.type == "Action":
-                    self.handle_action_message(connection_id, curr_msg.payload)
+                    usname = self.connections[connection_id].name
+                    if usname not in self.travel.all_gnomes.keys():
+                        gnome = Gnome(usname)
+                        gnome.strategy = curr_msg.payload
+                        self.travel.all_gnomes[usname] = gnome
+                        self.travel.add_gnome_to_gnome_queue(gnome)
+                    else:
+                        self.action_managger.update_gnomes_strategy(self.travel, curr_msg.payload, usname)
                 elif curr_msg.type == "Registration":
-                    self.handle_registration_message(connection_id, curr_msg.payload)
+                    self.connections[connection_id].name = curr_msg.payload['username']
+                    self.send_response(connection_id, self.db.check_user_upon_registration(curr_msg.payload['username'], curr_msg.payload['password']))
                 elif curr_msg.type == "Login":
-                    self.handle_login_message(connection_id, curr_msg.payload)
+                    is_valid = json.loads(self.db.login_user(curr_msg.payload['username'], curr_msg.payload['password']))
+                    if is_valid["Payload"]:
+                        self.connections[connection_id].name = curr_msg.payload['username']
+                        self.send_response(connection_id, is_valid)
+                    else:
+                        self.send_response(connection_id, is_valid)
                 elif curr_msg.type == "Closed":
                     self.connections[connection_id].close()
                 else:
-                    self.broadcast_message("Invalid payload")
-
-    def handle_action_message(self, connection_id, payload):
-        username = self.connections[connection_id].name
-        if username not in self.travel.all_gnomes:
-            gnome = Gnome(username)
-            gnome.strategy = payload
-            self.travel.all_gnomes[username] = gnome
-            self.travel.add_gnome_to_gnome_queue(gnome)
-        else:
-            self.action_manager.update_gnomes_strategy(self.travel, payload, username)
-
-    def handle_registration_message(self, connection_id, payload):
-        connection = self.connections[connection_id]
-        connection.name = payload['username']
-        response = self.db.check_user_upon_registration(payload['username'], payload['password'])
-        self.send_response(connection_id, response)
-
-    def handle_login_message(self, connection_id, payload):
-        connection = self.connections[connection_id]
-        is_valid = json.loads(self.db.login_user(payload['username'], payload['password']))
-        if is_valid["Payload"]:
-            connection.name = payload['username']
-            self.send_response(connection_id, is_valid)
-        else:
-            self.send_response(connection_id, is_valid)
-
+                    self.broadcast_message(800)  # Send code 999 for unknown type
+            else:
+                self.broadcast_message(999)  # Send code 999 for missing type
     def tik_data(self):
         while True:
             self.travel.transfer_gnomes_to_active_gnomes()
             position_dict = self.action_managger.move_all_gnomes(self.travel)
             self.broadcast_message(position_dict)
             time.sleep(0.1)
-            act_fight = self.action_manager.fight(self.travel)
+            act_fight = self.action_managger.fight(self.travel)
             print(position_dict)
             if len(act_fight) != 0:
-                self.broadcast_message({"Type": "Event", "Payload": act_fight})
+                self.broadcast_message({"Type": "Event", "Payload" : act_fight})
                 time.sleep(0.1)
                 print(act_fight)
-                death_check = self.action_manager.check_gnome_death(self.travel)
+                death_check = self.action_managger.check_gnome_death(self.travel)
                 if death_check["Payload"]:
                     self.broadcast_message(death_check)
-                    for death in death_check["Payload"]:
-                        self.db.add_results_upon_death(death["user"], death["score"], death["kills"])
-                    self.broadcast_message(self.db.get_sumscores())
             time.sleep(2)
 
-
     def run_tik_data_thread(self):
-        tik_thread = threading.Thread(target=self.tik_data, daemon=True)
+        tik_thread = threading.Thread(target=self.tik_data)
         tik_thread.start()
 
     def broadcast_message(self, data):
@@ -190,7 +176,4 @@ def main():
             time.sleep(0.001)
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        exit()
+    main()
