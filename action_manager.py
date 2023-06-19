@@ -60,14 +60,11 @@ class ActionManager:
         death_payload = []
         for gnome_name in gnome_deathnote:
             death_dict = {}
-            dead_gnome = map.active_gnomes[gnome_name]
+            dead_gnome = map.active_gnomes.pop(gnome_name)
             death_dict["user"] = dead_gnome.user
             death_dict["score"] = dead_gnome.actual_points
             death_dict["kills"] = dead_gnome.kill_count
             death_payload.append(death_dict)
-
-        for gnome_name in gnome_deathnote:
-            dead_gnome = map.active_gnomes.pop(gnome_name)
             dead_gnome.event_counter = 0
             dead_gnome.actual_points = 0
             dead_gnome.kill_count = 0
