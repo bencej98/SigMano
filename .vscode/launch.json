@@ -51,6 +51,14 @@
             "program": "socket_server.py",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "new_strategy_ui.py",
+            "type": "python",
+            "request": "launch",
+            "program": "Client/arena/new_strategy_ui.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
 }
