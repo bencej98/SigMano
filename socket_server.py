@@ -141,10 +141,10 @@ class Gameserver:
     def tik_data(self):
         while True:
             self.travel.transfer_gnomes_to_active_gnomes()
+            act_fight = self.action_manager.combat(self.travel)
             position_dict = self.action_manager.move_all_gnomes(self.travel)
             self.broadcast_message(position_dict)
             time.sleep(0.1)
-            act_fight = self.action_manager.fight(self.travel)
             print(position_dict)
             if len(act_fight) != 0:
                 self.broadcast_message({"Type": "Event", "Payload": act_fight})
@@ -156,7 +156,7 @@ class Gameserver:
                     for death in death_check["Payload"]:
                         self.db.add_results_upon_death(death["user"].lower(), death["score"], death["kills"])
                     self.broadcast_message(self.db.get_sumscores())
-            time.sleep(2)
+            time.sleep(1)
 
 
     def run_tik_data_thread(self):
@@ -180,14 +180,48 @@ class Gameserver:
             self.connections.pop(id)
 
 def main():
-        travel = Map(2, 2, 3)
+        travel = Map(10, 10, 5)
         action = ActionManager()
         server = Gameserver(travel, action)
+        gnome1 = Gnome("Gnome1")
+        gnome2 = Gnome("Gnome2")
+        gnome3 = Gnome("Gnome3")
+        gnome4 = Gnome("Gnome4")
+        gnome5 = Gnome("Gnome5")
+        strategy1 = [{"Event": "Fight happened", 
+                                                  "Action": "Approach"},
+                                                  {"Event": "Gnomes in vicinity",
+                                                   "Action": "Approach"}]
+        strategy2 = [{"Event": "Fight happened", 
+                                                "Action": "Runaway"},
+                                                {"Event": "Gnomes in vicinity",
+                                                "Action": "Runaway"}]
+        strategy3 = [{"Event": "Fight happened", 
+                                                  "Action": "Defend"},
+                                                  {"Event": "Gnomes in vicinity",
+                                                   "Action": "Defend"}]
+        gnome1.strategy = strategy1
+        gnome2.strategy = strategy2
+        gnome3.strategy = strategy3
+        gnome4.strategy = strategy1
+        gnome5.strategy = strategy2
+
+
+        server.travel.add_gnome_to_gnome_queue(gnome1)
+        server.travel.add_gnome_to_gnome_queue(gnome2)
+        server.travel.add_gnome_to_gnome_queue(gnome3)
+        server.travel.add_gnome_to_gnome_queue(gnome4)
+        server.travel.add_gnome_to_gnome_queue(gnome5)
         server.db.create_table()
         server.run_tik_data_thread()
         while True:            
             server.process_data()
-            time.sleep(0.001)
+            for gnome_name, gnome in server.travel.active_gnomes.items():
+                print(f"{gnome_name}target_location: {gnome.target_location}, action: {gnome.action_mode}, direction: {gnome.direction} \n"
+                      f"{gnome_name}current_location: {gnome.location} \n"
+                      f"{type(gnome.strategy)} {gnome.strategy}"
+                      f"bug_test:{gnome.bug_test} \n")
+            time.sleep(1)
 
 if __name__ == "__main__":
     try:

@@ -9,22 +9,26 @@ class Gnome:
         self.strategy = []
         self.event_reactions = []
         self.other_gnomes_dist = {}
-        self.event_counter = 0
         self.actual_points = 0
         self.kill_count = 0
         self.lose_count = 0
         self.target_location = {}
         self.direction = None
         self.max_health = 100
-        self.current_health = 100
-        self.attack = 10
+        self.current_health = 30
+        self.attack = 5
         self.defense = 2
         self.isdead = False
         self.action_mode = None
+        self.bug_test = {}
 
     def fight_gnome(self, gnome):
         if self.isdead != True and gnome.isdead != True:
             gnome.current_health -= max(1, self.attack - gnome.defense)
+
+    def check_if_dead(self):
+        if self.current_health <= 0:
+            self.isdead = True
 
     def apply_action_buffs(self):
         if self.action_mode == "Approach":
@@ -39,10 +43,11 @@ class Gnome:
     def spawn_gnome(self, map):
         self.location["x"] = random.randint(0, map.x_coordinate)
         self.location["y"] = random.randint(0, map.y_coordinate)
+        self.target_location = self.location.copy()
 
     def has_reached_target(self):
         if self.location == self.target_location:
-            self.target_location = {}
+            # self.target_location = {}
             self.action_mode = None
             return True
         return False
@@ -123,9 +128,10 @@ class Gnome:
                 self._move_by_direction(second_alter_direction)
             else:
                 self.random_move(map)
-                self.direction = None
+                # self.direction = None
 
     def update_direction(self, map):
+        self.bug_test = self.target_location
         self.direction = map.convert_unit_to_direction([self.target_location["x"], self.target_location["y"]])
 
     def _direction_converter(self,direction):
@@ -166,13 +172,6 @@ class Gnome:
             case 7: 
                 self.location["x"] -= 1
                 self.location["y"] += 1    
-        
-    def increase_event_counter(self):
-        if self.event_counter < len(self.strategy) - 1:
-            self.event_counter += 1
-        else:
-            self.event_counter = 0
-
 
 class Map:
     def __init__(self, max_x, max_y, maximum_gnomes) -> None:
