@@ -203,7 +203,7 @@ class ChooseAction(tk.Frame):
                     messagebox.showinfo("FIGHT", "You are going to fight!")
                     print("Returns choosed actions...")
                     print("Choosed actions:", fight_data)
-                    self.action_payload(fight_data)
+                    self.action_payload(fight_data, self.chosen_color)
                     self.controller.destroy()
 
             else:

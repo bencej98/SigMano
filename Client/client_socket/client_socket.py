@@ -110,6 +110,7 @@ class Incomming:
         self.is_login_success = False
 
         self.action_payload = None
+        self.chosen_color = None
         
         self.incoming_queue = queue.Queue()  
         self.outgoing = Outgoing()      
@@ -151,8 +152,9 @@ class Incomming:
                     start_arena = threading.Thread(target=self.start_arena)
                     start_arena.start()
 
-    def _get_action_payload(self, action_payload: dict):
+    def _get_action_payload(self, action_payload: dict, chosen_color: str):
         self.action_payload = action_payload
+        self.chosen_color = chosen_color
 
     def process_incoming(self, incoming, frame_destroy):
         if incoming is not None:
@@ -181,7 +183,8 @@ class Incomming:
         # TODO pass selected color
         username = ClientConnection.static_user_name
         print("USRR", username)
-        start_loop(username)
+        print("COLOR:", self.chosen_color)
+        start_loop(self.chosen_color)
         # start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
 
     def change_data(self, positions, username):
