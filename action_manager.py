@@ -59,7 +59,9 @@ class ActionManager:
                     "outcome": ""
                 }
         
-        gnome_first, gnome_second = random.choice([gnome_one, gnome_two])
+        gnomes = [gnome_one, gnome_two]
+        random.shuffle(gnomes)
+        gnome_first, gnome_second = gnomes
         gnome_first.fight_gnome(gnome_second)
         gnome_second.fight_gnome(gnome_first)
         gnome_first.actual_points += 15
