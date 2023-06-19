@@ -2,13 +2,14 @@ import tkinter as tk
 from tkinter import font as tkfont
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter.colorchooser import askcolor
 
 class ActionApp(tk.Tk):
 
     def __init__(self, get_action_payload, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.frame_width = 400
-        self.frame_height = 520
+        self.frame_height = 580
         self.resizable(False, False)
         self.action_payload = get_action_payload
         self.background_color = "#535356"
@@ -62,6 +63,7 @@ class ChooseAction(tk.Frame):
         self.action_payload = action_payload
         self.total_points = 0
         self.action_point_frame_background = "#3c3c3c"
+        self.chosen_color = None
         self.action_points = {
             "Run away - 1": 1,
             "Go there - 1": 1,
@@ -91,6 +93,9 @@ class ChooseAction(tk.Frame):
         # action point frame
         action_point_frame = tk.Frame(self, height=5, width=10, background=self.action_point_frame_background)
         action_point_frame.pack(padx=10, pady=10)
+        # color frame
+        color_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
+        color_frame.pack(padx=10, pady=10)
         # label frame
         label_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
         label_frame.pack(padx=10, pady=10)
@@ -111,6 +116,8 @@ class ChooseAction(tk.Frame):
         fight_button = tk.Button(button_frame, text="Fight", background="#040404", fg=self.controller.font_color,
             command=lambda: self.fight(), font=self.controller.button_font, width=5)
         calculate_points_button = tk.Button(action_point_frame, text="Calculate", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self.calculate_action_points)
+        # color picker
+        choose_color_label = tk.Button(color_frame, text="Choose color", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self._get_selected_color)
         
         # event option menu
         default_value_event = tk.StringVar()
@@ -142,6 +149,8 @@ class ChooseAction(tk.Frame):
         scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
 
+        # choose color section
+        choose_color_label.pack(side="left", fill="x", pady=10, padx=35)
         # labels
         action_label.pack(side="left", fill="x", pady=10, padx=35)
         event_label.pack(side="right", fill="x", pady=10, padx=35)
@@ -158,12 +167,22 @@ class ChooseAction(tk.Frame):
         self.tree.pack(side=tk.TOP)
         scrollbar.place(x=380, y=260, height=140)
 
+    def _get_selected_color(self) -> None:
+        """ Gets & saves the pciked color """
+        self.chosen_color = askcolor(title="Tkinter Color Chooser")[1]
+
+    def _color_choosed(self) -> bool:
+        if self.chosen_color is None:
+            return False
+        return True
+
     def fight(self) -> dict:
         """ Starts fight - returns a dictionary containing fight actions """
         fight_data = {"Type": "Action", "Payload": []} # e.g.: "Payload": [{"Attack": "If weaker opponent"}, {"Defend": "If fight nearby"}]
         current_action_pair = {}
         current_action = None
         current_event = None
+
         if self.calculate_action_points(): # calculate points before fight
             if self.total_points >= 2:
                     for line in self.tree.get_children():
@@ -176,6 +195,10 @@ class ChooseAction(tk.Frame):
                                 current_action_pair[current_action] = current_event
                                 fight_data["Payload"].append(current_action_pair)
                             counter += 1
+
+                    if not self._color_choosed():
+                        messagebox.showinfo("Color", "Choose a color!")
+                        return
 
                     messagebox.showinfo("FIGHT", "You are going to fight!")
                     print("Returns choosed actions...")
