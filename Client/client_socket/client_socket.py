@@ -79,7 +79,7 @@ class ClientConnection:
 
 # region OUTGOING MESSAGES:
 class Outgoing:
-    def __init__(self, outgoing_queue) -> None:
+    def __init__(self, outgoing_queue=None) -> None:
         self.outgoing_queue = outgoing_queue
         pass
 
@@ -170,7 +170,7 @@ class Incomming:
                 if incoming["Type"] == "Position":
                     self.put_queue(incoming)
 
-                #FIXME:
+                #TODO:
                 #{"Type": "Event", 
                 # "Payload": {
                 #   "Attila": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}], 
@@ -181,14 +181,26 @@ class Incomming:
                     for (user, fight_list) in get_payload.items:
                         print(get_payload)
 
-                #FIXME: {"Type": "Death", "Payload": []}' Minden Event-l együtt jön üresen is!
+                #TODO:
+                # {"Type": "Death", "Payload": []}' Minden Event-l együtt jön üresen is!
                 if incoming["Type"] == "Death":
                     if len(incoming["Payload"]) > 0:
                         self.print_dead_msg(incoming)
+
+                #TODO:
+                # Type : Leader , Payload: [{"Andras": 5}, {"Bela": 6 } , { }]
+                if incoming["Type"] == "Leader":
+                    if len(incoming["Payload"]) > 0:
+                        ordered_leaders = sorted(incoming["Payload"], key=self.get_values_for_sort, reverse=True)
+                        print("LEADER board", ordered_leaders)                  
+
                     
             except:
                 pass
         
+    def get_values_for_sort(self, leader_list):
+        return list(leader_list.values())[0]            
+
     def print_dead_msg(self, incoming):
         death_messages = ["Good day to die!", "Oh my God!", "Rest My Peace!", "Holy sh**t!"]
         death_msg_len = len(death_messages)
