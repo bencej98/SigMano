@@ -8,7 +8,7 @@ import queue
 from tkinter import messagebox
 from arena.auth_screen import MainApp
 from arena.new_strategy_ui import ActionApp
-from arena.arena import start_loop, dict_data_for_screen, json_temp, set_temp_json
+from arena.arena import start_loop, dict_data_for_screen, json_temp, set_temp_json, set_leader_board, set_dead_list,set_fight_event
 
 class ClientConnection:
 
@@ -179,23 +179,22 @@ class Incomming:
                 if incoming["Type"] == "Event":
                     event_payloads = incoming["Payload"]
                     if len(event_payloads) > 0:
-                        restul_text = self.process_fight_events(event_payloads)
-                        print(restul_text)
+                        self.process_fight_events(event_payloads)
 
                 #TODO:
                 # {"Type": "Death", "Payload": []}' Minden Event-l együtt jön üresen is!
                 if incoming["Type"] == "Death":
                     if len(incoming["Payload"]) > 0:
                         payload_list = incoming["Payload"]
-                        death_msg_text = self.print_dead_msg(payload_list)
-                        print(death_msg_text)
+                        self.print_dead_msg(payload_list)
 
                 #TODO:
                 # Type : Leader , Payload: [{"Andras": 5}, {"Bela": 6 } , { }]
                 if incoming["Type"] == "Leader":
                     if len(incoming["Payload"]) > 0:
                         ordered_leaders = sorted(incoming["Payload"], key=self.get_values_for_sort, reverse=True)
-                        print("LEADER board", ordered_leaders)                
+                        print("LEADER board", ordered_leaders)
+                        set_leader_board(ordered_leaders)
                     
             except:
                 pass
@@ -209,7 +208,8 @@ class Incomming:
         
         for dead_user in incoming:
             rand_msg_index = random.randrange(0,death_msg_len-1)
-            return f"{dead_user}: {death_messages[rand_msg_index]}"
+            dead_string =  f"{dead_user}: {death_messages[rand_msg_index]}"
+            set_dead_list(dead_string)
 
     def process_fight_events(self,incoming_payload_event):
         for (user, fight_list) in incoming_payload_event.items():
@@ -218,7 +218,9 @@ class Incomming:
             encounter_msg = payload_list[0]
             result_msg = payload_list[1]
 
-            return f"{encounter_msg}, result is {result_msg}!" 
+            fight_string = f"{encounter_msg}, result is {result_msg}!" 
+            set_fight_event(fight_string)
+
 
     def login_status(self, incoming, frame_destroy):
         if not incoming["Payload"]:
