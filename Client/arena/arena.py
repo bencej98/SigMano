@@ -78,10 +78,10 @@ def dict_data_for_screen(json_dict:dict, user_name, chosen_color, object_list:li
    remove_obj_from_list(object_list,json_dict)
    for name, coordinates in json_dict.items():
       if name in obj_names:
-         print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
          obj = get_obj_from_list(name, object_list)
          obj.move(coordinates[0], coordinates[1])
       else:
+         print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
          obj = create_object(name, coordinates, user_name, chosen_color)
          object_list.append(obj)
 
@@ -157,9 +157,9 @@ def set_screen(x,y):
    line.goto(-10, -y/2)
    leaderboard = tkinter.Label(text="LEADERBORD",font=(25))
    leaderboard.place(x=240,y=20)
-   message = tkinter.Label(text="EVENTS",font=(25))
-   message.place(x=260,y=320)
-   print("AAAAAAAAAAAAAAAAAAAAAAA",leaderboard)
+   # message = tkinter.Label(text="EVENTS",font=(25))
+   # message.place(x=260,y=320)
+   print("AAAAAAAAAAAAAAAAAAAAAAA","leaderboard")
    # leader = tkinter.Label(text="1. Andras with 10 point(s)""\nakarmi",justify='left')
    # leader.place(x=20,y=60)
 
@@ -173,7 +173,7 @@ def start_loop(chosen_color):
    window.title("Arena")
    window.bgcolor("lightgreen")
    set_screen(tile_size*tile_number, tile_size*tile_number)
-
+   time.sleep(0.1)
    temp_valami(user_name, chosen_color)
    window.mainloop()
 

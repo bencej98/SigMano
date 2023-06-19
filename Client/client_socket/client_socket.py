@@ -12,7 +12,7 @@ from arena.arena import start_loop, dict_data_for_screen, json_temp, set_temp_js
 
 class ClientConnection:
 
-    static_user_name = "missing - in client connection"
+    static_user_name = "missing"
 
     def __init__(self, host, port) -> None:
         self.init_message = "teszt hello"
@@ -190,7 +190,10 @@ class Incomming:
         # start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
 
     def change_data(self, positions, username):
-        set_temp_json(positions, username)
+        if username != "missing":
+            set_temp_json(positions, username)
+        else:
+            print("FUCK")
 
     def pop_queue(self):
         username = None
