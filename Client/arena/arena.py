@@ -1,6 +1,7 @@
 import turtle
 import time
 import random
+import tkinter
 
 class Player(turtle.Turtle):
    def __init__(self, name:str, x:int, y:int, color:str, size:float, speed:int):
@@ -22,8 +23,7 @@ class Player(turtle.Turtle):
       self.name1.write(name, False, "center")
 
    def move(self, x:int, y:int):
-      x = x_y_for_screen(x)
-      y = x_y_for_screen(y)
+      [x, y] = x_y_for_screen([x, y])
       self.name1.goto(x, y+self.size*10)
       self.name1.clear()
       self.goto(x, y)
@@ -32,16 +32,20 @@ class Player(turtle.Turtle):
 tile_size = 30
 tile_number = 20
 
-def x_y_for_screen(coordinate:int):
-   return tile_size*(coordinate-9.5)
+def x_y_for_screen(coordinates:list):
+   x = tile_size*(coordinates[0]+0.5)
+   y = tile_size*(coordinates[1]-9.5)
+   return [x, y]
 
 def create_object(object_name:str, coordinates:list, user_name, chosen_color):
-   x = x_y_for_screen(coordinates[0])
-   y = x_y_for_screen(coordinates[1])
+   [x, y] = x_y_for_screen(coordinates)
    if user_name == object_name:
       obj = Player(object_name, x, y, chosen_color, tile_size/60, 2)
+      print(type(chosen_color))
+      print(chosen_color)
+      print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
    else:
-      obj = Player(object_name, x, y, chosen_color, tile_size/60, 2)
+      obj = Player(object_name, x, y, "black", tile_size/60, 2)
    return obj
 
 def get_obj_from_list(name:str,object_list:list):
@@ -74,6 +78,7 @@ def dict_data_for_screen(json_dict:dict, user_name, chosen_color, object_list:li
    remove_obj_from_list(object_list,json_dict)
    for name, coordinates in json_dict.items():
       if name in obj_names:
+         print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
          obj = get_obj_from_list(name, object_list)
          obj.move(coordinates[0], coordinates[1])
       else:
@@ -83,6 +88,7 @@ def dict_data_for_screen(json_dict:dict, user_name, chosen_color, object_list:li
 object_list = []
 json_temp = {'loluser': [2, 3], 'loluser2': [18, 9]}
 user_name = 1
+events = []
 
 def set_temp_json(dict_obj, user):
    global json_temp
@@ -102,19 +108,71 @@ def set_temp_json(dict_obj, user):
 #       dict_data_for_screen(json, user_name, object_list)
 #       time.sleep(1)
 
-
 def temp_valami(user_name, chosen_color):
    while True:
+      #test_text = event_updater(list_to_string(events))
+      #event = tkinter.Label(text=test_text, width=40, justify='left')
+      #event.place(x=20,y=360)
       dict_data_for_screen(json_temp, user_name, chosen_color, object_list)
       time.sleep(1)
+
+def list_to_string(list:list) -> str:
+   text = ""
+   for i in list:
+      text = text + "\n" + i
+   return text
+
+
+def event_updater(new_event:str):
+   if len(events) >= 10:
+      events.pop(0)
+   events.append(new_event)
+
+
+def leaderboard_updater():
+   pass
+
+def set_fight_event(event):
+   event_updater(event)
+
+def set_dead_list(dead_str):
+   event_updater(dead_str)
+
+def set_leader_board(order_leader_list):
+   pass
+
+
+def set_screen(x,y):
+   line = turtle.Turtle()
+   line.color("black")
+   line.hideturtle()
+   line.speed(0)
+   line.penup()
+   line.goto(-10,0)
+   line.pendown()
+   line.goto(-x, 0)
+   line.penup()
+   line.goto(-10, y/2)
+   line.pendown()
+   line.goto(-10, -y/2)
+   leaderboard = tkinter.Label(text="LEADERBORD",font=(25))
+   leaderboard.place(x=240,y=20)
+   message = tkinter.Label(text="EVENTS",font=(25))
+   message.place(x=260,y=320)
+   print("AAAAAAAAAAAAAAAAAAAAAAA",leaderboard)
+   # leader = tkinter.Label(text="1. Andras with 10 point(s)""\nakarmi",justify='left')
+   # leader.place(x=20,y=60)
+
+
 
 
 def start_loop(chosen_color):
    # TODO: Flexible window later
-   turtle.setup(tile_size*tile_number, tile_size*tile_number, None, None)
+   turtle.setup(2*tile_size*tile_number, tile_size*tile_number, None, None)
    window = turtle.Screen()
    window.title("Arena")
    window.bgcolor("lightgreen")
+   set_screen(tile_size*tile_number, tile_size*tile_number)
 
    temp_valami(user_name, chosen_color)
    window.mainloop()
