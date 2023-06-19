@@ -154,7 +154,7 @@ class Gameserver:
                 if death_check["Payload"]:
                     self.broadcast_message(death_check)
                     for death in death_check["Payload"]:
-                        self.db.add_results_upon_death(death["user"], death["score"], death["kills"])
+                        self.db.add_results_upon_death(death["user"].lower(), death["score"], death["kills"])
                     self.broadcast_message(self.db.get_sumscores())
             time.sleep(2)
 

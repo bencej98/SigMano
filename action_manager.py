@@ -60,14 +60,11 @@ class ActionManager:
         death_payload = []
         for gnome_name in gnome_deathnote:
             death_dict = {}
-            dead_gnome = map.active_gnomes[gnome_name]
+            dead_gnome = map.active_gnomes.pop(gnome_name)
             death_dict["user"] = dead_gnome.user
             death_dict["score"] = dead_gnome.actual_points
             death_dict["kills"] = dead_gnome.kill_count
             death_payload.append(death_dict)
-
-        for gnome_name in gnome_deathnote:
-            dead_gnome = map.active_gnomes.pop(gnome_name)
             dead_gnome.event_counter = 0
             dead_gnome.actual_points = 0
             dead_gnome.kill_count = 0
@@ -93,38 +90,47 @@ class ActionManager:
         return position_update_for_client
 
     def _set_target_towards_fight(self, gnome: Gnome, map: Map):
-        if gnome.has_reached_target():
-            closest_fight_distance = map.x_coordinate
-            closest_fight_location = {}
-            for fight_location in self.collided_gnomes:
-                position_dict = {"x": fight_location[0], "y":fight_location[1]}
-                figth_vector = map.calculate_distance(gnome.location, position_dict)
-                if figth_vector["distance"] < closest_fight_distance:
-                    closest_fight_distance = figth_vector["distance"]
-                    closest_fight_location["x"] = fight_location[0]
-                    closest_fight_location["y"] = fight_location[1]
+        closest_fight_distance = map.x_coordinate
+        closest_fight_location = {}
+        for fight_location in self.collided_gnomes:
+            position_dict = {"x": fight_location[0], "y":fight_location[1]}
+            figth_vector = map.calculate_distance(gnome.location, position_dict)
+            if figth_vector["distance"] < closest_fight_distance:
+                closest_fight_distance = figth_vector["distance"]
+                closest_fight_location["x"] = fight_location[0]
+                closest_fight_location["y"] = fight_location[1]
 
-            gnome.target_location = closest_fight_location
+        return closest_fight_location
+
+    def check_gnomes_in_range(self, gnome: Gnome, map: Map):
+        gnomes_in_range = []
+        for gnome_name, data in gnome.other_gnomes_dist.items():
+            if data["distance"] <= 4:
+                gnomes_in_range.append(gnome_name)
+        return gnomes_in_range
+
+    def check_action(self, gnome: Gnome, map, strategy, target_location):
+        if strategy["Action"] == "Runaway":
+            gnome.set_runaway_target_location(map, target_location)
             gnome.update_direction(map)
-
-    def check_action(self, gnome: Gnome, strategy):
-        if strategy["action"] == "runaway":
-            gnome.turn_against_direction()
-        elif strategy["action"] == "approach":
-            pass
+        elif strategy["Action"] == "Approach":
+            gnome.target_location = target_location
+            gnome.update_direction(map)
 
     def choose_strategy(self, map: Map):
         for gnome_name, gnome in map.active_gnomes:
-            if len(gnome.target_location) == 0:
+            has_reached_target = gnome.has_reached_target(map)
+            if has_reached_target:
+                gnomes_in_range = self.check_gnomes_in_range(gnome, map)
                 for strategy in gnome.event_reactions:
-                    if strategy["event"] == "fight" and self.was_fight:
-                        self._set_target_towards_fight(gnome)
-                        self.check_action(gnome, strategy)
-                    if strategy["event"] == "":
-                        pass
+                    if strategy["Event"] == "Fight happened" and self.was_fight:
+                        closest_fight_location = self._set_target_towards_fight(gnome)
+                        self.check_action(gnome, map, strategy, closest_fight_location)
+                    elif strategy["Event"] == "Gnomes in vicinity" and len(gnomes_in_range) > 0:
+                        closest_gnome_location = map.active_gnomes[gnomes_in_range[0]].location
+                        self.check_action(gnome, map, strategy, closest_gnome_location)
                     else:
                         gnome.direction = None
-
 
     def _check_fight_option(self, gnome_first, gnome_second):
         gnome_first_action = gnome_first.strategy[gnome_first.event_counter]
