@@ -37,7 +37,9 @@ class TestActionManager(unittest.TestCase):
 
         # Run the _check_combat_option method
         fight_message_dict = self.action_manager._check_combat_option(self.gnome1, self.gnome2)
-
+        print(fight_message_dict)
+        print(vars(self.gnome1))
+        print(vars(self.gnome2))
         # Check that the outcome was correct
         self.assertEqual(fight_message_dict["outcome"], "gnome1 killed gnome2")
 
