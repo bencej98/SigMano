@@ -110,7 +110,7 @@ class ActionManager:
         self.was_death = False
         gnome_deathnote = []
         for gnome_name, gnome in map.active_gnomes.items():
-            if gnome.lose_count >= 3:
+            if gnome.isdead == True:
                 gnome_deathnote.append(gnome_name)
         
         death_payload = []
