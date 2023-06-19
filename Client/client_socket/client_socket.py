@@ -139,6 +139,8 @@ class Incomming:
                     a = ActionApp(self._get_action_payload)
                     a.mainloop()
 
+                    print("ACTION: ", self.action_payload)
+
                     #akciók küldése a szerver részére
                     client_socket.sendall(json.dumps(self.outgoing.action_message(self.action_payload["Payload"])).encode("utf-8"))
 
