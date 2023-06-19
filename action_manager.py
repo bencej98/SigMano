@@ -171,8 +171,10 @@ class ActionManager:
             gnome.update_direction(map)
         elif strategy["Action"] == "Approach":
             gnome.target_location = target_location
+            gnome.action_mode = "Approach"
             gnome.update_direction(map)
         elif strategy["Action"] == "Defend":
+            gnome.action_mode = "Defend"
             gnome.update_direction(map)
 
     def choose_strategy(self, map: Map):
