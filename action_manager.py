@@ -58,7 +58,7 @@ class ActionManager:
                 gnome_deathnote.append(gnome_name)
         
         death_payload = []
-        for gnome_name in gnome_deathnote():
+        for gnome_name in gnome_deathnote:
             death_dict = {}
             dead_gnome = map.active_gnomes[gnome_name]
             death_dict["user"] = dead_gnome.user
@@ -115,7 +115,6 @@ class ActionManager:
         elif strategy["action"] == "approach":
             pass
 
-
     def choose_strategy(self, map: Map):
         for gnome_name, gnome in map.active_gnomes:
             if len(gnome.target_location) == 0:
@@ -123,6 +122,8 @@ class ActionManager:
                     if strategy["event"] == "fight" and self.was_fight:
                         self._set_target_towards_fight(gnome)
                         self.check_action(gnome, strategy)
+                    if strategy["event"] == "":
+                        pass
                     else:
                         gnome.direction = None
 
