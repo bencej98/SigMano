@@ -94,6 +94,10 @@ class Outgoing:
     def action_message(self, action: dict) -> dict:
         # example: {"Type": "Action","Payload": {"1": "hit","2": "defend"}}
         return {"Type": "Action", "Payload": action}
+    
+    def behavior_message(self, action: dict) -> dict:
+        # example: {"Type": "Action","Payload": {"1": "hit","2": "defend"}}
+        return {"Type": "Behavior", "Payload": action}
 
 
     def close_message(self) -> dict:
