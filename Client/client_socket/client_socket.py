@@ -25,8 +25,12 @@ class ClientConnection:
         self.login_closed = False
         self.auth_screen_app = None
 
-        self.incomming = Incomming()
-        self.outgoing = Outgoing()
+
+        self.incoming_queue = queue.Queue()
+        self.incomming = Incomming(self.incoming_queue)
+
+        self.outgoing_queue = queue.Queue()
+        self.outgoing = Outgoing(self.outgoing_queue)
 
         self.connect_to_server(host, port)
 
@@ -71,7 +75,8 @@ class ClientConnection:
 
 # region OUTGOING MESSAGES:
 class Outgoing:
-    def __init__(self) -> None:
+    def __init__(self, outgoing_queue) -> None:
+        self.outgoing_queue = outgoing_queue
         pass
 
     def registration_message(self, user_name_and_password: dict) -> dict:
@@ -95,7 +100,7 @@ class Outgoing:
 class Incomming:
 
     counter = 0
-    def __init__(self) -> None:
+    def __init__(self, incoming_data_queue) -> None:
         self.positions = None
         self.event = None
 
