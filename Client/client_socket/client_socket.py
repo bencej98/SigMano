@@ -193,7 +193,6 @@ class Incomming:
                 print(f"{Incomming.counter} incoming queue:", incoming)
                 Incomming.counter += 1
                 if incoming["Type"] == "Position":
-                    print("HALLO")
                     self.change_data(incoming['Payload'], username)
             time.sleep(1)
 
