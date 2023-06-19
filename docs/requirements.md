@@ -21,10 +21,16 @@
 ```json
 {
 	"Type": "Action",
-	"Payload": {
-		"1": "hit",
-		"2": "defend"
-	}
+	"Payload": [
+		"rock", "paper"
+		]
+}
+{
+	"Type": "Action",
+	"Payload": [
+		{"Attack": "If weaker opponent"},
+		{"Defend": "If fight nearby"}
+	]
 }
 ```
 ```json
