@@ -88,3 +88,12 @@
 	"Type": "Death", "Payload":["gnome_name1", "gnome_name2", ...]
 }
 ```
+{
+	"Type": "Behavior",
+	"Payload": [
+		{"Event": "...",
+		 "Action": "..."},
+		{"Event": "...",
+		 "Action": "..."}
+	]
+}

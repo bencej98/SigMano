@@ -108,21 +108,34 @@ class ActionManager:
 
             gnome.target_location = closest_fight_location
             gnome.update_direction(map)
+            return gnome.target_location
 
-    def check_action(self, gnome: Gnome, strategy):
-        if strategy["action"] == "runaway":
+    def check_gnomes_in_range(self, gnome: Gnome, map: Map):
+        gnomes_in_range = []
+        for gnome_name, data in gnome.other_gnomes_dist.items():
+            if data["distance"] <= 4:
+                gnomes_in_range.append(gnome_name)
+        return gnomes_in_range
+
+    def check_action(self, gnome: Gnome, strategy, target_location):
+        if strategy["Action"] == "Runaway":
+            gnome.target_location = target_location
             gnome.turn_against_direction()
-        elif strategy["action"] == "approach":
+        elif strategy["Action"] == "Approach":
+            gnome.target_location = target_location
             pass
-
 
     def choose_strategy(self, map: Map):
         for gnome_name, gnome in map.active_gnomes:
             if len(gnome.target_location) == 0:
+                gnomes_in_range = self.check_gnomes_in_range(gnome, map)
                 for strategy in gnome.event_reactions:
-                    if strategy["event"] == "fight" and self.was_fight:
-                        self._set_target_towards_fight(gnome)
-                        self.check_action(gnome, strategy)
+                    if strategy["Event"] == "Fight" and self.was_fight:
+                        target_location = self._set_target_towards_fight(gnome)
+                        self.check_action(gnome, strategy, target_location)
+                    elif strategy["Event"] == "Gnomes_in_vicinity" and len(gnomes_in_range) > 0:
+                        target_location = map.active_gnomes[gnomes_in_range[0]].location
+                        self.check_action(gnome, strategy, target_location)
                     else:
                         gnome.direction = None
 
