@@ -189,7 +189,29 @@ class Gnome_Database:
             else:
                 return self.send_auth_json(False)
 
+    def get_sumscores(self):
+        player_base_list = []
+        temp_dict = {}
+        self.cursor.execute("""
+        SELECT * 
+        FROM user
+        """)
+        users_all_data = self.cursor.fetchall()
+        for row in users_all_data:
+            print(row[1],row[4])
+            temp_dict[f"{row[1]}"] = row[4]
+            player_base_list.append(temp_dict)
+            temp_dict = {}
+        print(player_base_list)
 
+
+    def send_user_sumscore(self, username: str, sumpoint: int):
+        
+        user_score = {
+                                "Type": "Leader", "Payload": [{username:sumpoint}]
+                            }
+        return json.dumps(user_score)
+    
 # Set up logging configuration
 logging.basicConfig(
     level=logging.INFO,
@@ -206,3 +228,4 @@ except sqlite3.Error as e:
 
 
 jatek = Gnome_Database()
+jatek.get_sumscores()
