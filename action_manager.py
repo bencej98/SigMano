@@ -130,10 +130,10 @@ class ActionManager:
             if len(gnome.target_location) == 0:
                 gnomes_in_range = self.check_gnomes_in_range(gnome, map)
                 for strategy in gnome.event_reactions:
-                    if strategy["Event"] == "Fight" and self.was_fight:
+                    if strategy["Event"] == "Fight happened" and self.was_fight:
                         target_location = self._set_target_towards_fight(gnome)
                         self.check_action(gnome, strategy, target_location)
-                    elif strategy["Event"] == "Gnomes_in_vicinity" and len(gnomes_in_range) > 0:
+                    elif strategy["Event"] == "Gnomes in vicinity" and len(gnomes_in_range) > 0:
                         target_location = map.active_gnomes[gnomes_in_range[0]].location
                         self.check_action(gnome, strategy, target_location)
                     else:
