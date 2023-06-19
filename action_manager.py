@@ -71,7 +71,7 @@ class ActionManager:
         
         return {
             "Type": "Death",
-            "Payload": death_dict
+            "Payload": death_payload
                 }
 
     def _check_fight_option(self, gnome_first, gnome_second):
