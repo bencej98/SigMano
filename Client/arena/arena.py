@@ -86,11 +86,13 @@ json_temp = {}
 user_name = 1
 events = []
 
-def set_temp_json(dict_obj, user):
+def set_temp_json(dict_obj):
    global json_temp
    json_temp = dict_obj
+
+def set_username(username):
    global user_name
-   user_name = user
+   user_name = username
 
 def set_fight_event(fight_event):
    print(fight_event)
