@@ -85,6 +85,7 @@ object_list = []
 json_temp = {}
 user_name = 1
 events = []
+leader_board = []
 
 def set_temp_json(dict_obj):
    global json_temp
@@ -103,23 +104,14 @@ def set_leader_board(order_leader_list):
 def set_dead_list(dead_str):
    print(dead_str)
 
-# def temp_valami(user_name):
-#    for i in range(10):
-#       x = random.randint(0,19)
-#       y = random.randint(0,19)
-#       name = random.randint(1,2)
-#       x2 = random.randint(0,19)
-#       y2 = random.randint(0,19)
-#       name2 = random.randint(3,4)
-#       json = {name:[x,y], name2:[x2,y2]}
-#       dict_data_for_screen(json, user_name, object_list)
-#       time.sleep(1)
-
 def temp_valami(root, user_name, chosen_color):
    while True:
-      test_text = list_to_string(events)
-      event = tkinter.Label(root.master, text=test_text, width=82, justify='left')
+      event_text = list_to_string(events)
+      event = tkinter.Label(root.master, text=event_text, width=82, justify='left')
       event.place(x=9,y=360)
+      leader_text = list_to_string(leader_board)
+      leader = tkinter.Label(root.master, text=leader_text,justify='left')
+      leader.place(x=20,y=60)
       dict_data_for_screen(json_temp, user_name, chosen_color, object_list)
       time.sleep(1)
 
@@ -127,7 +119,7 @@ def list_to_string(list:list) -> str:
    text = ""
    for i in list:
       text = text + "\n" + i
-   return text
+   return text[2:]
 
 
 def event_updater(new_event:str):
@@ -136,8 +128,11 @@ def event_updater(new_event:str):
    events.append(new_event)
 
 
-def leaderboard_updater():
-   pass
+def leaderboard_updater(leader_list):
+   n = 1
+   for i in leader_list:
+      [key,value] = i.items()
+      leader_board.append(f"{n}. {key} with {value} point(s)")
 
 def set_fight_event(event):
    event_updater(event)
@@ -146,7 +141,7 @@ def set_dead_list(dead_str):
    event_updater(dead_str)
 
 def set_leader_board(order_leader_list):
-   pass
+   leaderboard_updater(order_leader_list)
 
 
 def set_screen(root, x,y):
@@ -166,8 +161,6 @@ def set_screen(root, x,y):
    leaderboard.place(x=240,y=20)
    message = tkinter.Label(root.master, text="EVENTS",font=(25))
    message.place(x=260,y=320)
-   leader = tkinter.Label(root.master, text="1. Andras with 10 point(s)""\nakarmi",justify='left')
-   leader.place(x=20,y=60)
 
 
 
