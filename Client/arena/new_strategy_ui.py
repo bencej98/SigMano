@@ -30,7 +30,7 @@ class ActionApp(tk.Tk):
         screen_height = self.winfo_screenheight()
         x = (screen_width/2) - (self.frame_width/2)
         y = (screen_height/2) - (self.frame_height/1)
-        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, (y + 50)))
+        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, (y + 200)))
 
         # stack frames onto each other in container
         container = tk.Frame(self)
@@ -71,16 +71,12 @@ class ChooseAction(tk.Frame):
         self.ALLOWED_COLORS = ['Maroon', 'Red', 'Orange', 'Gold', 'Green', 'Teal', 'Navy']
         # self.ALLOWED_COLORS = ['red']
         self.action_points = {
-            "Run away - 1": 1,
-            "Go there - 1": 1,
-            "Attack - 2": 2,
-            "Defend - 2": 2
+            "Runaway - 2": 2,
+            "Approach - 1": 1,
         }
         self.event_points = {
-            "If weaker opponent - 2": 2,
-            "If in corner - 1": 1,
-            "If fight nearby - 2": 2,
-            "Met other Gnome - 1": 1
+            "Fight nearby - 2": 2,
+            "Gnomes in vicinity - 1": 1,
         }
 
         # style
@@ -128,19 +124,15 @@ class ChooseAction(tk.Frame):
         # event option menu
         default_value_event = tk.StringVar()
         default_value_event.set("Please Choose")
-        self.option_menu_event = tk.OptionMenu(option_meun_frame, default_value_event, "If weaker opponent - 2",
-                                                                            "If in corner - 1",
-                                                                            "If fight nearby - 2",
-                                                                            "Met other Gnome - 1",
-                                                                            command=self.save_chosen_event)
+        self.option_menu_event = tk.OptionMenu(option_meun_frame, default_value_event, "Fight nearby - 2",
+                                                                                        "Gnomes in vicinity - 1",
+                                                                                        command=self.save_chosen_event)
         # action option menu
         default_value_action = tk.StringVar()
         default_value_action.set("Please Choose")
-        self.option_menu_action = tk.OptionMenu(option_meun_frame, default_value_action,"Run away - 1",
-                                                                            "Go there - 1",
-                                                                            "Attack - 2",
-                                                                            "Defend - 2",
-                                                                            command=self.save_chosen_action)
+        self.option_menu_action = tk.OptionMenu(option_meun_frame, default_value_action,"Approach - 1",
+                                                                                        "Runaway - 2",
+                                                                                        command=self.save_chosen_action)
 
         # treeview
         columns = ('events', 'actions')
@@ -211,8 +203,8 @@ class ChooseAction(tk.Frame):
 
     def fight(self) -> dict:
         """ Starts fight - returns a dictionary containing fight actions """
-        fight_data = {"Type": "Action", "Payload": []} # e.g.: "Payload": [{"Attack": "If weaker opponent"}, {"Defend": "If fight nearby"}]
-        current_action_pair = {}
+        fight_data = {"Type": "Behavior", "Payload": []} # e.g.: "Payload": [{"Attack": "If weaker opponent"}, {"Defend": "If fight nearby"}]
+        current_action_pair = {} # e.g.: {"Event": "...","Action": "..."},{"Event": "...","Action": "..."}
         current_action = None
         current_event = None
 
@@ -225,7 +217,9 @@ class ChooseAction(tk.Frame):
                                 current_action = value
                             else:
                                 current_event = value
-                                current_action_pair[current_action] = current_event
+                                current_action_pair["Action"] = current_action
+                                current_action_pair["Event"] = current_event
+                                # current_action_pair[current_action] = current_event
                                 fight_data["Payload"].append(current_action_pair)
                             counter += 1
 

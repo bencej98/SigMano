@@ -96,6 +96,15 @@ def set_temp_json(dict_obj, user):
    global user_name
    user_name = user
 
+def set_fight_event(fight_event):
+   print(fight_event)
+
+def set_leader_board(order_leader_list):
+   print(order_leader_list)
+
+def set_dead_list(dead_str):
+   print(dead_str)
+
 # def temp_valami(user_name):
 #    for i in range(10):
 #       x = random.randint(0,19)
