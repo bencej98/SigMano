@@ -23,11 +23,14 @@ class Player(turtle.Turtle):
       self.name1.write(name, False, "center")
 
    def move(self, x:int, y:int):
-      [x, y] = x_y_for_screen([x, y])
-      self.name1.goto(x, y+self.size*10)
-      self.name1.clear()
-      self.goto(x, y)
-      self.name1.write(self.name, False, "center")
+      try:
+         [x, y] = x_y_for_screen([x, y])
+         self.name1.goto(x, y+self.size*10)
+         self.name1.clear()
+         self.goto(x, y)
+         self.name1.write(self.name, False, "center")
+      except Exception as e:
+         pass
 
 tile_size = 30
 tile_number = 20

@@ -11,9 +11,13 @@ class App():
         client_socket.ClientConnection(HOST, PORT)
 
 if __name__ == "__main__":
-    #App()
+    try:
+        #App()
 
-    #App("172.4.181.190", 10000)
-    #App("172.4.181.76", 10000)
-    
-    App("172.4.181.226", 10000)
+        #App("172.4.181.190", 10000)
+        #App("172.4.181.76", 10000)
+        
+        App("172.4.181.226", 10000)
+
+    except KeyboardInterrupt:
+        exit()

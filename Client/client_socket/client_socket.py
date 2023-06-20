@@ -45,7 +45,7 @@ class ClientConnection:
             self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket_client.connect((HOST, PORT))
 
-            incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(self.socket_client,self.init_socket, self.destroy_frames, self.user_name,))
+            incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(self.socket_client,self.init_socket, self.destroy_frames, self.user_name,), daemon=True)
             incomming_messages.start()
 
             auth_screen_app = MainApp(self.get_user_name_password_from_form)
