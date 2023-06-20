@@ -32,8 +32,8 @@ class Player(turtle.Turtle):
       except Exception as e:
          pass
 
-tile_size = 60
-tile_number = 10
+tile_size = 100
+tile_number = 6
 screen_size = tile_number*tile_size  # =600
 y_modifier = tile_number/2 - 0.5
 
@@ -45,9 +45,9 @@ def x_y_for_screen(coordinates:list):
 def create_object(object_name:str, coordinates:list, user_name, chosen_color):
    [x, y] = x_y_for_screen(coordinates)
    if user_name == object_name:
-      obj = Player(object_name, x, y, chosen_color, tile_size/60, 4)
+      obj = Player(object_name, x, y, chosen_color, tile_size/60, 7)
    else:
-      obj = Player(object_name, x, y, "black", tile_size/60, 4)
+      obj = Player(object_name, x, y, "black", tile_size/60, 7)
    return obj
 
 def get_obj_from_list(name:str,object_list:list):
@@ -118,7 +118,7 @@ def temp_valami(root, user_name, chosen_color):
       leader = tkinter.Label(root.master, text=leader_text,justify='left')
       leader.place(x=20,y=60)
       dict_data_for_screen(json_temp, user_name, chosen_color, object_list)
-      time.sleep(1)
+      time.sleep(0.1)
 
 def list_to_string(list:list) -> str:
    text = ""
@@ -128,7 +128,7 @@ def list_to_string(list:list) -> str:
 
 
 def event_updater(new_event:str):
-   if len(events) >= 10:
+   if len(events) >= 14:
       events.pop(0)
    events.append(new_event)
 
@@ -141,6 +141,8 @@ def leaderboard_updater(leader_list):
       for [key,value] in i.items():
          leader_board.append(f"{n}. {key} with {value} point(s)")
       n += 1
+   if len(leader_board) >= 10:
+      leader_board = leader_board[:10]
 
 def set_fight_event(event):
    event_updater(event)
