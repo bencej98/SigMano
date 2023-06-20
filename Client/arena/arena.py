@@ -45,9 +45,9 @@ def x_y_for_screen(coordinates:list):
 def create_object(object_name:str, coordinates:list, user_name, chosen_color):
    [x, y] = x_y_for_screen(coordinates)
    if user_name == object_name:
-      obj = Player(object_name, x, y, chosen_color, tile_size/60, 2)
+      obj = Player(object_name, x, y, chosen_color, tile_size/60, 4)
    else:
-      obj = Player(object_name, x, y, "black", tile_size/60, 2)
+      obj = Player(object_name, x, y, "black", tile_size/60, 4)
    return obj
 
 def get_obj_from_list(name:str,object_list:list):
@@ -134,6 +134,7 @@ def event_updater(new_event:str):
 
 
 def leaderboard_updater(leader_list):
+   leader_board = []
    n = 1
    for i in leader_list:
       for [key,value] in i.items():
