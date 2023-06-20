@@ -9,7 +9,6 @@ class ActionManager:
         self.user_strategies = {}
         #TODO
         self.was_fight = False
-        self.was_death = False
         
     def _get_collided_gnomes(self, map: Map):
         self.collided_gnomes = map.check_collisions()
@@ -87,7 +86,6 @@ class ActionManager:
             gnome.actual_points += 1
     
     def check_gnome_death(self, map: Map):
-        self.was_death = False
         gnome_deathnote = []
         for gnome_name, gnome in map.active_gnomes.items():
             gnome.check_if_dead()
