@@ -8,7 +8,7 @@ import queue
 from tkinter import messagebox
 from arena.auth_screen import MainApp
 from arena.new_strategy_ui import ActionApp
-from arena.arena import start_loop, dict_data_for_screen, json_temp, set_temp_json
+from arena.arena import start_loop, dict_data_for_screen, json_temp, set_temp_json, set_leader_board, set_dead_list,set_fight_event, set_username
 
 class ClientConnection:
 
@@ -28,8 +28,12 @@ class ClientConnection:
         self.login_closed = False
         self.auth_screen_app = None
 
-        self.incomming = Incomming()
-        self.outgoing = Outgoing()
+
+        self.incoming_queue = queue.Queue()
+        self.incomming = Incomming(self.incoming_queue)
+
+        self.outgoing_queue = queue.Queue()
+        self.outgoing = Outgoing(self.outgoing_queue)
 
         self.connect_to_server(host, port)
 
@@ -37,12 +41,11 @@ class ClientConnection:
          self.socket_client = socket
     
 
-    def connect_to_server(self, HOST, PORT):
-        
+    def connect_to_server(self, HOST, PORT):        
             self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket_client.connect((HOST, PORT))
 
-            incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(self.socket_client,self.init_socket, self.destroy_frames, self.user_name,))
+            incomming_messages = threading.Thread(target=self.incomming.accept_incoming, args=(self.socket_client,self.init_socket, self.destroy_frames, self.user_name,), daemon=True)
             incomming_messages.start()
 
             auth_screen_app = MainApp(self.get_user_name_password_from_form)
@@ -76,7 +79,8 @@ class ClientConnection:
 
 # region OUTGOING MESSAGES:
 class Outgoing:
-    def __init__(self) -> None:
+    def __init__(self, outgoing_queue=None) -> None:
+        self.outgoing_queue = outgoing_queue
         pass
 
     def registration_message(self, user_name_and_password: dict) -> dict:
@@ -90,6 +94,10 @@ class Outgoing:
     def action_message(self, action: dict) -> dict:
         # example: {"Type": "Action","Payload": {"1": "hit","2": "defend"}}
         return {"Type": "Action", "Payload": action}
+    
+    def behavior_message(self, action: dict) -> dict:
+        # example: {"Type": "Action","Payload": {"1": "hit","2": "defend"}}
+        return {"Type": "Behavior", "Payload": action}
 
 
     def close_message(self) -> dict:
@@ -100,7 +108,7 @@ class Outgoing:
 class Incomming:
 
     counter = 0
-    def __init__(self) -> None:
+    def __init__(self, incoming_data_queue) -> None:
         self.positions = None
         self.event = None
         self.user_name = None
@@ -112,7 +120,7 @@ class Incomming:
         self.action_payload = None
         self.chosen_color = None
         
-        self.incoming_queue = queue.Queue()  
+        self.incoming_queue = incoming_data_queue 
         self.outgoing = Outgoing()      
 
     def accept_incoming(self, client_socket, set_socket_cb, frame_destroy, user_name):
@@ -131,7 +139,7 @@ class Incomming:
             except OSError as e:
                 print(e)
             else:
-                print("DATA:", data)
+                #print("DATA:", data)
                 incoming = self.parse_incoming(data)
                 self.process_incoming(incoming, frame_destroy)
 
@@ -151,6 +159,7 @@ class Incomming:
                     client_socket.sendall(json.dumps(self.outgoing.action_message(self.action_payload["Payload"])).encode("utf-8"))
 
                     #nyitja az arenát felületet:
+                    set_username(ClientConnection.static_user_name)
                     start_arena = threading.Thread(target=self.start_arena)
                     start_arena.start()
 
@@ -159,6 +168,8 @@ class Incomming:
         self.chosen_color = chosen_color
 
     def process_incoming(self, incoming, frame_destroy):
+
+
         if incoming is not None:
             try:
                 if incoming["Type"] == "Registration" or incoming["Type"] == "Auth":
@@ -166,9 +177,59 @@ class Incomming:
 
                 if incoming["Type"] == "Position":
                     self.put_queue(incoming)
+
+                #TODO:
+                #{"Type": "Event", 
+                # "Payload": {
+                #   "Attila": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}], 
+                #   "Andras": [{"encounter": "Attila used rock and Andras used rock", "outcome": "tie"}]}
+                # }
+                if incoming["Type"] == "Event":
+                    event_payloads = incoming["Payload"]
+                    if len(event_payloads) > 0:
+                        self.process_fight_events(event_payloads)
+
+                #TODO:
+                # {"Type": "Death", "Payload": []}' Minden Event-l együtt jön üresen is!
+                if incoming["Type"] == "Death":
+                    if len(incoming["Payload"]) > 0:
+                        payload_list = incoming["Payload"]
+                        self.print_dead_msg(payload_list)
+
+                #TODO:
+                # Type : Leader , Payload: [{"Andras": 5}, {"Bela": 6 } , { }]
+                if incoming["Type"] == "Leader":
+                    if len(incoming["Payload"]) > 0:
+                        ordered_leaders = sorted(incoming["Payload"], key=self.get_values_for_sort, reverse=True)
+                        print("LEADER board", ordered_leaders)
+                        set_leader_board(ordered_leaders)
+                    
             except:
                 pass
+
+    def get_values_for_sort(self, leader_list):
+        return list(leader_list.values())[0]            
+
+    def print_dead_msg(self, incoming):
+        death_messages = ["Good day to die!", "Oh my God!", "Rest My Peace!", "Holy sh**t!"]
+        death_msg_len = len(death_messages)
         
+        for dead_user in incoming:
+            rand_msg_index = random.randrange(0,death_msg_len-1)
+            dead_string =  f"{dead_user}: {death_messages[rand_msg_index]}"
+            set_dead_list(dead_string)
+
+    def process_fight_events(self,incoming_payload_event):
+        for (user, fight_list) in incoming_payload_event.items():
+            payload_list = list(fight_list[0].values())
+
+            encounter_msg = payload_list[0]
+            result_msg = payload_list[1]
+
+            fight_string = f"{encounter_msg}, result is {result_msg}!" 
+            set_fight_event(fight_string)
+
+
     def login_status(self, incoming, frame_destroy):
         if not incoming["Payload"]:
             messagebox.showinfo("Message", f"{'Registration' if incoming['Type']=='Registration' else 'Authentication'} failed!")
@@ -182,26 +243,23 @@ class Incomming:
         frame_destroy()
 
     def start_arena(self):
-        # TODO pass selected color
         username = ClientConnection.static_user_name
         print("USRR", username)
         print("COLOR:", self.chosen_color)
         start_loop(self.chosen_color)
         # start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
 
-    def change_data(self, positions, username):
-        set_temp_json(positions, username)
+    def change_data(self, positions):
+        set_temp_json(positions)
 
     def pop_queue(self):
-        username = None
         while True:
-            username = ClientConnection.static_user_name
             if not self.incoming_queue.empty():
                 incoming = self.incoming_queue.get()
                 print(f"{Incomming.counter} incoming queue:", incoming)
                 Incomming.counter += 1
                 if incoming["Type"] == "Position":
-                    self.change_data(incoming['Payload'], username)
+                    self.change_data(incoming['Payload'])
             time.sleep(1)
 
     def put_queue(self, parsed):
@@ -212,7 +270,7 @@ class Incomming:
         try:
             data = data.decode("utf-8")
             parsed = json.loads(data)
-            print("PAAAYLOOAD: ", parsed)
+            #print("PAAAYLOOAD: ", parsed)
 
             return parsed
         except Exception as e:
