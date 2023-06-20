@@ -67,9 +67,7 @@ class ChooseAction(tk.Frame):
         self.total_points = 0
         self.action_point_frame_background = "#3c3c3c"
         self.chosen_color = None
-        # self.ALLOWED_COLORS = ['#8000000', '#FF0000', '#FF4500', '#FFD700', '#008000', '#008080', '#000080']
         self.ALLOWED_COLORS = ['Maroon', 'Red', 'Orange', 'Gold', 'Green', 'Teal', 'Navy']
-        # self.ALLOWED_COLORS = ['red']
         self.action_points = {
             "Runaway": 2,
             "Approach": 1,
@@ -102,7 +100,6 @@ class ChooseAction(tk.Frame):
         # label frame
         label_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
         label_frame.pack(padx=10, pady=10)
-
         # option menu frame
         option_meun_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
         option_meun_frame.pack(padx=10, pady=10)
@@ -144,11 +141,9 @@ class ChooseAction(tk.Frame):
         # headings
         self.tree.heading('events', text='Events')
         self.tree.heading('actions', text='Actions')
-
         # scrollbar
         scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
-
         # choose color section
         choose_color_label.pack(side="left", fill="x", pady=10, padx=35)
         # labels
@@ -166,13 +161,6 @@ class ChooseAction(tk.Frame):
         self.option_menu_event.pack(side=tk.LEFT, padx=10, pady=10)
         self.tree.pack(side=tk.TOP)
         scrollbar.place(x=380, y=260, height=140)
-
-    # def _get_selected_color(self):
-    #     """ Gets & saves the pciked color """
-    #     ALLOWED_COLORS = ['#FF0000', '#00FF00', '#0000FF']
-    #     self.grab_set()
-    #     self.chosen_color = askcolor(parent=self, color=ALLOWED_COLORS)[1]
-    #     self.grab_release()
 
     def _set_selected_color(self, color, top_level: tk.Toplevel):
         """ Saves the selected color """
@@ -205,7 +193,7 @@ class ChooseAction(tk.Frame):
 
     def fight(self) -> dict:
         """ Starts fight - returns a dictionary containing fight actions """
-        fight_data = {"Type": "Behavior", "Payload": []} # e.g.: "Payload": [{"Attack": "If weaker opponent"}, {"Defend": "If fight nearby"}]
+        fight_data = {"Type": "Behavior", "Payload": []} # e.g.: "Payload": [{"Action": "Attack", "Event": "Gnomes in vicinity"}]
         current_action_pair = {} # e.g.: {"Event": "...","Action": "..."},{"Event": "...","Action": "..."}
         current_action = None
         current_event = None
@@ -242,6 +230,7 @@ class ChooseAction(tk.Frame):
     def save_chosen_action(self, action):
         """ Saves the chosen action to a variable """
         self.current_action = action
+
     def save_chosen_event(self, event):
         """ Saves the chosen action to a variable """
         self.current_event = event
