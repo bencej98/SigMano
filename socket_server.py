@@ -184,44 +184,10 @@ def main():
         travel = Map(20, 20, 5)
         action = ActionManager()
         server = Gameserver(travel, action)
-        gnome1 = Gnome("Gnome1")
-        gnome2 = Gnome("Gnome2")
-        gnome3 = Gnome("Gnome3")
-        gnome4 = Gnome("Gnome4")
-        gnome5 = Gnome("Gnome5")
-        strategy1 = [{"Event": "Fight happened", 
-                                                  "Action": "Approach"},
-                                                  {"Event": "Gnomes in vicinity",
-                                                   "Action": "Approach"}]
-        strategy2 = [{"Event": "Fight happened", 
-                                                "Action": "Runaway"},
-                                                {"Event": "Gnomes in vicinity",
-                                                "Action": "Runaway"}]
-        strategy3 = [{"Event": "Fight happened", 
-                                                  "Action": "Defend"},
-                                                  {"Event": "Gnomes in vicinity",
-                                                   "Action": "Defend"}]
-        gnome1.strategy = strategy1
-        gnome2.strategy = strategy1
-        gnome3.strategy = strategy1
-        gnome4.strategy = strategy1
-        gnome5.strategy = strategy1
-
-
-        server.travel.add_gnome_to_gnome_queue(gnome1)
-        server.travel.add_gnome_to_gnome_queue(gnome2)
-        server.travel.add_gnome_to_gnome_queue(gnome3)
-        server.travel.add_gnome_to_gnome_queue(gnome4)
-        server.travel.add_gnome_to_gnome_queue(gnome5)
         server.db.create_table()
         server.run_tik_data_thread()
         while True:            
             server.process_data()
-            for gnome_name, gnome in server.travel.active_gnomes.items():
-                print(f"{gnome_name}target_location: {gnome.target_location}, action: {gnome.action_mode}, direction: {gnome.direction} \n"
-                      f"{gnome_name}current_location: {gnome.location}, actual points: {gnome.actual_points} \n"
-                      f"{type(gnome.strategy)} {gnome.strategy}"
-                      f"bug_test:{gnome.bug_test} \n")
             time.sleep(2)
 
 if __name__ == "__main__":
