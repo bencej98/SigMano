@@ -134,6 +134,7 @@ def event_updater(new_event:str):
 
 
 def leaderboard_updater(leader_list):
+   global leader_board
    leader_board = []
    n = 1
    for i in leader_list:
