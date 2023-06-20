@@ -120,6 +120,7 @@ class Gameserver:
             gnome.strategy = payload
             self.travel.all_gnomes[username] = gnome
             self.travel.add_gnome_to_gnome_queue(gnome)
+            self.broadcast_message(self.db.get_sumscores())
         else:
             self.action_manager.update_gnomes_strategy(self.travel, payload, username)
 
@@ -181,7 +182,7 @@ class Gameserver:
             self.connections.pop(id)
 
 def main():
-        travel = Map(20, 20, 5)
+        travel = Map(4, 4, 5)
         action = ActionManager()
         server = Gameserver(travel, action)
         server.db.create_table()
