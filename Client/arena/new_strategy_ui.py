@@ -71,12 +71,13 @@ class ChooseAction(tk.Frame):
         self.ALLOWED_COLORS = ['Maroon', 'Red', 'Orange', 'Gold', 'Green', 'Teal', 'Navy']
         # self.ALLOWED_COLORS = ['red']
         self.action_points = {
-            "Runaway - 2": 2,
-            "Approach - 1": 1,
+            "Runaway": 2,
+            "Approach": 1,
+            "Defend": 1
         }
         self.event_points = {
-            "Fight nearby - 2": 2,
-            "Gnomes in vicinity - 1": 1,
+            "Fight nearby": 2,
+            "Gnomes in vicinity": 1,
         }
 
         # style
@@ -124,14 +125,15 @@ class ChooseAction(tk.Frame):
         # event option menu
         default_value_event = tk.StringVar()
         default_value_event.set("Please Choose")
-        self.option_menu_event = tk.OptionMenu(option_meun_frame, default_value_event, "Fight nearby - 2",
-                                                                                        "Gnomes in vicinity - 1",
+        self.option_menu_event = tk.OptionMenu(option_meun_frame, default_value_event, "Fight nearby",
+                                                                                        "Gnomes in vicinity",
                                                                                         command=self.save_chosen_event)
         # action option menu
         default_value_action = tk.StringVar()
         default_value_action.set("Please Choose")
-        self.option_menu_action = tk.OptionMenu(option_meun_frame, default_value_action,"Approach - 1",
-                                                                                        "Runaway - 2",
+        self.option_menu_action = tk.OptionMenu(option_meun_frame, default_value_action,"Approach",
+                                                                                        "Runaway",
+                                                                                        "Defend",
                                                                                         command=self.save_chosen_action)
 
         # treeview
