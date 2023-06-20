@@ -7,11 +7,9 @@ class Gnome:
         self.user = user
         self.location = {}
         self.strategy = []
-        self.event_reactions = []
         self.other_gnomes_dist = {}
         self.actual_points = 0
         self.kill_count = 0
-        self.lose_count = 0
         self.target_location = {}
         self.direction = 20
         self.max_health = 100
@@ -20,7 +18,6 @@ class Gnome:
         self.defense = 2
         self.isdead = False
         self.action_mode = None
-        self.bug_test = {}
         self.reached_target = False
 
     def fight_gnome(self, gnome):
@@ -36,6 +33,8 @@ class Gnome:
             self.attack += 5
         elif self.action_mode == "Defend":
             self.defense += 3
+        elif self.action_mode == "Runaway":
+            self.defense -= 1
     
     def remove_action_buffs(self):
         self.attack = 10
@@ -135,7 +134,6 @@ class Gnome:
                 # self.direction = None
 
     def update_direction(self, map):
-        self.bug_test = self.target_location
         relative_x = self.target_location["x"] - self.location["x"]
         relative_y = self.target_location["y"] - self.location["y"]
         self.direction = map.convert_unit_to_direction((relative_x, relative_y))
