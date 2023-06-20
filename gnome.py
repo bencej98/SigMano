@@ -13,7 +13,7 @@ class Gnome:
         self.kill_count = 0
         self.lose_count = 0
         self.target_location = {}
-        self.direction = None
+        self.direction = 20
         self.max_health = 100
         self.current_health = 100
         self.attack = 5
@@ -21,6 +21,7 @@ class Gnome:
         self.isdead = False
         self.action_mode = None
         self.bug_test = {}
+        self.reached_target = False
 
     def fight_gnome(self, gnome):
         if self.isdead != True and gnome.isdead != True:
@@ -28,7 +29,7 @@ class Gnome:
 
     def check_if_dead(self):
         if self.current_health <= 0:
-            self.isdead = True
+            self.isdead = 1
 
     def apply_action_buffs(self):
         if self.action_mode == "Approach":
@@ -50,9 +51,8 @@ class Gnome:
         if self.target_location["x"] == self.location["x"] and self.target_location["y"] == self.location["y"]:
             # self.target_location = {}
             self.action_mode = None
-            return True
-        return False
-    
+            self.reached_target = True
+
     def set_runaway_target_location(self, map, target_location):
         vector_to_target = {
             "x": target_location["x"] - self.location["x"],

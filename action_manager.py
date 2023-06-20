@@ -117,7 +117,7 @@ class ActionManager:
         position_update_dict = {}
         self.choose_strategy(map)
         for gnome_name, gnome in map.active_gnomes.items():
-            if gnome.direction == None:
+            if gnome.direction == 20:
                 gnome.random_move(map)
             else:
                 gnome.move_towards_direction(map)
@@ -165,16 +165,19 @@ class ActionManager:
 
     def choose_strategy(self, map: Map):
         for gnome_name, gnome in map.active_gnomes.items():
-            has_reached_target = gnome.has_reached_target()
-            if has_reached_target == True and gnome.isdead == False:
-                gnomes_in_range = self.check_gnomes_in_range(gnome, map)
-                for strategy in gnome.strategy:
-                    if strategy["Event"] == "Fight happened" and self.was_fight:
-                        closest_fight_location = self._set_target_towards_fight(gnome, map)
-                        self.check_action(gnome, map, strategy, closest_fight_location)
-                    elif strategy["Event"] == "Gnomes in vicinity" and len(gnomes_in_range) > 0:
-                        closest_gnome_location = map.active_gnomes[gnomes_in_range[0]].location
-                        self.check_action(gnome, map, strategy, closest_gnome_location)
+            gnome.has_reached_target()
+            if gnome.reached_target == False or gnome.isdead == True:
+                continue
+            gnomes_in_range = self.check_gnomes_in_range(gnome, map)
+            for strategy in gnome.strategy:
+                if strategy["Event"] == "Fight happened" and self.was_fight:
+                    closest_fight_location = self._set_target_towards_fight(gnome, map)
+                    self.check_action(gnome, map, strategy, closest_fight_location)
+                    break
+                elif strategy["Event"] == "Gnomes in vicinity" and len(gnomes_in_range) > 0:
+                    closest_gnome_location = map.active_gnomes[gnomes_in_range[0]].location
+                    self.check_action(gnome, map, strategy, closest_gnome_location)
+                    break
 
 
 

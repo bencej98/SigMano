@@ -157,7 +157,7 @@ class Gameserver:
                     for death in death_check["Payload"]:
                         self.db.add_results_upon_death(death["user"].lower(), death["score"], death["kills"])
                     self.broadcast_message(self.db.get_sumscores())
-            time.sleep(0.5)
+            time.sleep(2)
 
 
     def run_tik_data_thread(self):
@@ -181,7 +181,7 @@ class Gameserver:
             self.connections.pop(id)
 
 def main():
-        travel = Map(5, 5, 5)
+        travel = Map(20, 20, 5)
         action = ActionManager()
         server = Gameserver(travel, action)
         gnome1 = Gnome("Gnome1")
@@ -219,10 +219,10 @@ def main():
             server.process_data()
             for gnome_name, gnome in server.travel.active_gnomes.items():
                 print(f"{gnome_name}target_location: {gnome.target_location}, action: {gnome.action_mode}, direction: {gnome.direction} \n"
-                      f"{gnome_name}current_location: {gnome.location} \n"
+                      f"{gnome_name}current_location: {gnome.location}, actual points: {gnome.actual_points} \n"
                       f"{type(gnome.strategy)} {gnome.strategy}"
                       f"bug_test:{gnome.bug_test} \n")
-            time.sleep(0.5)
+            time.sleep(2)
 
 if __name__ == "__main__":
     try:
