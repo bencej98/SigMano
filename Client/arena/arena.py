@@ -138,6 +138,7 @@ def leaderboard_updater(leader_list):
    for i in leader_list:
       for [key,value] in i.items():
          leader_board.append(f"{n}. {key} with {value} point(s)")
+      n += 1
 
 def set_fight_event(event):
    event_updater(event)
