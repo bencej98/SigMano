@@ -209,7 +209,7 @@ class Gnome_Database:
         user_score_json = {
                                 "Type": "Leader", "Payload": player_base_list
                             }
-        return json.dumps(user_score_json)
+        return user_score_json
     
 # Set up logging configuration
 logging.basicConfig(
