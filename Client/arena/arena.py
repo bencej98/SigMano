@@ -35,13 +35,13 @@ tile_number = 20
 def x_y_for_screen(coordinate:int):
    return tile_size*(coordinate-9.5)
 
-def create_object(object_name:str, coordinates:list, user_name):
+def create_object(object_name:str, coordinates:list, user_name, chosen_color):
    x = x_y_for_screen(coordinates[0])
    y = x_y_for_screen(coordinates[1])
    if user_name == object_name:
-      obj = Player(object_name, x, y, "red", tile_size/60, 2)
+      obj = Player(object_name, x, y, chosen_color, tile_size/60, 2)
    else:
-      obj = Player(object_name, x, y, "black", tile_size/60, 2)
+      obj = Player(object_name, x, y, chosen_color, tile_size/60, 2)
    return obj
 
 def get_obj_from_list(name:str,object_list:list):
@@ -69,7 +69,7 @@ def remove_obj_from_list(obj_list:list, json_dict:dict):
       obj.name1.clear()
       del obj
 
-def dict_data_for_screen(json_dict:dict, user_name, object_list:list=[]):
+def dict_data_for_screen(json_dict:dict, user_name, chosen_color, object_list:list=[]):
    obj_names = obj_names_from_list(object_list)
    remove_obj_from_list(object_list,json_dict)
    for name, coordinates in json_dict.items():
@@ -77,7 +77,7 @@ def dict_data_for_screen(json_dict:dict, user_name, object_list:list=[]):
          obj = get_obj_from_list(name, object_list)
          obj.move(coordinates[0], coordinates[1])
       else:
-         obj = create_object(name, coordinates, user_name)
+         obj = create_object(name, coordinates, user_name, chosen_color)
          object_list.append(obj)
 
 object_list = []
@@ -112,20 +112,20 @@ def set_dead_list(dead_str):
 #       time.sleep(1)
 
 
-def temp_valami(user_name):
+def temp_valami(user_name, chosen_color):
    while True:
-      dict_data_for_screen(json_temp, user_name, object_list)
+      dict_data_for_screen(json_temp, user_name, chosen_color, object_list)
       time.sleep(1)
 
 
-def start_loop(json):
+def start_loop(chosen_color):
    # TODO: Flexible window later
    turtle.setup(tile_size*tile_number, tile_size*tile_number, None, None)
    window = turtle.Screen()
    window.title("Arena")
    window.bgcolor("lightgreen")
 
-   temp_valami(user_name)
+   temp_valami(user_name, chosen_color)
    window.mainloop()
 
 if __name__ == "__main__":

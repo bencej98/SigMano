@@ -118,6 +118,7 @@ class Incomming:
         self.is_login_success = False
 
         self.action_payload = None
+        self.chosen_color = None
         
         self.incoming_queue = incoming_data_queue 
         self.outgoing = Outgoing()      
@@ -144,7 +145,6 @@ class Incomming:
 
                 if self.is_login_success:
                     self.is_login_success = False
-                    
 
                     #zárja a regisztárciót:
                     self.destroy_login_ui(frame_destroy)
@@ -153,6 +153,8 @@ class Incomming:
                     a = ActionApp(self._get_action_payload)
                     a.mainloop()
 
+                    print("ACTION: ", self.action_payload)
+
                     #akciók küldése a szerver részére
                     client_socket.sendall(json.dumps(self.outgoing.action_message(self.action_payload["Payload"])).encode("utf-8"))
 
@@ -160,8 +162,9 @@ class Incomming:
                     start_arena = threading.Thread(target=self.start_arena)
                     start_arena.start()
 
-    def _get_action_payload(self, action_payload: dict):
+    def _get_action_payload(self, action_payload: dict, chosen_color: str):
         self.action_payload = action_payload
+        self.chosen_color = chosen_color
 
     def process_incoming(self, incoming, frame_destroy):
 
@@ -239,7 +242,11 @@ class Incomming:
         frame_destroy()
 
     def start_arena(self):
-        start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
+        username = ClientConnection.static_user_name
+        print("USRR", username)
+        print("COLOR:", self.chosen_color)
+        start_loop(self.chosen_color)
+        # start_loop({'loluser': [2, 3], 'loluser2': [18, 9]})
 
     def change_data(self, positions, username):
         set_temp_json(positions, username)

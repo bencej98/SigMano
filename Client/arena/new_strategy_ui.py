@@ -2,13 +2,14 @@ import tkinter as tk
 from tkinter import font as tkfont
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter.colorchooser import askcolor
 
 class ActionApp(tk.Tk):
 
     def __init__(self, get_action_payload, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.frame_width = 400
-        self.frame_height = 520
+        self.frame_height = 580
         self.resizable(False, False)
         self.action_payload = get_action_payload
         self.background_color = "#535356"
@@ -29,7 +30,7 @@ class ActionApp(tk.Tk):
         screen_height = self.winfo_screenheight()
         x = (screen_width/2) - (self.frame_width/2)
         y = (screen_height/2) - (self.frame_height/1)
-        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, y))
+        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, (y + 200)))
 
         # stack frames onto each other in container
         container = tk.Frame(self)
@@ -51,6 +52,9 @@ class ActionApp(tk.Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
+    def _get_frame_width(self):
+        return self.frame_width
+
 
 class ChooseAction(tk.Frame):
 
@@ -62,17 +66,17 @@ class ChooseAction(tk.Frame):
         self.action_payload = action_payload
         self.total_points = 0
         self.action_point_frame_background = "#3c3c3c"
+        self.chosen_color = None
+        # self.ALLOWED_COLORS = ['#8000000', '#FF0000', '#FF4500', '#FFD700', '#008000', '#008080', '#000080']
+        self.ALLOWED_COLORS = ['Maroon', 'Red', 'Orange', 'Gold', 'Green', 'Teal', 'Navy']
+        # self.ALLOWED_COLORS = ['red']
         self.action_points = {
-            "Run away - 1": 1,
-            "Go there - 1": 1,
-            "Attack - 2": 2,
-            "Defend - 2": 2
+            "Runaway - 2": 2,
+            "Approach - 1": 1,
         }
         self.event_points = {
-            "If weaker opponent - 2": 2,
-            "If in corner - 1": 1,
-            "If fight nearby - 2": 2,
-            "Met other Gnome - 1": 1
+            "Fight nearby - 2": 2,
+            "Gnomes in vicinity - 1": 1,
         }
 
         # style
@@ -91,6 +95,9 @@ class ChooseAction(tk.Frame):
         # action point frame
         action_point_frame = tk.Frame(self, height=5, width=10, background=self.action_point_frame_background)
         action_point_frame.pack(padx=10, pady=10)
+        # color frame
+        color_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
+        color_frame.pack(padx=10, pady=10)
         # label frame
         label_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
         label_frame.pack(padx=10, pady=10)
@@ -111,23 +118,21 @@ class ChooseAction(tk.Frame):
         fight_button = tk.Button(button_frame, text="Fight", background="#040404", fg=self.controller.font_color,
             command=lambda: self.fight(), font=self.controller.button_font, width=5)
         calculate_points_button = tk.Button(action_point_frame, text="Calculate", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self.calculate_action_points)
+        # color picker
+        choose_color_label = tk.Button(color_frame, text="Choose color", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self._open_colorchooser)
         
         # event option menu
         default_value_event = tk.StringVar()
         default_value_event.set("Please Choose")
-        self.option_menu_event = tk.OptionMenu(option_meun_frame, default_value_event, "If weaker opponent - 2",
-                                                                            "If in corner - 1",
-                                                                            "If fight nearby - 2",
-                                                                            "Met other Gnome - 1",
-                                                                            command=self.save_chosen_event)
+        self.option_menu_event = tk.OptionMenu(option_meun_frame, default_value_event, "Fight nearby - 2",
+                                                                                        "Gnomes in vicinity - 1",
+                                                                                        command=self.save_chosen_event)
         # action option menu
         default_value_action = tk.StringVar()
         default_value_action.set("Please Choose")
-        self.option_menu_action = tk.OptionMenu(option_meun_frame, default_value_action,"Run away - 1",
-                                                                            "Go there - 1",
-                                                                            "Attack - 2",
-                                                                            "Defend - 2",
-                                                                            command=self.save_chosen_action)
+        self.option_menu_action = tk.OptionMenu(option_meun_frame, default_value_action,"Approach - 1",
+                                                                                        "Runaway - 2",
+                                                                                        command=self.save_chosen_action)
 
         # treeview
         columns = ('events', 'actions')
@@ -142,6 +147,8 @@ class ChooseAction(tk.Frame):
         scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
 
+        # choose color section
+        choose_color_label.pack(side="left", fill="x", pady=10, padx=35)
         # labels
         action_label.pack(side="left", fill="x", pady=10, padx=35)
         event_label.pack(side="right", fill="x", pady=10, padx=35)
@@ -158,12 +165,49 @@ class ChooseAction(tk.Frame):
         self.tree.pack(side=tk.TOP)
         scrollbar.place(x=380, y=260, height=140)
 
+    # def _get_selected_color(self):
+    #     """ Gets & saves the pciked color """
+    #     ALLOWED_COLORS = ['#FF0000', '#00FF00', '#0000FF']
+    #     self.grab_set()
+    #     self.chosen_color = askcolor(parent=self, color=ALLOWED_COLORS)[1]
+    #     self.grab_release()
+
+    def _set_selected_color(self, color, top_level: tk.Toplevel):
+        """ Saves the selected color """
+        self.chosen_color = color
+        top_level.withdraw()
+
+    def _open_colorchooser(self):
+        """ Displays available colors """
+        top_level = tk.Toplevel(self)
+        # screen opens in the middle
+        self.top_lvl_frame_width = 400
+        self.top_lvl_frame_height = 580
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width/2) - (self.top_lvl_frame_width/2)
+        y = (screen_height/2) - (self.top_lvl_frame_height/1)
+        top_level.geometry('%dx%d+%d+%d' % (350, 200, x, (y + 50)))
+
+        top_level.attributes('-topmost', True)
+        for color in self.ALLOWED_COLORS:
+            button = tk.Button(top_level, bg=color, width=4,
+                               command=lambda c=color: self._set_selected_color(c, top_level))
+            button.pack(side=tk.LEFT, padx=5, pady=5)
+
+    def _color_choosed(self) -> bool:
+        """ Checks if user has choosen color """
+        if self.chosen_color is None:
+            return False
+        return True
+
     def fight(self) -> dict:
         """ Starts fight - returns a dictionary containing fight actions """
-        fight_data = {"Type": "Action", "Payload": []} # e.g.: "Payload": [{"Attack": "If weaker opponent"}, {"Defend": "If fight nearby"}]
-        current_action_pair = {}
+        fight_data = {"Type": "Behavior", "Payload": []} # e.g.: "Payload": [{"Attack": "If weaker opponent"}, {"Defend": "If fight nearby"}]
+        current_action_pair = {} # e.g.: {"Event": "...","Action": "..."},{"Event": "...","Action": "..."}
         current_action = None
         current_event = None
+
         if self.calculate_action_points(): # calculate points before fight
             if self.total_points >= 2:
                     for line in self.tree.get_children():
@@ -173,14 +217,20 @@ class ChooseAction(tk.Frame):
                                 current_action = value
                             else:
                                 current_event = value
-                                current_action_pair[current_action] = current_event
+                                current_action_pair["Action"] = current_action
+                                current_action_pair["Event"] = current_event
+                                # current_action_pair[current_action] = current_event
                                 fight_data["Payload"].append(current_action_pair)
                             counter += 1
+
+                    if not self._color_choosed():
+                        messagebox.showinfo("Color", "Choose a color!")
+                        return
 
                     messagebox.showinfo("FIGHT", "You are going to fight!")
                     print("Returns choosed actions...")
                     print("Choosed actions:", fight_data)
-                    self.action_payload(fight_data)
+                    self.action_payload(fight_data, self.chosen_color)
                     self.controller.destroy()
 
             else:
