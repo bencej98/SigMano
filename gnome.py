@@ -29,7 +29,7 @@ class Gnome:
 
     def check_if_dead(self):
         if self.current_health <= 0:
-            self.isdead = 1
+            self.isdead = True
 
     def apply_action_buffs(self):
         if self.action_mode == "Approach":
@@ -42,6 +42,8 @@ class Gnome:
         self.defense = 2
 
     def spawn_gnome(self, map):
+        self.isdead = False
+        self.current_health = self.max_health
         self.location["x"] = random.randint(0, map.x_coordinate)
         self.location["y"] = random.randint(0, map.y_coordinate)
         self.target_location["x"] = self.location["x"]
