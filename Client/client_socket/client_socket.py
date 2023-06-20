@@ -12,7 +12,7 @@ from arena.arena import start_loop, dict_data_for_screen, json_temp, set_temp_js
 
 class ClientConnection:
 
-    static_user_name = "missing"
+    static_user_name = "missing - in client connection"
 
     def __init__(self, host, port) -> None:
         self.init_message = "teszt hello"

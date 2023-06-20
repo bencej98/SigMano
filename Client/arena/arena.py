@@ -86,7 +86,7 @@ def dict_data_for_screen(json_dict:dict, user_name, chosen_color, object_list:li
          object_list.append(obj)
 
 object_list = []
-json_temp = {'loluser': [2, 3], 'loluser2': [18, 9]}
+json_temp = {}
 user_name = 1
 events = []
 
@@ -108,17 +108,19 @@ def set_temp_json(dict_obj, user):
 #       dict_data_for_screen(json, user_name, object_list)
 #       time.sleep(1)
 
-def temp_valami(user_name, chosen_color):
+def temp_valami(root, user_name, chosen_color):
    while True:
-      #test_text = event_updater(list_to_string(events))
-      #event = tkinter.Label(text=test_text, width=40, justify='left')
-      #event.place(x=20,y=360)
+      test_text = list_to_string(events)
+      event = tkinter.Label(root.master, text=test_text, width=40, justify='left')
+      event.place(x=20,y=360)
       dict_data_for_screen(json_temp, user_name, chosen_color, object_list)
       time.sleep(1)
 
 def list_to_string(list:list) -> str:
    text = ""
    for i in list:
+      print(i)
+      print(type(text))
       text = text + "\n" + i
    return text
 
@@ -133,6 +135,7 @@ def leaderboard_updater():
    pass
 
 def set_fight_event(event):
+   print("INCOOOOOOOOOOOOOMING EVENT",event)
    event_updater(event)
 
 def set_dead_list(dead_str):
@@ -142,7 +145,7 @@ def set_leader_board(order_leader_list):
    pass
 
 
-def set_screen(x,y):
+def set_screen(root, x,y):
    line = turtle.Turtle()
    line.color("black")
    line.hideturtle()
@@ -155,13 +158,13 @@ def set_screen(x,y):
    line.goto(-10, y/2)
    line.pendown()
    line.goto(-10, -y/2)
-   leaderboard = tkinter.Label(text="LEADERBORD",font=(25))
+   leaderboard = tkinter.Label(root.master, text="LEADERBORD",font=(25))
    leaderboard.place(x=240,y=20)
-   # message = tkinter.Label(text="EVENTS",font=(25))
-   # message.place(x=260,y=320)
+   message = tkinter.Label(root.master, text="EVENTS",font=(25))
+   message.place(x=260,y=320)
    print("AAAAAAAAAAAAAAAAAAAAAAA","leaderboard")
-   # leader = tkinter.Label(text="1. Andras with 10 point(s)""\nakarmi",justify='left')
-   # leader.place(x=20,y=60)
+   leader = tkinter.Label(root.master, text="1. Andras with 10 point(s)""\nakarmi",justify='left')
+   leader.place(x=20,y=60)
 
 
 
@@ -172,9 +175,10 @@ def start_loop(chosen_color):
    window = turtle.Screen()
    window.title("Arena")
    window.bgcolor("lightgreen")
-   set_screen(tile_size*tile_number, tile_size*tile_number)
-   time.sleep(0.1)
-   temp_valami(user_name, chosen_color)
+   root = window.getcanvas()
+   set_screen(root, tile_size*tile_number, tile_size*tile_number)
+   time.sleep(0.3)
+   temp_valami(root, user_name, chosen_color)
    window.mainloop()
 
 if __name__ == "__main__":
