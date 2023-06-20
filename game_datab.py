@@ -122,7 +122,7 @@ class Gnome_Database:
 
             self.connect.commit()
             logging.info("Results added upon death for user: %s. Score: %s, kill count: %s", username, score, kill_count)
-            self.update_sumscore_upon_death(username, kill_count)
+            self.update_sumscore_upon_death(username, score)
         except sqlite3.Error as e:
             error_msg = "Error adding results upon death: %s" % str(e)
             logging.error(error_msg)
