@@ -9,23 +9,50 @@ class Gnome:
         self.strategy = []
         self.event_reactions = []
         self.other_gnomes_dist = {}
-        self.event_counter = 0
         self.actual_points = 0
         self.kill_count = 0
         self.lose_count = 0
         self.target_location = {}
-        self.direction = None
+        self.direction = 20
+        self.max_health = 100
+        self.current_health = 100
+        self.attack = 5
+        self.defense = 2
+        self.isdead = False
+        self.action_mode = None
+        self.bug_test = {}
+        self.reached_target = False
+
+    def fight_gnome(self, gnome):
+        if self.isdead != True and gnome.isdead != True:
+            gnome.current_health -= max(1, self.attack - gnome.defense)
+
+    def check_if_dead(self):
+        if self.current_health <= 0:
+            self.isdead = 1
+
+    def apply_action_buffs(self):
+        if self.action_mode == "Approach":
+            self.attack += 5
+        elif self.action_mode == "Defend":
+            self.defense += 3
+    
+    def remove_action_buffs(self):
+        self.attack = 10
+        self.defense = 2
 
     def spawn_gnome(self, map):
         self.location["x"] = random.randint(0, map.x_coordinate)
         self.location["y"] = random.randint(0, map.y_coordinate)
+        self.target_location["x"] = self.location["x"]
+        self.target_location["y"] = self.location["y"]
 
     def has_reached_target(self):
-        if self.location == self.target_location:
-            self.target_location = {}
-            return True
-        return False
-    
+        if self.target_location["x"] == self.location["x"] and self.target_location["y"] == self.location["y"]:
+            # self.target_location = {}
+            self.action_mode = None
+            self.reached_target = True
+
     def set_runaway_target_location(self, map, target_location):
         vector_to_target = {
             "x": target_location["x"] - self.location["x"],
@@ -88,6 +115,7 @@ class Gnome:
     def random_move(self, map):
         direction=self._check_random_direction(map)
         self._move_by_direction(direction)
+        self.update_direction(map)
 
     def move_towards_direction(self, map):
         is_direction_valid = self._validate_movement(self.direction, map)
@@ -102,10 +130,13 @@ class Gnome:
                 self._move_by_direction(second_alter_direction)
             else:
                 self.random_move(map)
-                self.direction = None
+                # self.direction = None
 
     def update_direction(self, map):
-        self.direction = map.convert_unit_to_direction([self.target_location["x"], self.target_location["y"]])
+        self.bug_test = self.target_location
+        relative_x = self.target_location["x"] - self.location["x"]
+        relative_y = self.target_location["y"] - self.location["y"]
+        self.direction = map.convert_unit_to_direction((relative_x, relative_y))
 
     def _direction_converter(self,direction):
         converted_direction = direction
@@ -145,13 +176,6 @@ class Gnome:
             case 7: 
                 self.location["x"] -= 1
                 self.location["y"] += 1    
-        
-    def increase_event_counter(self):
-        if self.event_counter < len(self.strategy) - 1:
-            self.event_counter += 1
-        else:
-            self.event_counter = 0
-
 
 class Map:
     def __init__(self, max_x, max_y, maximum_gnomes) -> None:
@@ -222,6 +246,7 @@ class Map:
             y = -1
         elif 0 < y:
             y = 1
+
 
         return x, y
 
