@@ -41,9 +41,6 @@ def create_object(object_name:str, coordinates:list, user_name, chosen_color):
    [x, y] = x_y_for_screen(coordinates)
    if user_name == object_name:
       obj = Player(object_name, x, y, chosen_color, tile_size/60, 2)
-      print(type(chosen_color))
-      print(chosen_color)
-      print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
    else:
       obj = Player(object_name, x, y, "black", tile_size/60, 2)
    return obj
@@ -81,7 +78,6 @@ def dict_data_for_screen(json_dict:dict, user_name, chosen_color, object_list:li
          obj = get_obj_from_list(name, object_list)
          obj.move(coordinates[0], coordinates[1])
       else:
-         print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
          obj = create_object(name, coordinates, user_name, chosen_color)
          object_list.append(obj)
 
@@ -120,16 +116,14 @@ def set_dead_list(dead_str):
 def temp_valami(root, user_name, chosen_color):
    while True:
       test_text = list_to_string(events)
-      event = tkinter.Label(root.master, text=test_text, width=40, justify='left')
-      event.place(x=20,y=360)
+      event = tkinter.Label(root.master, text=test_text, width=82, justify='left')
+      event.place(x=9,y=360)
       dict_data_for_screen(json_temp, user_name, chosen_color, object_list)
       time.sleep(1)
 
 def list_to_string(list:list) -> str:
    text = ""
    for i in list:
-      print(i)
-      print(type(text))
       text = text + "\n" + i
    return text
 
@@ -144,7 +138,6 @@ def leaderboard_updater():
    pass
 
 def set_fight_event(event):
-   print("INCOOOOOOOOOOOOOMING EVENT",event)
    event_updater(event)
 
 def set_dead_list(dead_str):
@@ -171,7 +164,6 @@ def set_screen(root, x,y):
    leaderboard.place(x=240,y=20)
    message = tkinter.Label(root.master, text="EVENTS",font=(25))
    message.place(x=260,y=320)
-   print("AAAAAAAAAAAAAAAAAAAAAAA","leaderboard")
    leader = tkinter.Label(root.master, text="1. Andras with 10 point(s)""\nakarmi",justify='left')
    leader.place(x=20,y=60)
 
