@@ -32,12 +32,14 @@ class Player(turtle.Turtle):
       except Exception as e:
          pass
 
-tile_size = 30
-tile_number = 20
+tile_size = 60
+tile_number = 10
+screen_size = tile_number*tile_size  # =600
+y_modifier = tile_number/2 - 0.5
 
 def x_y_for_screen(coordinates:list):
    x = tile_size*(coordinates[0]+0.5)
-   y = tile_size*(coordinates[1]-9.5)
+   y = tile_size*(coordinates[1]-y_modifier)
    return [x, y]
 
 def create_object(object_name:str, coordinates:list, user_name, chosen_color):
@@ -122,7 +124,7 @@ def list_to_string(list:list) -> str:
    text = ""
    for i in list:
       text = text + "\n" + i
-   return text[2:]
+   return text[1:]
 
 
 def event_updater(new_event:str):
@@ -170,12 +172,12 @@ def set_screen(root, x,y):
 
 def start_loop(chosen_color):
    # TODO: Flexible window later
-   turtle.setup(2*tile_size*tile_number, tile_size*tile_number, None, None)
+   turtle.setup(2*screen_size, screen_size, None, None)
    window = turtle.Screen()
    window.title("Arena")
    window.bgcolor("lightgreen")
    root = window.getcanvas()
-   set_screen(root, tile_size*tile_number, tile_size*tile_number)
+   set_screen(root, screen_size, screen_size)
    time.sleep(0.3)
    temp_valami(root, user_name, chosen_color)
    window.mainloop()
