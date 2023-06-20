@@ -142,9 +142,9 @@ class Gameserver:
         while True:
             self.travel.transfer_gnomes_to_active_gnomes()
             position_dict = self.action_manager.move_all_gnomes(self.travel)
+            self.action_manager.participation_award(self.travel)
             act_fight = self.action_manager.combat(self.travel)
             self.broadcast_message(position_dict)
-            self.action_manager.participation_award(self.travel)
             time.sleep(0.1)
             print(position_dict)
             if len(act_fight) != 0:
