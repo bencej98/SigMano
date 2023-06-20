@@ -1,5 +1,6 @@
 from gnome import Map, Gnome
 import random
+import heapq
 
 class ActionManager:
     def __init__(self) -> None:
@@ -142,8 +143,9 @@ class ActionManager:
         gnomes_in_range = []
         for gnome_name, data in gnome.other_gnomes_dist.items():
             if data["distance"] <= 4:
-                gnomes_in_range.append(gnome_name)
-        return gnomes_in_range
+                heapq.heappush(gnomes_in_range, (data["distance"], gnome_name))
+        return [heapq.heappop(gnomes_in_range)[1] for _ in range(len(gnomes_in_range))]
+
 
     def check_action(self, gnome: Gnome, map, strategy, target_location):
         # if target_location == {}:
