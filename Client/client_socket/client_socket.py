@@ -220,15 +220,14 @@ class Incomming:
             set_dead_list(dead_string)
 
     def process_fight_events(self,incoming_payload_event):
-        for (user, fight_list) in incoming_payload_event.items():
-            payload_list = list(fight_list[0].values())
+        (first, sec) = incoming_payload_event.items()
+        (ecnount, info) = first
+        encounter_msg = info[0]["encounter"]
+        result_msg = info[0]["outcome"]
 
-            encounter_msg = payload_list[0]
-            result_msg = payload_list[1]
-
-            fight_string = f"{encounter_msg}, result is {result_msg}!" 
-            set_fight_event(fight_string)
-
+       
+        fight_string = f"{encounter_msg}, result is {result_msg}!" 
+        set_fight_event(fight_string)
 
     def login_status(self, incoming, frame_destroy):
         if not incoming["Payload"]:
