@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import font as tkfont
 from tkinter import ttk
 from tkinter import messagebox
-from tkinter.colorchooser import askcolor
 
 class ActionApp(tk.Tk):
 
@@ -53,6 +52,7 @@ class ActionApp(tk.Tk):
         frame.tkraise()
 
     def _get_frame_width(self):
+        """ returns the width of frame"""
         return self.frame_width
 
 
@@ -68,6 +68,7 @@ class ChooseAction(tk.Frame):
         self.action_point_frame_background = "#3c3c3c"
         self.chosen_color = None
         self.ALLOWED_COLORS = ['Maroon', 'Red', 'Orange', 'Gold', 'Green', 'Teal', 'Navy']
+        self.added_events = []
         self.action_points = {
             "Runaway": 2,
             "Approach": 1,
@@ -110,12 +111,12 @@ class ChooseAction(tk.Frame):
         self.points_label = tk.Label(action_point_frame, text="points", fg=self.controller.font_color, background=self.controller.points_frame_background, font=self.controller.label_font)
         # buttons
         add_action = tk.Button(button_frame, text="Add", background="#1c1c24", fg=self.controller.font_color,
-                    command=self.add_action, font=self.controller.button_font, width=5)
+                    command=self._add_action, font=self.controller.button_font, width=5)
         remove_action = tk.Button(button_frame, text="Remove", background=self.controller.remove_button_background, fg=self.controller.font_color,
-                    command=self.remove_action, font=self.controller.button_font, width=5)
+                    command=self._remove_action, font=self.controller.button_font, width=5)
         fight_button = tk.Button(button_frame, text="Fight", background="#040404", fg=self.controller.font_color,
             command=lambda: self.fight(), font=self.controller.button_font, width=5)
-        calculate_points_button = tk.Button(action_point_frame, text="Calculate", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self.calculate_action_points)
+        calculate_points_button = tk.Button(action_point_frame, text="Calculate", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self._calculate_action_points)
         # color picker
         choose_color_label = tk.Button(color_frame, text="Choose color", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self._open_colorchooser)
         
@@ -124,23 +125,25 @@ class ChooseAction(tk.Frame):
         default_value_event.set("Please Choose")
         self.option_menu_event = tk.OptionMenu(option_meun_frame, default_value_event, "Fight nearby",
                                                                                         "Gnomes in vicinity",
-                                                                                        command=self.save_chosen_event)
+                                                                                        command=self._save_chosen_event)
         # action option menu
         default_value_action = tk.StringVar()
         default_value_action.set("Please Choose")
         self.option_menu_action = tk.OptionMenu(option_meun_frame, default_value_action,"Approach",
                                                                                         "Runaway",
                                                                                         "Defend",
-                                                                                        command=self.save_chosen_action)
+                                                                                        command=self._save_chosen_action)
 
         # treeview
-        columns = ('events', 'actions')
+        columns = ('actions', 'events')
         self.tree = ttk.Treeview(tree_frame, columns=columns, show='headings', height=5)
-        self.tree.column('events', width=100)
-        self.tree.column('actions', width=140)
+        self.tree.column('actions', width=100)
+        self.tree.column('events', width=140)
+        # bind to tree
+        self.tree.bind("<<TreeviewSelect>>", self._get_selected_item_name)
         # headings
-        self.tree.heading('events', text='Events')
         self.tree.heading('actions', text='Actions')
+        self.tree.heading('events', text='Events')
         # scrollbar
         scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
@@ -198,7 +201,7 @@ class ChooseAction(tk.Frame):
         current_action = None
         current_event = None
 
-        if self.calculate_action_points(): # calculate points before fight
+        if self._calculate_action_points(): # calculate points before fight
             if self.total_points >= 2:
                     for line in self.tree.get_children():
                         counter = 0
@@ -209,7 +212,6 @@ class ChooseAction(tk.Frame):
                                 current_event = value
                                 current_action_pair["Action"] = current_action
                                 current_action_pair["Event"] = current_event
-                                # current_action_pair[current_action] = current_event
                                 fight_data["Payload"].append(current_action_pair)
                             counter += 1
 
@@ -218,8 +220,6 @@ class ChooseAction(tk.Frame):
                         return
 
                     messagebox.showinfo("FIGHT", "You are going to fight!")
-                    print("Returns choosed actions...")
-                    print("Choosed actions:", fight_data)
                     self.action_payload(fight_data, self.chosen_color)
                     self.controller.destroy()
 
@@ -227,15 +227,15 @@ class ChooseAction(tk.Frame):
                 messagebox.showinfo("Choose action", "You don't have anough action points to fight" \
                                     "\nChoose one action pair at least.")
 
-    def save_chosen_action(self, action):
+    def _save_chosen_action(self, action):
         """ Saves the chosen action to a variable """
         self.current_action = action
 
-    def save_chosen_event(self, event):
+    def _save_chosen_event(self, event):
         """ Saves the chosen action to a variable """
         self.current_event = event
 
-    def add_action(self):
+    def _add_action(self):
         """ Adds saved action to tree """
         number_of_added_items = len(self.tree.get_children())
         if self.current_action == None or self.current_action == "Please Choose":
@@ -246,12 +246,23 @@ class ChooseAction(tk.Frame):
                 messagebox.showinfo("Full", "Can't add any more action." \
                                     "\nMaximum number of actions: 20")
             else:
-                if self.action_pair_exists():
+                if self._action_pair_exists():
                     messagebox.showinfo("Already exists", "The action event pair already added...")
                 else:
-                    self.tree.insert('', tk.END, values=(self.current_action, self.current_event, ))
+                    if self._is_event_added():
+                        if self.current_event not in self.added_events:
+                            self.added_events.append(self.current_event) # save choosed events
+                        self.tree.insert('', tk.END, values=(self.current_action, self.current_event, ))
+                    else:
+                        messagebox.showinfo("Already exists", "This event has been already added...")
 
-    def action_pair_exists(self) -> bool:
+    def _is_event_added(self):
+        """ Checks if event has been already added """
+        if self.current_event in self.added_events:
+            return False
+        return True
+
+    def _action_pair_exists(self) -> bool:
         """ Checks if current action event pair already added """
         current_action = None
         current_event = None
@@ -262,20 +273,31 @@ class ChooseAction(tk.Frame):
                     current_action = value
                 else:
                     current_event = value
+                    # if current_event not in self.added_events:
+                    #     self.added_events.append(current_event) # save choosed events
                     if self.current_event == current_event and self.current_action == current_action:
                         return True
                 counter += 1
         return False
+    
+    def _get_selected_item_name(self) -> str:
+        """ Returns the selected item from the TreeView"""
+        selected_items = self.tree.selection()
+        for item_id in selected_items:
+            item = self.tree.item(item_id)
+            return item['values'][1]
 
-    def remove_action(self):
+    def _remove_action(self):
         """ Removes action that has been seleced """
         if self.tree.selection() != (): # eg.: () or ('I003',)
+            event_to_remove = self._get_selected_item_name()
+            self.added_events.remove(event_to_remove) # remove saved events
             selected_item = self.tree.selection()[0]
             self.tree.delete(selected_item)
         else:
             messagebox.showinfo("No item selected", "Select an action event pair to remove.")
 
-    def calculate_action_points(self) -> bool:
+    def _calculate_action_points(self) -> bool:
         """Calculates the action an even points, returns false if points are too much."""
         current_event_points = 0
         current_action_points = 0
