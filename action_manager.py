@@ -104,7 +104,6 @@ class ActionManager:
             death_payload.append(death_dict)
             dead_gnome.actual_points = 0
             dead_gnome.kill_count = 0
-            dead_gnome.lose_count = 0
             map.add_gnome_to_gnome_queue(dead_gnome)
         
         return {
