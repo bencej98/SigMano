@@ -193,7 +193,7 @@ class ChooseAction(tk.Frame):
 
     def fight(self) -> dict:
         """ Starts fight - returns a dictionary containing fight actions """
-        fight_data = {"Type": "Behavior", "Payload": []} # e.g.: "Payload": [{"Action": "Attack", "Event": "Gnomes in vicinity"}]
+        fight_data = {"Type": "Action", "Payload": []} # e.g.: "Payload": [{"Action": "Attack", "Event": "Gnomes in vicinity"}]
         current_action_pair = {} # e.g.: {"Event": "...","Action": "..."},{"Event": "...","Action": "..."}
         current_action = None
         current_event = None
