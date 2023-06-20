@@ -136,8 +136,8 @@ def event_updater(new_event:str):
 def leaderboard_updater(leader_list):
    n = 1
    for i in leader_list:
-      [key,value] = i.items()
-      leader_board.append(f"{n}. {key} with {value} point(s)")
+      for [key,value] in i.items():
+         leader_board.append(f"{n}. {key} with {value} point(s)")
 
 def set_fight_event(event):
    event_updater(event)
