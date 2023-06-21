@@ -7,7 +7,6 @@ class ActionManager:
         self.collided_gnomes = {}
         self.event_dictionary = {}
         self.user_strategies = {}
-        #TODO
         self.was_fight = False
         
     def _get_collided_gnomes(self, map: Map):
@@ -113,7 +112,7 @@ class ActionManager:
         map.update_gnomes_distances()
         position_update_dict = {}
         self.choose_strategy(map)
-        for gnome_name, gnome in map.active_gnomes.items():
+        for gnome in map.active_gnomes.values():
             if gnome.direction == 20:
                 gnome.random_move(map)
             else:
@@ -136,7 +135,7 @@ class ActionManager:
 
         return closest_fight_location
 
-    def check_gnomes_in_range(self, gnome: Gnome, map: Map):
+    def check_gnomes_in_range(self, gnome: Gnome):
         gnomes_in_range = []
         for gnome_name, data in gnome.other_gnomes_dist.items():
             if data["distance"] <= 4:
@@ -145,9 +144,6 @@ class ActionManager:
 
 
     def check_action(self, gnome: Gnome, map, strategy, target_location):
-        # if target_location == {}:
-        #     target_location["x"] = map.x_coordinate
-        #     target_location["y"] = map.y_coordinate
         if strategy["Action"] == "Runaway":
             gnome.set_runaway_target_location(map, target_location)
             gnome.update_direction(map)
@@ -161,11 +157,11 @@ class ActionManager:
             gnome.update_direction(map)
 
     def choose_strategy(self, map: Map):
-        for gnome_name, gnome in map.active_gnomes.items():
+        for gnome in map.active_gnomes.values():
             gnome.has_reached_target()
             if gnome.reached_target == False or gnome.isdead == True:
                 continue
-            gnomes_in_range = self.check_gnomes_in_range(gnome, map)
+            gnomes_in_range = self.check_gnomes_in_range(gnome)
             for strategy in gnome.strategy:
                 if strategy["Event"] == "Fight happened" and self.was_fight:
                     closest_fight_location = self._set_target_towards_fight(gnome, map)

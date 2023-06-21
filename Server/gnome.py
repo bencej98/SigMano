@@ -1,6 +1,4 @@
 import random
-import math
-
 
 class Gnome:
     def __init__(self, user) -> None:
@@ -50,7 +48,6 @@ class Gnome:
 
     def has_reached_target(self):
         if self.target_location["x"] == self.location["x"] and self.target_location["y"] == self.location["y"]:
-            # self.target_location = {}
             self.action_mode = None
             self.reached_target = True
 
@@ -131,7 +128,6 @@ class Gnome:
                 self._move_by_direction(second_alter_direction)
             else:
                 self.random_move(map)
-                # self.direction = None
 
     def update_direction(self, map):
         relative_x = self.target_location["x"] - self.location["x"]
@@ -155,7 +151,6 @@ class Gnome:
 
     def _move_by_direction(self, direction):
         match direction:
-            # 0 is up then clockwise
             case 0: 
                 self.location["y"] += 1 
             case 1: 
@@ -198,7 +193,7 @@ class Map:
 
     def check_collisions(self):
         position_dict = {}
-        for gnome_name, gnome in self.active_gnomes.items():
+        for gnome in self.active_gnomes.values():
             position = (gnome.location["x"], gnome.location["y"])
             if position in position_dict:
                 position_dict[position].append(gnome)
@@ -229,7 +224,6 @@ class Map:
             distance = abs_y
         else:
             distance = abs_x
-            #distance = math.sqrt((x * x) + (y * y))
         
         return {"distance": distance, "direction": self.convert_unit_to_direction([x, y])}
     
@@ -280,30 +274,3 @@ class Map:
         return direction
     
     
-#function check
-if __name__ == "__main__":
-    gnomes_list = []
-    for n in range (10):
-        gnome = Gnome(f"loluser{n}")
-        gnomes_list.append(gnome)
-
-    map = Map(5, 5, 5)
-    for gnome in gnomes_list:
-        map.add_gnome_to_gnome_queue(gnome)
-    map.transfer_gnomes_to_active_gnomes()
-
-    for gnome_name, gnome in map.active_gnomes.items():
-        print(gnome_name, gnome.location["x"], gnome.location["y"])
-        for valami in range(20):
-            gnome.random_move(map)
-            #gnome.move_against_direction(5, map)
-            print(gnome_name, gnome.location["x"], gnome.location["y"])
-    map.update_gnomes_distances()
-    print(map.active_gnomes["loluser0"].other_gnomes_dist)
-    # for i in range(10):
-    #     position_dict = map.move_all_gnomes()
-    #     for gnome_n, gnome in map.active_gnomes.items():
-    #         print(gnome.other_gnomes_dist)
-    # print(position_dict)
-    # print(map.active_gnomes)
-    # print(map.gnome_queue)

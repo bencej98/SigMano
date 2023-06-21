@@ -180,19 +180,3 @@ class Gameserver:
                 conns_to_del.append(connection_id)
         for id in conns_to_del:
             self.connections.pop(id)
-
-def main():
-        travel = Map(4, 4, 5)
-        action = ActionManager()
-        server = Gameserver(travel, action)
-        server.db.create_table()
-        server.run_tik_data_thread()
-        while True:            
-            server.process_data()
-            time.sleep(2)
-
-if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        exit()
