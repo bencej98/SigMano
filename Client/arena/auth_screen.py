@@ -1,36 +1,29 @@
 import tkinter as tk
 from tkinter import font as tkfont
 from tkinter import messagebox
-from tkinter import ttk
 
 class MainApp(tk.Tk):
 
     def __init__(self, add_user_name_password: callable  ,*args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        self.frame_width = 400
-        self.frame_height = 400
-        self.resizable(False, False)
-        self.background_color = "#535356"
-        self.title_line_color = "#6b0404"
-        self.login_background_color = "#2b2b2c"
-        self.register_button_background = "#a40c13"
-        self.font_color = "white"
-        self.wm_iconbitmap('logo/sigma_logo.ico')
+        # setup basics
+        self._setup_mainapp_basics()
+        # screen opens in the middle
+        self._open_screen_middle()
         # fonts
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
         self.label_font = tkfont.Font(family='Arial', size=12, weight="bold")
         self.login_label_font = tkfont.Font(family='Arial', size=10)
         self.button_font = tkfont.Font(family='Helvetica', size=12, weight="bold")
-        self.geometry("400x400")
-        self.title("Sigmano War")
-        # screen opens in the middle
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        x = (screen_width/2) - (self.frame_width/2)
-        y = (screen_height/2) - (self.frame_height/1)
-        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, y))
 
         # stack frames onto each other in container
+        self._organize_frames(add_user_name_password)
+
+        # show login as default
+        self.show_frame("LoginPage")
+
+    def _organize_frames(self, add_user_name_password):
+        """ Creates a main frame and sub frames, then organizes it under main frame """
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -46,7 +39,27 @@ class MainApp(tk.Tk):
             # set all frame to the same grid location
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame("LoginPage")
+    def _open_screen_middle(self):
+        """ Makes the screen open in the 'middle' """
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width/2) - (self.frame_width/2)
+        y = (screen_height/2) - (self.frame_height/1)
+        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, y))
+
+    def _setup_mainapp_basics(self):
+        """ Setup basic attributs of the screen """
+        self.frame_width = 400
+        self.frame_height = 400
+        self.resizable(False, False)
+        self.background_color = "#535356"
+        self.title_line_color = "#6b0404"
+        self.login_background_color = "#2b2b2c"
+        self.register_button_background = "#a40c13"
+        self.font_color = "white"
+        self.wm_iconbitmap('logo/sigma_logo.ico')
+        self.geometry("400x400")
+        self.title("Sigmano War")
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
@@ -60,12 +73,12 @@ class LoginPage(tk.Frame):
         self.add_user_to_login = add_user_to_login
         self.frame_parent = controller
         self.direct_frame_parent = parent
+        self.controller = controller
 
         tk.Frame.__init__(self, parent, bg=controller.background_color)
-        self.controller = controller
-        title_label = tk.Label(self, text="Login Page", font=self.controller.title_font, background=self.controller.title_line_color, fg="white")
-        title_label.pack(side="top", fill="x", pady=10)
 
+        # title
+        title_label = tk.Label(self, text="Login Page", font=self.controller.title_font, background=self.controller.title_line_color, fg="white")
         # username
         label_1 = tk.Label(self, text="User name", font=self.controller.label_font, background=controller.background_color, fg=self.controller.font_color)
         username = tk.StringVar()
@@ -80,6 +93,7 @@ class LoginPage(tk.Frame):
         register_button = tk.Button(self, text="Register",
                             command=lambda: controller.show_frame("RegisterPage"), font=self.controller.button_font, width=10, background=self.controller.register_button_background, fg="white")
         
+        title_label.pack(side="top", fill="x", pady=10)
         label_1.pack()
         username_input_field.pack()
         label_2.pack()
@@ -114,12 +128,12 @@ class RegisterPage(tk.Frame):
     def __init__(self, parent, controller, add_user_to_login):
         self.add_user_to_login = add_user_to_login 
         self.frame_parent = controller
+        self.controller = controller
 
         tk.Frame.__init__(self, parent, background=controller.background_color)
-        self.controller = controller
-        title_label = tk.Label(self, text="Register Page", font=controller.title_font, background=self.controller.title_line_color, fg=self.controller.font_color)
-        title_label.pack(side="top", fill="x", pady=10)
 
+        # title
+        title_label = tk.Label(self, text="Register Page", font=controller.title_font, background=self.controller.title_line_color, fg=self.controller.font_color)
         # # username
         username_label = tk.Label(self, text="User name: ", font=controller.label_font, background=controller.background_color, fg=self.controller.font_color)
         username = tk.StringVar()
@@ -137,7 +151,8 @@ class RegisterPage(tk.Frame):
                            command=lambda: self._register_user(username, password_1, password_2), font=self.controller.button_font, width=10, background=self.controller.register_button_background, fg="white")
         go_to_login_button = tk.Button(self, text="Back to Login",
                            command=lambda: controller.show_frame("LoginPage"), font=self.controller.button_font, width=10, background=self.controller.login_background_color, fg="white")
-        # pack all
+        # pack
+        title_label.pack(side="top", fill="x", pady=10)
         username_label.pack()
         self.username_entry.pack()
         password_label_1.pack()
