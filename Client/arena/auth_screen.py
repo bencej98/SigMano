@@ -77,7 +77,11 @@ class LoginPage(tk.Frame):
 
         tk.Frame.__init__(self, parent, bg=controller.background_color)
 
-        # title
+        # creating widgets
+        self._create_widgets(controller)
+
+    def _create_widgets(self, controller):
+        """ Creates and packs widgets """
         title_label = tk.Label(self, text="Login Page", font=self.controller.title_font, background=self.controller.title_line_color, fg="white")
         # username
         label_1 = tk.Label(self, text="User name", font=self.controller.label_font, background=controller.background_color, fg=self.controller.font_color)
@@ -93,6 +97,10 @@ class LoginPage(tk.Frame):
         register_button = tk.Button(self, text="Register",
                             command=lambda: controller.show_frame("RegisterPage"), font=self.controller.button_font, width=10, background=self.controller.register_button_background, fg="white")
         
+        self._pack_widgets(title_label, label_1, username_input_field, label_2, password_input_field, login_button, register_button)
+
+    def _pack_widgets(self, title_label, label_1, username_input_field, label_2, password_input_field, login_button, register_button):
+        """ Packs all widget """
         title_label.pack(side="top", fill="x", pady=10)
         label_1.pack()
         username_input_field.pack()
@@ -132,9 +140,13 @@ class RegisterPage(tk.Frame):
 
         tk.Frame.__init__(self, parent, background=controller.background_color)
 
-        # title
+        # create widgets
+        self._create_widgets(controller)
+
+    def _create_widgets(self, controller):
+        """ Creates and packs widgets """
         title_label = tk.Label(self, text="Register Page", font=controller.title_font, background=self.controller.title_line_color, fg=self.controller.font_color)
-        # # username
+        # username
         username_label = tk.Label(self, text="User name: ", font=controller.label_font, background=controller.background_color, fg=self.controller.font_color)
         username = tk.StringVar()
         self.username_entry = tk.Entry(self, textvariable=username, font=controller.label_font)
@@ -152,6 +164,10 @@ class RegisterPage(tk.Frame):
         go_to_login_button = tk.Button(self, text="Back to Login",
                            command=lambda: controller.show_frame("LoginPage"), font=self.controller.button_font, width=10, background=self.controller.login_background_color, fg="white")
         # pack
+        self._pack_widgets(title_label, username_label, password_label_1, password_label_2, register_button, go_to_login_button)
+
+    def _pack_widgets(self, title_label, username_label, password_label_1, password_label_2, register_button, go_to_login_button):
+        """ Packs  widgets """
         title_label.pack(side="top", fill="x", pady=10)
         username_label.pack()
         self.username_entry.pack()
