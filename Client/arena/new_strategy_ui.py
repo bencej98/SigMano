@@ -7,31 +7,24 @@ class ActionApp(tk.Tk):
 
     def __init__(self, get_action_payload, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        self.frame_width = 400
-        self.frame_height = 580
-        self.resizable(False, False)
-        self.action_payload = get_action_payload
-        self.background_color = "#535356"
-        self.points_frame_background = "#3c3c3c"
-        self.remove_button_background = "#a40c13"
-        self.font_color = "white"
-        self.wm_iconbitmap('logo/sigma_logo.ico')
 
+        # basics
+        self._setup_basics_attributes(get_action_payload)
         # fonts
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
         self.label_font = tkfont.Font(family='Arial', size=11, weight="bold")
         self.button_font = tkfont.Font(family='Helvetica', size=12, weight="bold")
 
-        self.geometry("400x400")
-        self.title("Sigmano War")
         # screen opens in the middle
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        x = (screen_width/2) - (self.frame_width/2)
-        y = (screen_height/2) - (self.frame_height/1)
-        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, (y + 200)))
+        self._open_screen_middle()
 
         # stack frames onto each other in container
+        self._organize_frame()
+
+        self.show_frame("ChooseAction")
+
+    def _organize_frame(self):
+        """ Creates a parent frame and put subframe under it """
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -44,7 +37,27 @@ class ActionApp(tk.Tk):
         self.frames[ChooseAction.__name__] = frame
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame("ChooseAction")
+    def _open_screen_middle(self):
+        """ Screens open in the 'middle' """
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width/2) - (self.frame_width/2)
+        y = (screen_height/2) - (self.frame_height/1)
+        self.geometry('%dx%d+%d+%d' % (self.frame_width, self.frame_height, x, (y + 200)))
+
+    def _setup_basics_attributes(self, get_action_payload):
+        """ Sets up basic attributes """
+        self.frame_width = 400
+        self.frame_height = 580
+        self.resizable(False, False)
+        self.action_payload = get_action_payload
+        self.background_color = "#535356"
+        self.points_frame_background = "#3c3c3c"
+        self.remove_button_background = "#a40c13"
+        self.font_color = "white"
+        self.wm_iconbitmap('logo/sigma_logo.ico')
+        self.geometry("400x400")
+        self.title("Sigmano War")
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
@@ -84,41 +97,89 @@ class ChooseAction(tk.Frame):
         self.someStyle.configure('my.TMenubutton',font=('Futura',20))
 
         # title label
-        title_label = tk.Label(self, text="Strategy", font=self.controller.title_font, background="#6b0404", fg=self.controller.font_color)
-        title_label.pack(side="top", fill="x", pady=10)
+        self._create_widgets()
+
+    def _create_widgets(self):
+        """ Creates widgets """
+        title_label = tk.Label(self, text="Strategy",
+                                font=self.controller.title_font,
+                                background="#6b0404",
+                                fg=self.controller.font_color)
         # tree frame
-        tree_frame = tk.Frame(self, height=5, width=1, padx=3)
-        tree_frame.pack(side=tk.BOTTOM, padx=10, pady=10)
+        tree_frame = tk.Frame(self, height=5,width=1,padx=3)
         # button frame
-        button_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
-        button_frame.pack(padx=10, pady=10)
+        button_frame = tk.Frame(self, height=5,
+                                width=10,
+                                background=self.controller.background_color)
         # action point frame
-        action_point_frame = tk.Frame(self, height=5, width=10, background=self.action_point_frame_background)
-        action_point_frame.pack(padx=10, pady=10)
+        action_point_frame = tk.Frame(self, height=5,
+                                width=10,
+                                background=self.action_point_frame_background)
         # color frame
-        color_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
-        color_frame.pack(padx=10, pady=10)
+        color_frame = tk.Frame(self, height=5,
+                                width=10,
+                                background=self.controller.background_color)
         # label frame
-        label_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
-        label_frame.pack(padx=10, pady=10)
+        label_frame = tk.Frame(self, height=5,
+                                width=10,
+                                background=self.controller.background_color)
         # option menu frame
-        option_meun_frame = tk.Frame(self, height=5, width=10, background=self.controller.background_color)
-        option_meun_frame.pack(padx=10, pady=10)
+        option_meun_frame = tk.Frame(self, height=5,
+                                width=10,
+                                background=self.controller.background_color)
         # labels
-        event_label = tk.Label(label_frame, text="Choose event", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font)
-        action_label = tk.Label(label_frame, text="Choose action", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font)
-        self.action_points_label = tk.Label(action_point_frame, text="0", fg=self.controller.font_color, background=self.controller.points_frame_background, font=self.controller.label_font)
-        self.points_label = tk.Label(action_point_frame, text="points", fg=self.controller.font_color, background=self.controller.points_frame_background, font=self.controller.label_font)
+        event_label = tk.Label(label_frame, text="Choose event",
+                                fg=self.controller.font_color,
+                                background=self.controller.background_color,
+                                font=self.controller.label_font)
+
+        action_label = tk.Label(label_frame, text="Choose action",
+                                fg=self.controller.font_color,
+                                background=self.controller.background_color,
+                                font=self.controller.label_font)
+
+        self.action_points_label = tk.Label(action_point_frame, text="0",
+                                            fg=self.controller.font_color,
+                                            background=self.controller.points_frame_background,
+                                            font=self.controller.label_font)
+        
+        self.points_label = tk.Label(action_point_frame, text="points",
+                                            fg=self.controller.font_color,
+                                            background=self.controller.points_frame_background,
+                                            font=self.controller.label_font)
         # buttons
-        add_action = tk.Button(button_frame, text="Add", background="#1c1c24", fg=self.controller.font_color,
-                    command=self._add_action, font=self.controller.button_font, width=5)
-        remove_action = tk.Button(button_frame, text="Remove", background=self.controller.remove_button_background, fg=self.controller.font_color,
-                    command=self._remove_action, font=self.controller.button_font, width=5)
-        fight_button = tk.Button(button_frame, text="Fight", background="#040404", fg=self.controller.font_color,
-            command=lambda: self.fight(), font=self.controller.button_font, width=5)
-        calculate_points_button = tk.Button(action_point_frame, text="Calculate", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self._calculate_action_points)
+        add_action = tk.Button(button_frame, text="Add",
+                                background="#1c1c24",
+                                fg=self.controller.font_color,
+                                command=self._add_action,
+                                font=self.controller.button_font,
+                                width=5)
+        
+        remove_action = tk.Button(button_frame, text="Remove",
+                                    background=self.controller.remove_button_background,
+                                    fg=self.controller.font_color,
+                                    command=self._remove_action,
+                                    font=self.controller.button_font,
+                                    width=5)
+
+        fight_button = tk.Button(button_frame, text="Fight",
+                                    background="#040404",
+                                    fg=self.controller.font_color,
+                                    command=lambda: self.fight(),
+                                    font=self.controller.button_font,
+                                    width=5)
+        
+        calculate_points_button = tk.Button(action_point_frame, text="Calculate",
+                                            fg=self.controller.font_color,
+                                            background=self.controller.background_color,
+                                            font=self.controller.label_font,
+                                            command=self._calculate_action_points)
         # color picker
-        choose_color_label = tk.Button(color_frame, text="Choose color", fg=self.controller.font_color, background=self.controller.background_color, font=self.controller.label_font, command=self._open_colorchooser)
+        choose_color_label = tk.Button(color_frame, text="Choose color",
+                                        fg=self.controller.font_color,
+                                        background=self.controller.background_color,
+                                        font=self.controller.label_font,
+                                        command=self._open_colorchooser)
         
         # event option menu
         default_value_event = tk.StringVar()
@@ -137,6 +198,20 @@ class ChooseAction(tk.Frame):
         # treeview
         columns = ('actions', 'events')
         self.tree = ttk.Treeview(tree_frame, columns=columns, show='headings', height=5)
+        scrollbar = self._configure_tree_and_scrollbar()
+
+        # pack
+        self._pack_widgets(title_label,
+                            tree_frame,button_frame,
+                            action_point_frame,color_frame,
+                            label_frame,option_meun_frame,
+                            event_label,action_label,
+                            add_action,remove_action,
+                            fight_button,calculate_points_button,
+                            choose_color_label,scrollbar)
+
+    def _configure_tree_and_scrollbar(self):
+        """ Configures the treeview and scroll bar widgets """
         self.tree.column('actions', width=100)
         self.tree.column('events', width=140)
         # bind to tree
@@ -147,6 +222,25 @@ class ChooseAction(tk.Frame):
         # scrollbar
         scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
+        return scrollbar
+
+    def _pack_widgets(self, title_label,
+                        tree_frame,button_frame,
+                        action_point_frame,color_frame,
+                        label_frame,option_meun_frame,
+                        event_label,action_label,
+                        add_action,remove_action,
+                        fight_button,calculate_points_button,
+                        choose_color_label,scrollbar):
+        """ Packs all widgets """
+        
+        title_label.pack(side="top", fill="x", pady=10)
+        tree_frame.pack(side=tk.BOTTOM, padx=10, pady=10)
+        button_frame.pack(padx=10, pady=10)
+        action_point_frame.pack(padx=10, pady=10)
+        color_frame.pack(padx=10, pady=10)
+        label_frame.pack(padx=10, pady=10)
+        option_meun_frame.pack(padx=10, pady=10)
         # choose color section
         choose_color_label.pack(side="left", fill="x", pady=10, padx=35)
         # labels
