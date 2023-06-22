@@ -212,7 +212,8 @@ class Map:
             for other_gnome_name in self.active_gnomes:
                 if gnome_name != other_gnome_name:
                     other_gnome = self.active_gnomes[other_gnome_name]
-                    gnome.other_gnomes_dist[other_gnome_name] = self.calculate_distance(gnome.location, other_gnome.location)
+                    gnome.other_gnomes_dist[other_gnome_name] = \
+                        self.calculate_distance(gnome.location, other_gnome.location)
 
     def calculate_distance(self, base_location, target_location):
         x = base_location["x"] - target_location["x"]

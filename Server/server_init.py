@@ -4,7 +4,7 @@ from gnome import *
 import time
 
 def main():
-    travel = Map(4, 4, 5)
+    travel = Map(5, 5, 7)
     action = ActionManager()
     server = Gameserver(travel, action)
     server.db.create_table()
